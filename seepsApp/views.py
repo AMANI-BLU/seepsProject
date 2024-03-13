@@ -278,14 +278,16 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .models import Exam
 
+from django.db.models import Count
+
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def manage_exam(request):
     # Retrieve the department name of the logged-in user
     department_name = request.user.username
 
-    # Retrieve exams added by the department
-    exams = Exam.objects.filter(department_name=department_name)
+    # Retrieve exams added by the department along with the number of questions for each exam
+    exams = Exam.objects.filter(department_name=department_name).annotate(num_questions=Count('question'))
 
     if request.method == 'POST':
         activate_exam_id = request.POST.get('activate_exam_id')
@@ -312,6 +314,7 @@ def manage_exam(request):
                 messages.error(request, 'Exam not found.')
 
     return render(request, 'department_template/manage_exam.html', {'exams': exams})
+
 
 
 @login_required(login_url='login_view')
@@ -490,8 +493,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from .models import Exam  # Import your Exam model
 
+from django.shortcuts import get_object_or_404
+
+@login_required(login_url='login_view')
 def enter_exam_code(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
+
+    # Retrieve the number of questions for the exam
+    num_questions = exam.question_set.count()
 
     if request.method == 'POST':
         entered_exam_code = request.POST.get('exam_code', '').strip()
@@ -507,7 +516,8 @@ def enter_exam_code(request, exam_id):
         else:
             messages.error(request, 'Please enter a valid exam code.')
 
-    return render(request, 'student_template/enter_exam_code.html', {'exam': exam})
+    return render(request, 'student_template/enter_exam_code.html', {'exam': exam, 'num_questions': num_questions})
+
 
 from django.shortcuts import render, redirect
 from django.contrib import messages

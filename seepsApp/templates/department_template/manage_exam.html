@@ -17,10 +17,9 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <div class="btn-group">
-                                <a href="{% url 'add_exam' %}"  class="btn btn-info">
+                                <a href="{% url 'add_exam' %}" class="btn btn-info">
                                     <i class="fas fa-plus"></i> Add New
                                 </a>
-                                
                             </div>
                         </div>
 
@@ -49,55 +48,53 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <!-- Add New Exam Button -->
                             <!-- Exams Table -->
-                      <!-- Add New Exam Button -->
-<!-- Exams Table -->
-<table id="examsTable" class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>No.</th>
-            <th>Name</th>
-            <th>Time in minutes</th>
-            <th>Exam Code</th>
-            <th class="exclude-export">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for exam in exams %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ exam.name }}</td>
-                <td>{{ exam.timer }}</td>
-                <td>{{ exam.exam_code }}</td>
-                <td class="d-flex align-items-center">
-                    {% if not exam.is_active %}
-                        <form method="post" class="me-3">
-                            {% csrf_token %}
-                            <input type="hidden" name="activate_exam_id" value="{{ exam.id }}">
-                            <button type="submit" class="btn btn-success me-4">
-                                <i class="fas fa-check"></i> Activate
-                            </button>
-                        </form>
-                    {% else %}
-                        <form method="post" class="me-3">
-                            {% csrf_token %}
-                            <input type="hidden" name="deactivate_exam_id" value="{{ exam.id }}">
-                            <button type="submit" class="btn btn-warning">
-                                <i class="fas fa-times"></i> Deactivate
-                            </button>
-                        </form>
-                    {% endif %}
-                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                            data-target="#deleteModal{{ forloop.counter }}">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+                            <table id="examsTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Time in minutes</th>
+                                        <th>Number of Questions</th>  <!-- New column header -->
+                                        <th>Exam Code</th>
+                                        <th class="exclude-export">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for exam in exams %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ exam.name }}</td>
+                                            <td>{{ exam.timer }}</td>
+                                            <td>{{ exam.num_questions }}</td>  <!-- New data cell for number of questions -->
+                                            <td>{{ exam.exam_code }}</td>
+                                            <td class="d-flex align-items-center">
+                                                {% if not exam.is_active %}
+                                                    <form method="post" class="me-3">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="activate_exam_id" value="{{ exam.id }}">
+                                                        <button type="submit" class="btn btn-success me-4">
+                                                            <i class="fas fa-check"></i> Activate
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <form method="post" class="me-3">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="deactivate_exam_id" value="{{ exam.id }}">
+                                                        <button type="submit" class="btn btn-warning">
+                                                            <i class="fas fa-times"></i> Deactivate
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                <button type="button" class="btn btn-danger" data-toggle="modal"
+                                                        data-target="#deleteModal{{ forloop.counter }}">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -112,8 +109,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title"><i class="fas fa-plus"></i> Add New Exam</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <!-- Add your form for adding a new exam here -->
@@ -152,7 +148,6 @@
                     ]
                 });
             });
-            
         </script>
 
         {% include 'department_template/footer.html' %}
