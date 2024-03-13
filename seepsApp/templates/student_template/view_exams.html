@@ -1,0 +1,64 @@
+<!-- student_template/view_exams.html -->
+{% extends 'student_template/base.html' %}
+
+{% block title %}Student | View Exams{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="jumbotron pt-4" style="margin-top:65px;">
+    <h3 class="text-muted">Exam Overview</h3>
+    <p class="text-muted">
+        Explore the available exams below. Click on the "Take Exam" button to get started.
+    </p>
+    <hr class="my-4"/>
+</div>
+
+<div class="row mt-6">
+    <div class="col-md-12 mt-4">
+        {% if exams %}
+            {% for exam in exams %}
+                <div class="card mt-2">
+                    <div class="row g-0">
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h3>{{ exam.name }}</h3>
+                                <p class="card-text">
+                                    Some quick example text to build on the card title and make up
+                                    the bulk of the card's content.
+                                </p>
+                                <!-- student_template/view_exams.html -->
+                                <!-- ... existing code ... -->
+                                <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
+                                <!-- ... existing code ... -->
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="position-relative">
+                                <img src="{% static 'dist/img/EX.jpg' %}" alt="Photo 1" class="img-fluid">
+
+                                <div class="ribbon-wrapper ribbon-lg">
+                                    <div class="ribbon bg-info">
+                                        Exam Taken
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card ">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">No exams are currently available</h5>
+                    <p class="card-text text-muted">
+                        Check back later
+                    </p>
+                    <!-- You can add more styling or buttons as needed -->
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

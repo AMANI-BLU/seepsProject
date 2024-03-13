@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EEPS</title>
+
+    <!-- Google Font: Poppins -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha384-pzjw8f+ua/C1DHmJo0i6IcIj+1tgz6zawVtjr5A6N5IfGJm1g3dA2R5eXKMAd0P4" crossorigin="anonymous">
+
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+
+        .h{
+            padding-left:50px;
+        }
+
+        .navbar-nav .nav-link {
+             margin-left: 50px;
+        }
+
+      
+       
+    </style>
+</head>
+
+<body class="hold-transition layout-top-nav">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand-md navbar-light shadow fixed-top">
+            <div class="container-fluid">
+                <a href="#" class="navbar-brand">
+                    <h6 class="text-muted">Exit Exam <span class="text-info">Prep. System</span></h6>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-center" id="navbarCollapse">
+                    <!-- Centered navbar links -->
+                    <ul class="navbar-nav">
+                        <li class="nav-item h">
+                            <a href="{% url "student_home" %}" class="nav-link">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url "view_exams" %}" class="nav-link">Exams</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">Materials</a>
+                        </li>
+                         <li class="nav-item">
+                            <a href="{% url "submit_feedback" %}" class="nav-link">Feedback</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- User dropdown menu -->
+                <div class="collapse navbar-collapse justify-content-end">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user"></i> {{request.user.username}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <!-- Add user-related dropdown items here -->
+                                <a class="dropdown-item" href="#">Profile</a>
+                                <a class="dropdown-item" href="#">Settings</a>
+                                <div class="dropdown-divider"></div>
+<a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
+              <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
+             </a>                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <!-- /.navbar -->
+
+
+
+        <div class="modal fade" id="modal-primary">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                 <h5>Confirm to Logout</h5> 
+            </div> 
+            <div class="modal-body">
+              <h6>Are you sure want to logout?</h6>
+            </div>
+            <div class="modal-footer pl-5">
+                  <a href="{% url 'logout' %}" class="btn btn-info">
+                     Yes
+                  </a>
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <!-- /.modal -->
+
+        <!-- Bootstrap JS and dependencies -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-2sZv1KImJ3aANEE2xqZb9sG8aFZbhJYYg3Z2mqxmePPlXEeg3bBC1jefFGK1Pqf" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </div>
+</body>
+
+</html>

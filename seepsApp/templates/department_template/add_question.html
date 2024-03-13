@@ -1,0 +1,133 @@
+<!-- department_template/add_question.html -->
+{% extends 'base.html' %}
+
+{% block title %}Department | Add Question{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'department_template/navbar.html' %}
+  {% include 'department_template/aside.html' %}
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Question Creation Form</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url 'manage_exam' %}">Manage Exam</a></li>
+              <li class="breadcrumb-item active">Add Question</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="login-box w-100">
+          <div class="card card-outline card-info">
+            <div class="card-body">
+              {% if success_msg %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                  Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    text: '{{ success_msg }}',
+                    showConfirmButton: false,
+                    timer: 6000,
+                  });
+                </script>
+              {% endif %}
+
+              <form action="{% url 'add_question' %}" method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                  <div class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    {{ form.non_field_errors.as_text }}
+                  </div>
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="{{ form.exam.id_for_label }}" class="text-muted">Exam</label>
+                  {{ form.exam }}
+                  {% if form.exam.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.exam.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.content.id_for_label }}" class="text-muted">Question Content</label>
+                  {{ form.content }}
+                  {% if form.content.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.content.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {{ form.choices.management_form }}
+
+                {% for choice_form in form.choices %}
+                  <div class="form-group">
+                    <label for="{{ choice_form.text.id_for_label }}" class="text-muted">Choice</label>
+                    {{ choice_form.text }}
+                    {% if choice_form.text.errors %}
+                      <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ choice_form.text.errors.as_text }}
+                      </div>
+                    {% endif %}
+
+                    <label for="{{ choice_form.is_correct.id_for_label }}" class="text-muted">Is Correct? </label>
+                    {{ choice_form.is_correct }}
+                    {% if choice_form.is_correct.errors %}
+                      <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ choice_form.is_correct.errors.as_text }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endfor %}
+
+                <div class="row">
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-info btn-block">
+                      Add Question
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    
+    </section>
+  </div>
+  <script>
+  $(function () {
+    // Summernote
+    $('#summernote').summernote()
+
+    // CodeMirror
+    CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+      mode: "htmlmixed",
+      theme: "monokai"
+    });
+  })
+</script>
+  {% include 'department_template/footer.html' %}
+</div>
+{% endblock %}

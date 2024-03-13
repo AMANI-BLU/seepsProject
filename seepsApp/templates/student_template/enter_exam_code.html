@@ -1,0 +1,109 @@
+{% extends 'student_template/base.html' %}
+
+{% block title %}Enter Exam Code{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4 content-container">
+  <div class="row mt-6">
+    <div class="container mt-4">
+      <div class="card card-outline card-info">
+        <div class="card-header">
+          <h5>Confirm Data</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td><h6>Name</h6></td>
+                    <td>{{ request.user.username }}</td>
+                  </tr>
+                  <!-- Add other relevant user information as needed -->
+                  <tr>
+                    <td><h6>Exam Name</h6></td>
+                    <td>{{ exam.name }}</td>
+                  </tr>
+                  <tr>
+                    <td><h6>Number of Questions</h6></td>
+                    <td>{{ exam.questions.count }}</td>
+                  </tr>
+                  <tr>
+                    <td><h6>Time Given</h6></td>
+                    <td>{{ exam.timer }} minutes</td>
+                  </tr>
+                  <tr>
+                    <td><h6>Exam Code</h6></td>
+                    <td>
+                      <form method="post" action="{% url 'enter_exam_code' exam.id %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="examCode"
+                            name="exam_code"
+                            placeholder="Enter Exam Code"
+                          />
+                        </div>
+                        <button type="submit" id="fullscreenButton" class="btn btn-info">Submit</button>
+                        <!-- Display error message -->
+                      
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <div class="alert alert-info rounded-3" role="alert">
+                <div class="d-flex justify-content-center align-items-center">
+                  <i class="fas fa-info-circle fa-2x"></i>    
+                  <p class="mb-0 ms-5">
+                     Enter the exam code provided by your coordinator and click the "Submit" button
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+          
+<script>
+document.querySelector('form').addEventListener('submit', function(event) {
+    var enteredCode = document.getElementById('examCode').value;
+    var correctCode = "{{ exam.exam_code }}";  // Replace with the actual exam code
+
+    // Check if the entered code is empty
+    if (enteredCode.trim() === '') {
+        // Show AdminLTE-style alert for empty code
+        Swal.fire({
+            toast: true,
+            icon: 'info',
+            text: 'Please enter the exam code.',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 6000,
+        });
+        event.preventDefault();  // Prevent form submission
+    } else if (enteredCode !== correctCode) {
+        // Show AdminLTE-style alert for incorrect code
+        Swal.fire({
+            toast: true,
+            icon: 'error',
+            text: 'The entered exam code is incorrect.',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 6000,
+        });
+        event.preventDefault();  // Prevent form submission
+    }
+    // You can add more validation checks here if needed
+});
+</script>
+
+{% endblock %}

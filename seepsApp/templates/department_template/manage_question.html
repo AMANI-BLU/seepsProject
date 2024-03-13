@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Department | Manage Questions{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'department_template/navbar.html' %}
+        {% include 'department_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-plus"></i> Add New
+                                </button>
+                                <div class="dropdown-menu">
+                                
+                                    <a class="dropdown-item" href="{% url 'add_question' %}">Add Question</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">Manage Questions</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- Manage Questions Section -->
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Question List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Questions Table -->
+                            <table id="questionsTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Question Content</th>
+                                        <th>Exam</th>
+                                        <th class="exclude-export">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sample Data -->
+                                    {% for question in questions %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td style="max-width: 200px; max-height: 200px; overflow: hidden;">{{ question.content|safe }}</td>
+                                            <td>{{ question.exam.name }}</td>
+                                            <td>
+                                                <!-- Add actions for managing questions here -->
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+    
+
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+
+         <script>
+                $(document).ready(function () {
+            var questionsTable = $('#questionsTable').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 5, // Set the default number of rows per page
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: ':not(.exclude-export)'
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: ':not(.exclude-export)'
+                        }
+                    }
+                ]
+            });
+
+            // Add an event listener to update the page length when the user changes the selection
+            $('#rowsPerPage').on('change', function () {
+                var selectedRows = $(this).val();
+                questionsTable.page.len(selectedRows).draw();
+            });
+        });
+
+                </script>
+
+        {% include 'department_template/footer.html' %}
+    </div>
+    <!-- ./wrapper -->
+{% endblock %}

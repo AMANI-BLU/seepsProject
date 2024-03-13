@@ -1,0 +1,24 @@
+<!-- student_template/exam_submitted.html -->
+{% extends 'student_template/base.html' %}
+
+{% block title %}Student | Exam Submitted{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow" style="margin-top:70px;">
+    <div class="card-header bg-success text-white">
+      <h2 class="text-center">Exam Submitted Successfully</h2>
+    </div>
+    <div class="card-body">
+      <p class="text-muted">
+        Thank you for submitting the exam. Your responses have been recorded.
+      </p>
+     
+    </div>
+    <div class="card-footer text-muted text-center">
+  <a href="{% url 'student_home' %}" class="btn btn-primary">Go to Dashboard</a>
+  <a href="{% url 'result' result.id %}" class="btn btn-info ml-2">View Result</a>
+</div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'student_template/base.html' %}
+
+{% block content %}
+{% load static %}
+    <div class="jumbotron pt-4" style="margin-top:65px;">
+        <h3 class="text-muted">Welcome, {{user.username}}!</h3>
+        <p  class="text-muted">
+            This is a student exit exam preparation platform, which provides you a
+            different materials, tutorials, tests and mock exam.
+        </p>
+        <hr class="my-4"/>
+        
+    </div>
+
+    <div class="row mt-6">
+        <div class="col-4 mt-4">
+            <div class="card shadow" style="width: 18rem">
+                <img class="card-img-top"  src="{% static 'dist/img/dsa.png' %}" alt="Card image cap"/>
+                <div class="card-body">
+                    <h5>Data Structure and Algorithm</h5>
+                    <p>
+                        Some quick example text to build on the card title and make up.
+                    </p>
+                    <a href="viewcourse.html" class="btn btn-info">View</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4 mt-4">
+            <div class="card shadow" style="width: 18rem">
+                <img class="card-img-top"  src="{% static 'dist/img/dsa.png' %}" alt="Card image cap"/>
+                <div class="card-body">
+                    <h5>Data Structure and Algorithm</h5>
+                    <p>
+                        Some quick example text to build on the card title and make up.
+                    </p>
+                    <a href="viewcourse.html" class="btn btn-info">View</a>
+                </div>
+            </div>
+        </div>
+<div class="col-4 mt-4">
+            <div class="card shadow" style="width: 18rem">
+                <img class="card-img-top"  src="{% static 'dist/img/dsa.png' %}" alt="Card image cap"/>
+                <div class="card-body">
+                    <h5>Data Structure and Algorithm</h5>
+                    <p>
+                        Some quick example text to build on the card title and make up.
+                    </p>
+                    <a href="viewcourse.html" class="btn btn-info">View</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 mt-4">
+            <div class="card shadow" style="width: 18rem">
+                <img class="card-img-top"  src="{% static 'dist/img/dsa.png' %}" alt="Card image cap"/>
+                <div class="card-body">
+                    <h5>Data Structure and Algorithm</h5>
+                    <p>
+                        Some quick example text to build on the card title and make up.
+                    </p>
+                    <a href="viewcourse.html" class="btn btn-info">View</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Add other cards here... -->
+    </div>
+{% endblock %}

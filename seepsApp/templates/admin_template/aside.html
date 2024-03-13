@@ -1,0 +1,55 @@
+
+{% load static %}
+
+   <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-link">
+        <span class="brand-text font-weight-light">Dashboard</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+          <div class="image">
+            <img src="{% static "dist/img/avatar5.png" %}" class="img-circle elevation-2" alt="User Image">
+          </div>
+          <div class="info">
+            <a href="#" class="d-block">{{user.username}}</a>
+          </div>
+        </div>
+
+       <!-- Sidebar Menu -->
+<nav class="mt-2">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a href="{% url "home" %}" class="nav-link">
+        <i class="nav-icon fas fa-chart-pie"></i>
+        <p>Dashboard</p>
+      </a>
+    </li>
+    <!-- Manage Students -->
+
+    <li class="nav-item">
+      <a href="{% url "view_department" %}" class="nav-link">
+        <i class="nav-icon fas fa-building"></i>
+        <p>Manage Department</p>
+      </a>
+    </li>
+   
+
+
+    <!-- View Feedback -->
+    <li class="nav-item">
+      <a href="{% url "feedback" %}" class="nav-link">
+        <i class="nav-icon fas fa-comments"></i>
+        <p>Feedback</p>
+      </a>
+    </li>
+  </ul>
+</nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+</aside>

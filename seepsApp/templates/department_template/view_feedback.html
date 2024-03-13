@@ -1,0 +1,143 @@
+<!-- dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}Department | Feedback{% endblock %}
+
+{% block content %}
+  <!-- Main content -->
+  <div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+    
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+       <!-- Main content -->
+      <section class="content mt-5">
+        <div class="container-fluid">
+         
+          <!-- Manage Students Section -->
+          <div class="card card-outline card-info">
+            <div class="card-header">
+              <h3 class="card-title">Feedback</h3>
+            </div>
+            <div class="card-body">
+              
+                <!-- Students Table -->
+                <table id="feedbackTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Message</th>
+                            <th>Sent At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                <tbody>
+                        {% for feedback in student_feedback %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ feedback.user.username }}</td>
+                            <td>{{ feedback.user.email }}</td>
+                            <td>{{ feedback.feedback_text }}</td>
+                            <td>{{ feedback.created_at }}</td>
+                            <td>{{ feedback.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+          </div>
+        </div>
+        <!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+      <!-- /.content -->
+    </div>
+ 
+
+     <!-- Add Student Modal -->
+    <div class="modal fade" id="addStudentModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><i class="fas fa-user-plus"></i> Add New Student</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Add your form for adding a new student here -->
+            <form id="addStudentForm">
+              <div class="mb-3">
+                <label for="studentName" class="form-label">Name</label>
+                <input type="text" class="form-control" id="studentName" name="studentName" placeholder="Enter student name" required>
+              </div>
+              <div class="mb-3">
+                <label for="studentEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="studentEmail" name="studentEmail" placeholder="Enter student email" required>
+              </div>
+              <div class="mb-3">
+                <label for="studentPhone" class="form-label">Phone no.</label>
+                <input type="tel" class="form-control" id="studentPhone" name="studentPhone" placeholder="Enter student phone number" required>
+              </div>
+              <div class="mb-3">
+                <label for="studentPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="studentPassword" name="studentPassword" placeholder="Enter password" required>
+              </div>
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+              </div>
+              <button type="button" class="btn btn-info" onclick="submitForm()"><i class="fas fa-plus"></i> Add Student</button>
+            </form>
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+            <script>
+                $(document).ready(function () {
+            var feedbackTable = $('#feedbackTable').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 5, // Set the default number of rows per page
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: ':not(.exclude-export)'
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                        className: 'btn btn-light',
+                        exportOptions: {
+                            columns: ':not(.exclude-export)'
+                        }
+                    }
+                ]
+            });
+
+            // Add an event listener to update the page length when the user changes the selection
+            $('#rowsPerPage').on('change', function () {
+                var selectedRows = $(this).val();
+                feedbackTable.page.len(selectedRows).draw();
+            });
+        });
+
+                </script>
+
+
+    {% include 'department_template/footer.html' %}
+  </div>
+  <!-- ./wrapper -->
+{% endblock %}
