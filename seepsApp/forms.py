@@ -56,6 +56,18 @@ class FeedbackForm(forms.ModelForm):
         self.fields['feedback_text'].label = ''
         self.fields['feedback_text'].label_suffix = ''  # Remove default ':' after label
        
+       
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['title', 'description', 'resource', 'thumbnail', 'is_active']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Course Title'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description', 'rows': '5'}),
+            'resource': forms.FileInput(attrs={'class': 'form-control-file'}),
+            'thumbnail': forms.FileInput(attrs={'class': 'form-control-file'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }    
     # forms.py
     
     

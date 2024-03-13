@@ -2,6 +2,8 @@
 from django.contrib import admin
 from django.urls import path
 from .views import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', login_view,name ="login_view" ),
@@ -21,6 +23,11 @@ urlpatterns = [
     path('add_question/', add_question, name='add_question'),
     path('manage_questions/', manage_questions, name='manage_questions'),
     path('feedback-management/', feedback_management, name='feedback_management'),
+    
+    path('manage/courses/', manage_courses, name='manage_courses'),
+    path('manage/courses/add/', add_course, name='add_course'),
+    path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
+    path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
 
 
     #student urls
@@ -34,3 +41,5 @@ urlpatterns = [
     #NoPage
     path('nopage/', NoPage, name='NoPage'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

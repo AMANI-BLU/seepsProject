@@ -361,12 +361,55 @@ def feedback_management(request):
 
     return render(request, 'department_template/view_feedback.html', context)
 
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Course
+
+def manage_courses(request):
+    courses = Course.objects.all()
+    return render(request, 'department_template/manage_courses.html', {'courses': courses})
+
+def add_course(request):
+    if request.method == 'POST':
+        form = CourseForm(request.POST, request.FILES)  # Pass POST and FILES data to the form
+        if form.is_valid():  # Check if the form is valid
+            form.save()  # Save the form data to create a new Course object
+            return redirect('manage_courses')
+    else:
+        form = CourseForm()  # If it's a GET request or the form is not valid, create a new empty form
+
+    return render(request, 'department_template/add_course.html', {'form': form})
+
+def edit_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == 'POST':
+        course.title = request.POST.get('title')
+        course.description = request.POST.get('description')
+        course.resource = request.FILES.get('resource') or course.resource
+        course.thumbnail = request.FILES.get('thumbnail') or course.thumbnail
+        course.is_active = request.POST.get('is_active')
+        course.save()
+        return redirect('manage_courses')
+    return render(request, 'department_template/edit_course.html', {'course': course})
+
+def delete_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    if request.method == 'POST':
+        course.delete()
+        return redirect('manage_courses')
+    return render(request, 'department_template/delete_course.html', {'course': course})
+
+
 ####################### Student Views ############################
 #Student Home Page
 @login_required(login_url='login_view')
 @user_passes_test(is_student, login_url='NoPage')
 def student_home(request):
-    return render(request,'student_template/student_home.html')
+    # Retrieve all active courses from the database
+    courses = Course.objects.filter(is_active=True)
+    return render(request, 'student_template/student_home.html', {'courses': courses})
 
 @login_required(login_url='login_view')
 @user_passes_test(lambda user: user.is_student, login_url='NoPage')

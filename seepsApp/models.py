@@ -47,6 +47,24 @@ class Result(models.Model):
     def __str__(self):
         return f"{self.student.username}'s Result for {self.exam.name}"
 
+
+ 
+from django.db import models
+
+class Course(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    resource = models.FileField(upload_to='files/resources/', blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='files/thumbnails/', blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+
+
 class Feedback(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     feedback_text = models.TextField()
@@ -54,3 +72,4 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f'Feedback from {self.user.username} at {self.created_at}'
+    
