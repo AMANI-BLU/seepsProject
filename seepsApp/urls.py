@@ -26,8 +26,8 @@ urlpatterns = [
     
     path('manage/courses/', manage_courses, name='manage_courses'),
     path('manage/courses/add/', add_course, name='add_course'),
-    path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
-    path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
+    # path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
+    # path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
 
 
     #student urls

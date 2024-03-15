@@ -366,40 +366,62 @@ def feedback_management(request):
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Course
+from .forms import CourseForm  # Import the CourseForm
+
+from django.shortcuts import render, redirect
+from .models import Course
+from .forms import CourseForm
 
 def manage_courses(request):
-    courses = Course.objects.all()
+    department_name = request.user.username
+    courses = Course.objects.filter(department_name=department_name)
     return render(request, 'department_template/manage_courses.html', {'courses': courses})
 
+from django.contrib import messages
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def add_course(request):
+    success_msg = None
+    error_msg = None
+
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES)  # Pass POST and FILES data to the form
-        if form.is_valid():  # Check if the form is valid
-            form.save()  # Save the form data to create a new Course object
-            return redirect('manage_courses')
+        form = CourseForm(request.POST, request.FILES, department_name=request.user.department_name)
+        if form.is_valid():
+            form.save()
+            success_msg = 'Course added successfully!'
+            return redirect('add_course')
+        else:
+            error_msg = 'Form is not valid'
     else:
-        form = CourseForm()  # If it's a GET request or the form is not valid, create a new empty form
+        form = CourseForm(department_name=request.user.department_name)
 
-    return render(request, 'department_template/add_course.html', {'form': form})
+    return render(request, 'department_template/add_course.html', {
+        'form': form,
+        'success_msg': success_msg,
+        'error_msg': error_msg
+    })
 
-def edit_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    if request.method == 'POST':
-        course.title = request.POST.get('title')
-        course.description = request.POST.get('description')
-        course.resource = request.FILES.get('resource') or course.resource
-        course.thumbnail = request.FILES.get('thumbnail') or course.thumbnail
-        course.is_active = request.POST.get('is_active')
-        course.save()
-        return redirect('manage_courses')
-    return render(request, 'department_template/edit_course.html', {'course': course})
 
-def delete_course(request, course_id):
-    course = get_object_or_404(Course, id=course_id)
-    if request.method == 'POST':
-        course.delete()
-        return redirect('manage_courses')
-    return render(request, 'department_template/delete_course.html', {'course': course})
+
+# def edit_course(request, course_id):
+#     course = get_object_or_404(Course, id=course_id)
+#     if request.method == 'POST':
+#         course.title = request.POST.get('title')
+#         course.description = request.POST.get('description')
+#         course.resource = request.FILES.get('resource') or course.resource
+#         course.thumbnail = request.FILES.get('thumbnail') or course.thumbnail
+#         course.is_active = request.POST.get('is_active')
+#         course.save()
+#         return redirect('manage_courses')
+#     return render(request, 'department_template/edit_course.html', {'course': course})
+
+# def delete_course(request, course_id):
+#     course = get_object_or_404(Course, id=course_id)
+#     if request.method == 'POST':
+#         course.delete()
+#         return redirect('manage_courses')
+#     return render(request, 'department_template/delete_course.html', {'course': course})
 
 
 ####################### Student Views ############################
@@ -407,8 +429,9 @@ def delete_course(request, course_id):
 @login_required(login_url='login_view')
 @user_passes_test(is_student, login_url='NoPage')
 def student_home(request):
+    department_name = request.user.department_name
     # Retrieve all active courses from the database
-    courses = Course.objects.filter(is_active=True)
+    courses = Course.objects.filter(department_name=department_name,is_active=True)
     return render(request, 'student_template/student_home.html', {'courses': courses})
 
 @login_required(login_url='login_view')

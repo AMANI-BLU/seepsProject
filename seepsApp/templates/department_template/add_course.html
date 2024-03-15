@@ -1,0 +1,114 @@
+<!-- department_template/add_course.html -->
+{% extends 'base.html' %}
+
+{% block title %}Department | Add Course{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'department_template/navbar.html' %}
+  {% include 'department_template/aside.html' %}
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Course Creation Form</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url 'manage_courses' %}">Manage Courses</a></li>
+              <li class="breadcrumb-item active">Add Course</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="login-box w-100">
+          <div class="card card-outline card-info">
+            <div class="card-body">
+              <form action="{% url 'add_course' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                  <div class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    {{ form.non_field_errors.as_text }}
+                  </div>
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="{{ form.title.id_for_label }}" class="text-muted">Course Title</label>
+                  {{ form.title }}
+                  {% if form.title.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.title.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.description.id_for_label }}" class="text-muted">Description</label>
+                  {{ form.description }}
+                  {% if form.description.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.description.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.resource.id_for_label }}" class="text-muted">Resource</label>
+                  {{ form.resource }}
+                  {% if form.resource.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.resource.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.thumbnail.id_for_label }}" class="text-muted">Thumbnail</label>
+                  {{ form.thumbnail }}
+                  {% if form.thumbnail.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.thumbnail.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group form-check">
+                  {{ form.is_active }}
+                  <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active</label>
+                  {% if form.is_active.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.is_active.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-info btn-block">
+                      Add Course
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  {% include 'department_template/footer.html' %}
+</div>
+{% endblock %}

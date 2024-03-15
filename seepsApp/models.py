@@ -50,13 +50,13 @@ class Result(models.Model):
 
  
 from django.db import models
-
 class Course(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=255)
+    department_name = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField()
     resource = models.FileField(upload_to='files/resources/', blank=True, null=True)
     thumbnail = models.ImageField(upload_to='files/thumbnails/', blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     date_added = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

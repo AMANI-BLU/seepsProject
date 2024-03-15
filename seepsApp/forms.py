@@ -56,23 +56,55 @@ class FeedbackForm(forms.ModelForm):
         self.fields['feedback_text'].label = ''
         self.fields['feedback_text'].label_suffix = ''  # Remove default ':' after label
        
-       
+from django import forms
+from .models import Course
+from django import forms
+from .models import Course
+
+from django import forms
+from .models import Course
+
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['title', 'description', 'resource', 'thumbnail', 'is_active']
+        fields = ['title', 'department_name', 'description', 'resource', 'thumbnail', 'is_active']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Course Title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description', 'rows': '5'}),
             'resource': forms.FileInput(attrs={'class': 'form-control-file'}),
             'thumbnail': forms.FileInput(attrs={'class': 'form-control-file'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-        }    
-    # forms.py
-    
-    
-    
-    
+            'department_name': forms.HiddenInput(),  # Hidden field for department
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.department_name = kwargs.pop('department_name', None)
+        super(CourseForm, self).__init__(*args, **kwargs)
+        if self.department_name:
+            self.fields['department_name'].initial = self.department_name
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        thumbnail = cleaned_data.get('thumbnail')
+
+        # Custom validation for title not null
+        if not title:
+            raise forms.ValidationError("Title cannot be empty.")
+
+        # Custom validation for thumbnail not null
+        if not thumbnail:
+            raise forms.ValidationError("Thumbnail is required.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        course = super(CourseForm, self).save(commit=False)
+        course.department_name = self.department_name
+        if commit:
+            course.save()
+        return course
 from django import forms
 from django.forms.models import inlineformset_factory
 from .models import Question, Choice, Exam
