@@ -378,15 +378,16 @@ def manage_courses(request):
     return render(request, 'department_template/manage_courses.html', {'courses': courses})
 
 from django.contrib import messages
-
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def add_course(request):
     success_msg = None
     error_msg = None
 
+    department_name = request.user.username  # Verify the department name is correctly set
+   
     if request.method == 'POST':
-        form = CourseForm(request.POST, request.FILES, department_name=request.user.department_name)
+        form = CourseForm(request.POST, request.FILES, department_name=department_name)
         if form.is_valid():
             form.save()
             success_msg = 'Course added successfully!'
@@ -394,7 +395,7 @@ def add_course(request):
         else:
             error_msg = 'Form is not valid'
     else:
-        form = CourseForm(department_name=request.user.department_name)
+        form = CourseForm(department_name=department_name)
 
     return render(request, 'department_template/add_course.html', {
         'form': form,

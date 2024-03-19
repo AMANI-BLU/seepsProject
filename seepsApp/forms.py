@@ -80,6 +80,7 @@ class CourseForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.department_name = kwargs.pop('department_name', None)
+        print("Department Name:", self.department_name)  # Debug print
         super(CourseForm, self).__init__(*args, **kwargs)
         if self.department_name:
             self.fields['department_name'].initial = self.department_name
@@ -105,6 +106,7 @@ class CourseForm(forms.ModelForm):
         if commit:
             course.save()
         return course
+
 from django import forms
 from django.forms.models import inlineformset_factory
 from .models import Question, Choice, Exam
