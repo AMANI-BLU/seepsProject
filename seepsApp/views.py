@@ -622,6 +622,10 @@ def submit_feedback(request):
     return render(request, 'student_template/feedback.html', {'form': form, 'success_msg': success_msg})
 
 
+
+def courses(request):
+    return render(request,'student_template/course_detail.html')
+    
 ####################/Student Views/###############################
 
 

@@ -38,6 +38,7 @@ urlpatterns = [
     path('submit_exam/<int:exam_id>/', submit_exam, name='submit_exam'),
     path('enter_exam_code/<int:exam_id>/', enter_exam_code, name='enter_exam_code'),
     path('submit_feedback/', submit_feedback, name='submit_feedback'),
+    path('coursedetail/', courses, name='courses'),
     #NoPage
     path('nopage/', NoPage, name='NoPage'),
 ]
