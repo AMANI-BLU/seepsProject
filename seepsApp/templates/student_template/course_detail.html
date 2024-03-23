@@ -1,0 +1,65 @@
+{% extends 'student_template/base.html' %}
+{% block title %}Course{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 pt-5">
+    <div class="row">
+        <div class="col-9">
+            <!-- Video Player -->
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/Z-8FMoSO0n0" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <!-- Navigation between blocks -->
+            <div class="card me-0">
+                <div class="card-header">
+                    <h5 class="text-muted">Navigation</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#prerequisites" class="text-info">1) Introduction</a></li>
+                        <li class="list-group-item"><a href="#learning-outcomes" class="text-info">2) Python Basics</a></li>
+                        <li class="list-group-item"><a href="#content" class="text-info">3) Python List</a></li>
+                        <!-- Add more block links as needed -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Blocks -->
+    <div class="row mt-5">
+        <div class="col-9">
+            <!-- Video Information -->
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="text-muted">About Course</h4>
+                     <div class="row ml-1">
+                    <p class="text-muted">Total Videos: <span class="bg-info rounded px-2">33</span></p> 
+                    <p class="text-muted">Course Length: <span class="bg-info rounded px-2">33</span></p>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            <div class="card" id="prerequisites">
+                <div class="card-body">
+                    <h4 class="text-muted">Prerequisites</h4>
+                    <p>List of prerequisites for this tutorial goes here.</p>
+                    <p>List of prerequisites for this tutorial goes here.</p>
+                    <p>List of prerequisites for this tutorial goes here.</p>
+                </div>
+            </div>
+            <hr>
+            <div class="card" id="learning-outcomes">
+                <div class="card-body">
+                    <h2 class="card-title">Learning Outcomes</h2>
+                    <p class="card-text">List of learning outcomes for this tutorial goes here.</p>
+                </div>
+            </div>
+            <hr>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
