@@ -18,9 +18,31 @@
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush" id="tutorialLinks">
-                        {% for tutorial in tutorials %}
-                        <li class="list-group-item"><a href="#" data-url="{{ tutorial.tutorial_url }}" onclick="changeVideo(this)">{{ forloop.counter }}) {{ tutorial.title }}</a></li>
-                        {% endfor %}
+                                        {% for tutorial in tutorials %}
+                        {% comment %} Extracting video ID from the URL {% endcomment %}
+                        {% with video_id=tutorial.tutorial_url|slice:"v=" %} 
+                            {% if "t=" in video_id %}
+                                {% with video_id=video_id|slice:":&" %}
+                                    {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                                        <li class="list-group-item">
+                                            <a href="#" class="list-group-link" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                                {{ forloop.counter }}) {{ tutorial.title }}
+                                            </a>
+                                        </li>
+                                    {% endwith %}
+                                {% endwith %}
+                            {% else %}
+                                {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                                    <li class="list-group-item">
+                                        <a href="#" class="list-group-link" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                            {{ forloop.counter }}) {{ tutorial.title }}
+                                        </a>
+                                    </li>
+                                {% endwith %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+
                     </ul>
                 </div>
             </div>
@@ -62,6 +84,12 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load the URL of the first video
+        var firstLink = document.querySelector('#tutorialLinks li:first-child a');
+        changeVideo(firstLink);
+    });
+
     function changeVideo(link) {
         var videoUrl = link.getAttribute('data-url');
         document.getElementById('videoPlayer').src = videoUrl;
