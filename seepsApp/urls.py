@@ -26,6 +26,8 @@ urlpatterns = [
     
     path('manage/courses/', manage_courses, name='manage_courses'),
     path('manage/courses/add/', add_course, name='add_course'),
+    path('manage/tutorials/add/', add_tutorial, name='add_tutorial'),
+     path('manage/tutorials/', manage_tutorials, name='manage_tutorials'),
     # path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
     # path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
 
@@ -38,7 +40,7 @@ urlpatterns = [
     path('submit_exam/<int:exam_id>/', submit_exam, name='submit_exam'),
     path('enter_exam_code/<int:exam_id>/', enter_exam_code, name='enter_exam_code'),
     path('submit_feedback/', submit_feedback, name='submit_feedback'),
-    path('coursedetail/', courses, name='courses'),
+      path('tutorial/<int:course_id>/', tutorial_page, name='tutorial_page'),
     #NoPage
     path('nopage/', NoPage, name='NoPage'),
 ]

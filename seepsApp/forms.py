@@ -65,16 +65,61 @@ from django import forms
 from .models import Course
 
 
+
+from django import forms
+from .models import Tutorial
+
+class TutorialForm(forms.ModelForm):
+    class Meta:
+        model = Tutorial
+        fields = ['course', 'title', 'tutorial_url']  # Add 'tutorial_url' to fields
+        widgets = {
+            'course': forms.Select(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial Title'}),
+            'tutorial_url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial URL'}),  # Add widget for 'tutorial_url'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(TutorialForm, self).__init__(*args, **kwargs)
+        self.fields['course'].queryset = Course.objects.all()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        title = cleaned_data.get('title')
+        course = cleaned_data.get('course')
+
+        # Custom validation for title and course not null
+        if not title:
+            raise forms.ValidationError("Tutorial title cannot be empty.")
+        if not course:
+            raise forms.ValidationError("Please select a course.")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        tutorial = super(TutorialForm, self).save(commit=False)
+        if commit:
+            tutorial.save()
+        return tutorial
+
+
+from django import forms
+from .models import Course
+from django import forms
+from .models import Course
+
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['title', 'department_name', 'description', 'resource', 'thumbnail', 'is_active']
+        fields = ['title', 'department_name', 'description', 'resource', 'thumbnail', 'is_active', 'prerequisites', 'learning_outcomes']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Course Title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Description', 'rows': '5'}),
             'resource': forms.FileInput(attrs={'class': 'form-control-file'}),
             'thumbnail': forms.FileInput(attrs={'class': 'form-control-file'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'prerequisites': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Prerequisites', 'rows': 3}),
+            'learning_outcomes': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Learning Outcomes', 'rows': 3}),
             'department_name': forms.HiddenInput(),  # Hidden field for department
         }
 

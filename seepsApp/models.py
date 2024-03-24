@@ -49,7 +49,7 @@ class Result(models.Model):
 
 
  
-from django.db import models
+
 class Course(models.Model):
     title = models.CharField(max_length=255)
     department_name = models.CharField(max_length=255, blank=True, null=True)
@@ -58,10 +58,22 @@ class Course(models.Model):
     thumbnail = models.ImageField(upload_to='files/thumbnails/', blank=True, null=True)
     is_active = models.BooleanField(default=False)
     date_added = models.DateTimeField(auto_now_add=True)
+    prerequisites = models.TextField()  # Added prerequisites field to Course model
+    learning_outcomes = models.TextField()  # Added learning_outcomes field to Course model
 
     def __str__(self):
         return self.title
 
+class Tutorial(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    tutorial_url = models.CharField(max_length=100)  # New field for tutorial URL
+
+    def __str__(self):
+        return self.title
+
+    def __str__(self):
+        return self.title
 
 
 

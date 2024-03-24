@@ -40,6 +40,7 @@
                   </div>
                 {% endif %}
 
+                <!-- Course Title -->
                 <div class="form-group">
                   <label for="{{ form.title.id_for_label }}" class="text-muted">Course Title</label>
                   {{ form.title }}
@@ -51,6 +52,7 @@
                   {% endif %}
                 </div>
 
+                <!-- Description -->
                 <div class="form-group">
                   <label for="{{ form.description.id_for_label }}" class="text-muted">Description</label>
                   {{ form.description }}
@@ -61,7 +63,31 @@
                     </div>
                   {% endif %}
                 </div>
+  <!-- Prerequisites -->
+                <div class="form-group">
+                  <label for="{{ form.prerequisites.id_for_label }}" class="text-muted">Prerequisites</label>
+                  {{ form.prerequisites }}
+                  {% if form.prerequisites.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.prerequisites.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
 
+                <!-- Learning Outcomes -->
+                <div class="form-group">
+                  <label for="{{ form.learning_outcomes.id_for_label }}" class="text-muted">Learning Outcomes</label>
+                  {{ form.learning_outcomes }}
+                  {% if form.learning_outcomes.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.learning_outcomes.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Resource -->
                 <div class="form-group">
                   <label for="{{ form.resource.id_for_label }}" class="text-muted">Resource</label>
                   {{ form.resource }}
@@ -73,6 +99,7 @@
                   {% endif %}
                 </div>
 
+                <!-- Thumbnail -->
                 <div class="form-group">
                   <label for="{{ form.thumbnail.id_for_label }}" class="text-muted">Thumbnail</label>
                   {{ form.thumbnail }}
@@ -84,6 +111,7 @@
                   {% endif %}
                 </div>
 
+                <!-- Is Active -->
                 <div class="form-group form-check">
                   {{ form.is_active }}
                   <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Is Active</label>
@@ -95,6 +123,8 @@
                   {% endif %}
                 </div>
 
+              
+                <!-- Submit Button -->
                 <div class="row">
                   <div class="col-12">
                     <button type="submit" class="btn btn-info btn-block">

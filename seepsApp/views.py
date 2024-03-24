@@ -377,6 +377,14 @@ def manage_courses(request):
     courses = Course.objects.filter(department_name=department_name)
     return render(request, 'department_template/manage_courses.html', {'courses': courses})
 
+def manage_tutorials(request):
+    department_name = request.user.username
+    courses = Course.objects.filter(department_name=department_name)
+    tutorials = Tutorial.objects.filter(course__in=courses)
+    return render(request, 'department_template/manage_tutorials.html', {'tutorials': tutorials})
+
+
+
 from django.contrib import messages
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
@@ -404,6 +412,22 @@ def add_course(request):
     })
 
 
+# views.py
+from django.shortcuts import render, redirect
+from .forms import TutorialForm
+
+def add_tutorial(request):
+    if request.method == 'POST':
+        form = TutorialForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('add_tutorial')  # Redirect to the same page after adding a tutorial
+    else:
+        form = TutorialForm()
+    
+    return render(request, 'department_template/add_tutorial.html', {
+        'form': form,
+    })
 
 # def edit_course(request, course_id):
 #     course = get_object_or_404(Course, id=course_id)
@@ -623,8 +647,20 @@ def submit_feedback(request):
 
 
 
-def courses(request):
-    return render(request,'student_template/course_detail.html')
+# views.py
+from django.shortcuts import render
+from .models import Course
+from django.shortcuts import render, get_object_or_404
+from .models import Course, Tutorial
+
+def tutorial_page(request, course_id):
+    # Retrieve the course object based on the course ID
+    course = Course.objects.get(pk=course_id)
+    # Retrieve all tutorials associated with the course
+    tutorials = Tutorial.objects.filter(course=course)
+    # Pass the course and tutorials to the template
+    return render(request, 'student_template/tutorial_page.html', {'course': course, 'tutorials': tutorials})
+
     
 ####################/Student Views/###############################
 
