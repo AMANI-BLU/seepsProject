@@ -1,0 +1,141 @@
+<!-- department_template/manage_tutorials.html -->
+{% extends 'base.html' %}
+
+{% block title %}Department | Manage Tutorials{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'department_template/navbar.html' %}
+        {% include 'department_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <div class="btn-group">
+                                <a href="{% url 'add_tutorial' %}" class="btn btn-info">
+                                    <i class="fas fa-plus"></i> Add New
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">Manage Tutorials</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- Manage Tutorials Section -->
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Tutorial List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Tutorials Table -->
+                            <table id="tutorialsTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Course</th>
+                                        <th>Title</th>
+                                        <th>Tutorial URL</th>
+                                        <th class="exclude-export">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tutorial in tutorials %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ tutorial.course.title }}</td>
+                                            <td>{{ tutorial.title }}</td>
+                                            <td>{{ tutorial.tutorial_url }}</td>
+                                            <td class="d-flex align-items-center">
+                                                {% comment %} <a href="{% url 'edit_tutorial' tutorial.id %}" class="btn btn-primary me-3">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a> {% endcomment %}
+                                                {% comment %} <form method="post" action="{% url 'delete_tutorial' tutorial.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-trash-alt"></i> Delete
+                                                    </button>
+                                                </form> {% endcomment %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+
+        <!-- Add Tutorial Modal -->
+        <div class="modal fade" id="addTutorialModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title"><i class="fas fa-plus"></i> Add New Tutorial</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Add your form for adding a new tutorial here -->
+                        <form method="post" class="form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">Add Tutorial</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <script>
+            $(document).ready(function () {
+                $('#tutorialsTable').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                            className: 'btn btn-light',
+                            exportOptions: {
+                                columns: ':not(.exclude-export)'
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                            className: 'btn btn-light',
+                            exportOptions: {
+                                columns: ':not(.exclude-export)'
+                            }
+                        }
+                    ]
+                });
+            });
+        </script>
+
+        {% include 'department_template/footer.html' %}
+    </div>
+    <!-- ./wrapper -->
+{% endblock %}
