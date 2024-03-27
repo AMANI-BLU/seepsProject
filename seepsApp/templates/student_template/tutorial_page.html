@@ -101,24 +101,37 @@
         <div class="col-lg-9">
             <!-- Video Information -->
             <div class="row">
+           
                 <div class="card-body col-4">
                     <h4 class="text-info mb-4">About Course</h4>
-                    <p><strong class="text-muted">Course Name:</strong> <span class="text-muted">{{course.title }}</span></p>
-                    <p><strong class="text-muted">Total Videos:</strong> <span class="text-muted">{{tutorials.count }}</span></p>
-                    <p><strong class="text-muted">Course Material:</strong> <span class="text-muted">{{ course.course_length }}</span></p>
+                    <p><strong class="text-muted">Course Name:</strong> <span class="text-muted">{{ course.title }}</span></p>
+                    <p><strong class="text-muted">Total Videos:</strong> <span class="text-muted">{{ tutorials.count }}</span></p>
+        
+                        <span class="text-muted">
+                            {% if course.resource %}
+                                <a href="/media/{{ course.resource }}" target="_blank" download>
+                                    <i class="fas fa-download"></i> Course Material
+                                </a><br>
+                              
+                            {% else %}
+                                No material available
+                            {% endif %}
+                        </span>
+                    </p>
                 </div>
+
 
                 <div class="card-body col-4">
                     <h4 class="text-info mb-4">Prerequisites</h4>
-                    <p><strong class="text-muted">Course Name:</strong> <span class="text-muted">{{course.title }}</span></p>
+                    <p><strong class="text-muted">Prerequisites</strong> <span class="text-muted">{{course.prerequisites|safe}}</span></p>
                 </div>
 
 
                  <div class="card-body col-4">
                     <h4 class="text-info mb-4">Learning Outcomes</h4>
-                    <p><strong class="text-muted">You will learn: 
+                    <p><strong class="text-muted">You will learn 
                         <br>
-                    </strong> <span class="text-muted">{{course.title }}</span></p>
+                    </strong> <span class="text-muted">{{course.learning_outcomes |safe }}</span></p>
                 </div>
             </div>
             <hr>    
