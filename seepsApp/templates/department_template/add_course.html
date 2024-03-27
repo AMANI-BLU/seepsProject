@@ -139,6 +139,30 @@
       </div>
     </section>
   </div>
+
+    <script>
+  $(function () {
+    // Summernote
+    $('#summernotee').summernote()
+
+    // CodeMirror
+    CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+      mode: "htmlmixed",
+      theme: "monokai"
+    });
+  })
+
+   $(function () {
+    // Summernote
+    $('#summernote').summernote()
+
+    // CodeMirror
+    CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+      mode: "htmlmixed",
+      theme: "monokai"
+    });
+  })
+</script>
   {% include 'department_template/footer.html' %}
 </div>
 {% endblock %}

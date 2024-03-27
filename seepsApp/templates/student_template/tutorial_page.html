@@ -1,89 +1,135 @@
-{% extends 'student_template/base.html' %}
-{% block title %}Course - {{ course.title }}{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="{% static "fontawesome-free/css/all.min.css" %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static "icheck-bootstrap/icheck-bootstrap.min.css" %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static "jqvmap/jqvmap.min.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'  %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static "overlayScrollbars/css/OverlayScrollbars.min.css" %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static "daterangepicker/daterangepicker.css" %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static "summernote/summernote-bs4.css" %}">
 
-{% block content %}
-<div class="container-fluid mt-5 pt-5">
+  <link rel="stylesheet" href="{% static "plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" %}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{% static "plugins/toastr/toastr.min.css" %}">
+  <!-- Theme style -->
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+  <link rel="stylesheet" href="{% static "plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" %}">
+  <link rel="stylesheet" href="{% static "plugins/datatables-responsive/css/responsive.bootstrap4.min.css" %}">
+  <link rel="stylesheet" href="{% static "plugins/datatables-buttons/css/buttons.bootstrap4.min.css" %}">
+
+    <title>seeps</title>
+    <style></style>
+</head>
+  {% include 'student_template/navbar.html' %}
+<body>
+
+    <div class="container-fluid mt-5 content-container">
+        <div class="container-fluid mt-5 pt-5">
     <div class="row">
-        <div class="col-9">
+        <div class="col-lg-9">
             <!-- Video Player -->
-            <div class="embed-responsive embed-responsive-16by9">
+            <div class="embed-responsive embed-responsive-16by9 rounded shadow" style="height:90%;">
                 <iframe id="videoPlayer" class="embed-responsive-item" src="" allowfullscreen></iframe>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-lg-3">
             <!-- Navigation between blocks -->
-            <div class="card me-0">
-                <div class="card-header">
-                    <h5 class="text-muted">Navigation</h5>
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Navigation</h5>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush" id="tutorialLinks">
-                                        {% for tutorial in tutorials %}
-                        {% comment %} Extracting video ID from the URL {% endcomment %}
-                        {% with video_id=tutorial.tutorial_url|slice:"v=" %} 
-                            {% if "t=" in video_id %}
-                                {% with video_id=video_id|slice:":&" %}
+                        {% for tutorial in tutorials %}
+                            {% with video_id=tutorial.tutorial_url|slice:"v=" %}
+                                {% if "t=" in video_id %}
+                                    {% with video_id=video_id|slice:":&" %}
+                                        {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                                            <li class="list-group-item">
+                                                <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                                    {{ forloop.counter }}) {{ tutorial.title }}
+                                                </a>
+                                            </li>
+                                        {% endwith %}
+                                    {% endwith %}
+                                {% else %}
                                     {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
                                         <li class="list-group-item">
-                                            <a href="#" class="list-group-link" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                            <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
                                                 {{ forloop.counter }}) {{ tutorial.title }}
                                             </a>
                                         </li>
                                     {% endwith %}
-                                {% endwith %}
-                            {% else %}
-                                {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
-                                    <li class="list-group-item">
-                                        <a href="#" class="list-group-link" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
-                                            {{ forloop.counter }}) {{ tutorial.title }}
-                                        </a>
-                                    </li>
-                                {% endwith %}
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
                     </ul>
                 </div>
             </div>
+             <div class="text-center mt-3">
+                <button type="button" class="btn btn-info me-2" onclick="showPreviousTutorial()">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <button type="button" class="btn btn-info" onclick="showNextTutorial()">
+                    Next <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
         </div>
     </div>
+
     <!-- Blocks -->
-    <div class="row mt-5">
-        <div class="col-9">
+    <div class="row mt-3">
+        <div class="col-lg-9">
             <!-- Video Information -->
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="text-muted">About Course</h4>
-                    <p class="text-muted">Course Name   : <span class="bg-info rounded px-2">{{course.title }}</span></p> 
-                    <p class="text-muted">Total Videos: <span class="bg-info rounded px-2">{{tutorials.count }}</span></p> 
-                    <p class="text-muted">Course Length: <span class="bg-info rounded px-2">{{ course.course_length }}</span></p>
+            <div class="row">
+                <div class="card-body col-4">
+                    <h4 class="text-info mb-4">About Course</h4>
+                    <p><strong class="text-muted">Course Name:</strong> <span class="text-muted">{{course.title }}</span></p>
+                    <p><strong class="text-muted">Total Videos:</strong> <span class="text-muted">{{tutorials.count }}</span></p>
+                    <p><strong class="text-muted">Course Material:</strong> <span class="text-muted">{{ course.course_length }}</span></p>
+                </div>
+
+                <div class="card-body col-4">
+                    <h4 class="text-info mb-4">Prerequisites</h4>
+                    <p><strong class="text-muted">Course Name:</strong> <span class="text-muted">{{course.title }}</span></p>
+                </div>
+
+
+                 <div class="card-body col-4">
+                    <h4 class="text-info mb-4">Learning Outcomes</h4>
+                    <p><strong class="text-muted">You will learn: 
+                        <br>
+                    </strong> <span class="text-muted">{{course.title }}</span></p>
                 </div>
             </div>
             <hr>    
-            <!-- Prerequisites -->
-            <div class="card mb-4">     
-                <div class="card-header">
-                    <h5 class="text-muted">Prerequisites</h5>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted">{{ course.prerequisites }}</p>
-                </div>
-            </div>
-            <!-- Learning Outcomes -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="text-muted">Learning Outcomes</h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">{{ course.learning_outcomes }}</p>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
+    var currentIndex = 0;
+    var tutorialLinks = document.getElementById('tutorialLinks').getElementsByTagName('a');
+
     document.addEventListener('DOMContentLoaded', function() {
         // Load the URL of the first video
         var firstLink = document.querySelector('#tutorialLinks li:first-child a');
@@ -93,20 +139,96 @@
     function changeVideo(link) {
         var videoUrl = link.getAttribute('data-url');
         document.getElementById('videoPlayer').src = videoUrl;
-        
+
         // Remove 'active' class from all links
-        var links = document.querySelectorAll('#tutorialLinks li a');
-        links.forEach(function (item) {
-            item.classList.remove('active');
-        });
-        
+        for (var i = 0; i < tutorialLinks.length; i++) {
+            tutorialLinks[i].classList.remove('active');
+        }
+
         // Add 'active' class to the clicked link
         link.classList.add('active');
-        
+
+        // Update currentIndex
+        currentIndex = Array.prototype.indexOf.call(tutorialLinks, link);
+
         // Prevent default link behavior
         event.preventDefault();
     }
+
+    function showNextTutorial() {
+        if (currentIndex < tutorialLinks.length - 1) {
+            currentIndex++;
+            changeVideo(tutorialLinks[currentIndex]);
+        }
+    }
+
+    function showPreviousTutorial() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            changeVideo(tutorialLinks[currentIndex]);
+        }
+    }
 </script>
+    </div>
 
+    {% comment %} {% include 'student_template/footer.html' %} {% endcomment %}
 
-{% endblock %}
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<!-- jQuery -->
+<!-- SweetAlert2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+ 
+<script src="{% static "jquery/jquery.min.js"  %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static "jquery-ui/jquery-ui.min.js"  %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
+</script>
+<!-- Bootstrap 4 -->
+<script src="{% static "bootstrap/js/bootstrap.bundle.min.js"  %}"></script>
+<!-- ChartJS -->
+<script src="{% static "chart.js/Chart.min.js"  %}"></script>
+<!-- Sparkline -->
+<script src="{% static "sparklines/sparkline.js"  %}"></script>
+<!-- JQVMap -->
+<script src="{% static "jqvmap/jquery.vmap.min.js"  %}"></script>
+<script src="{% static "jqvmap/maps/jquery.vmap.usa.js"  %}"></script>
+<!-- jQuery Knob Chart -->
+<script src="{% static "jquery-knob/jquery.knob.min.js"  %}"></script>
+<!-- daterangepicker -->
+<script src="{% static "moment/moment.min.js"  %}"></script>
+<script src="{% static "daterangepicker/daterangepicker.js"  %}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static "tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"  %}"></script>
+<!-- Summernote -->
+<script src="{% static "summernote/summernote-bs4.min.js"  %}"></script>
+<!-- overlayScrollbars -->
+<script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'dist/js/adminlte.js'  %}"></script>
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script src="{% static 'dist/js/pages/dashboard.js'  %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{% static 'dist/js/demo.js'%}"></script>
+ <script src="{% static "plugins/sweetalert2/sweetalert2.min.js" %}"></script>
+<!-- Toastr -->
+<script src="{% static "plugins/toastr/toastr.min.js" %}"></script>
+
+<!-- DataTables  & Plugins -->
+<script src="{% static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/datatables-responsive/js/dataTables.responsive.min.js"%}"></script>
+<script src="{% static "plugins/datatables-responsive/js/responsive.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/dataTables.buttons.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/jszip/jszip.min.js"%}"></script>
+<script src="{% static "plugins/pdfmake/pdfmake.min.js"%}"></script>
+<script src="{% static "plugins/pdfmake/vfs_fonts.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.html5.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.print.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.colVis.min.js"%}"></script>
+</body>
+</html>
+

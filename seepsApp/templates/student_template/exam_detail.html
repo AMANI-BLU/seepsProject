@@ -53,8 +53,8 @@
         </div>
         
     </nav>
-
-    <div class="card shadow p-3 mb-5 bg-white rounded mt-4" style="margin-top: 180px;">
+<br>
+    <div class="card shadow p-3 mb-5 bg-white rounded">
      <div class="card-header bg-info text-white text-center">
         <div style="display:none;">
            
@@ -73,8 +73,9 @@
                             <div class="page">
                         {% endif %}
                         <div class="mb-4">
-                            <h4>{{ forloop.counter }}) {{ question.content|safe }}</h4>
-                            <div class="list-group">
+                      <h4>{{ forloop.counter }}){{ question.content|safe }}</h4>
+                
+                      <div class="list-group">
                                 {% for choice in question.choice_set.all %}
                                     <label class="list-group-item list-group-item-action">
                                         <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">

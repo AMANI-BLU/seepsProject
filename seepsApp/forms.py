@@ -118,8 +118,8 @@ class CourseForm(forms.ModelForm):
             'resource': forms.FileInput(attrs={'class': 'form-control-file'}),
             'thumbnail': forms.FileInput(attrs={'class': 'form-control-file'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'prerequisites': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Prerequisites', 'rows': 3}),
-            'learning_outcomes': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Learning Outcomes', 'rows': 3}),
+            'prerequisites': forms.Textarea(attrs={ 'class': 'form-control','id':'summernote', 'placeholder': 'Enter Question here..',}),
+            'learning_outcomes': forms.Textarea(attrs={ 'class': 'form-control','id':'summernotee',}),
             'department_name': forms.HiddenInput(),  # Hidden field for department
         }
 

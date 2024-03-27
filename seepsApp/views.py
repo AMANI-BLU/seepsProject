@@ -62,8 +62,12 @@ def login_view(request):
 def home(request):
     # Calculate the total number of departments
     total_departments = User.objects.filter(is_department=True).count()
+    total_students = User.objects.filter(is_student=True).count()
+    exams = Exam.objects.all().count()
     context = {
         'total_departments': total_departments,
+        'total_students':total_students,
+        'exams':exams,
     }
     return render(request, 'admin_template/dashboard.html', context)
 
