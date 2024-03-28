@@ -419,7 +419,14 @@ def add_course(request):
 # views.py
 from django.shortcuts import render, redirect
 from .forms import TutorialForm
+# views.py
+from django.shortcuts import render, redirect
+from .forms import TutorialForm
+from .models import Course
 
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def add_tutorial(request):
     if request.method == 'POST':
         form = TutorialForm(request.POST)
@@ -427,8 +434,11 @@ def add_tutorial(request):
             form.save()
             return redirect('add_tutorial')  # Redirect to the same page after adding a tutorial
     else:
-        form = TutorialForm()
-    
+        department_name = request.user.username  # Get department name from user
+        courses = Course.objects.filter(department_name=department_name)  # Filter courses by department
+        # Pass the department to the form
+        form = TutorialForm(department=department_name)
+        
     return render(request, 'department_template/add_tutorial.html', {
         'form': form,
     })

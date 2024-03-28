@@ -116,6 +116,7 @@
             $(document).ready(function () {
                 $('#coursesTable').DataTable({
                     dom: 'Bfrtip',
+                    pageLength: 5, // Set the default number of rows per page
                     buttons: [
                         {
                             extend: 'excelHtml5',
@@ -135,6 +136,12 @@
                         }
                     ]
                 });
+
+                  // Add an event listener to update the page length when the user changes the selection
+            $('#rowsPerPage').on('change', function () {
+                var selectedRows = $(this).val();
+                questionsTable.page.len(selectedRows).draw();
+            });
             });
         </script>
 

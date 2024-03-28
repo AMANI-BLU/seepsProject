@@ -72,23 +72,25 @@ from .models import Tutorial
 class TutorialForm(forms.ModelForm):
     class Meta:
         model = Tutorial
-        fields = ['course', 'title', 'tutorial_url']  # Add 'tutorial_url' to fields
+        fields = ['course', 'title', 'tutorial_url']
         widgets = {
             'course': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial Title'}),
-            'tutorial_url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial URL'}),  # Add widget for 'tutorial_url'
+            'tutorial_url': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial URL'}),
         }
 
     def __init__(self, *args, **kwargs):
+        department = kwargs.pop('department', None)
         super(TutorialForm, self).__init__(*args, **kwargs)
-        self.fields['course'].queryset = Course.objects.all()
+        if department:
+            # Filter the queryset based on the department
+            self.fields['course'].queryset = Course.objects.filter(department_name=department)
 
     def clean(self):
         cleaned_data = super().clean()
         title = cleaned_data.get('title')
         course = cleaned_data.get('course')
 
-        # Custom validation for title and course not null
         if not title:
             raise forms.ValidationError("Tutorial title cannot be empty.")
         if not course:
@@ -101,6 +103,7 @@ class TutorialForm(forms.ModelForm):
         if commit:
             tutorial.save()
         return tutorial
+
 
 
 from django import forms

@@ -43,6 +43,7 @@
 
     <div class="container-fluid mt-5 content-container">
         <div class="container-fluid mt-5 pt-5">
+             {% if tutorials %}
     <div class="row">
         <div class="col-lg-9">
             <!-- Video Player -->
@@ -52,38 +53,40 @@
         </div>
         <div class="col-lg-3">
             <!-- Navigation between blocks -->
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Navigation</h5>
-                </div>
-                <div class="card-body">
-                    <ul class="list-group list-group-flush" id="tutorialLinks">
-                        {% for tutorial in tutorials %}
-                            {% with video_id=tutorial.tutorial_url|slice:"v=" %}
-                                {% if "t=" in video_id %}
-                                    {% with video_id=video_id|slice:":&" %}
-                                        {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
-                                            <li class="list-group-item">
-                                                <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
-                                                    {{ forloop.counter }}) {{ tutorial.title }}
-                                                </a>
-                                            </li>
-                                        {% endwith %}
-                                    {% endwith %}
-                                {% else %}
-                                    {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
-                                        <li class="list-group-item">
-                                            <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
-                                                {{ forloop.counter }}) {{ tutorial.title }}
-                                            </a>
-                                        </li>
-                                    {% endwith %}
-                                {% endif %}
+      <div class="card">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Navigation</h5>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush" id="tutorialLinks">
+            {% for tutorial in tutorials %}
+                {% with video_id=tutorial.tutorial_url|slice:"v=" %}
+                    {% if "t=" in video_id %}
+                        {% with video_id=video_id|slice:":&" %}
+                            {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                                <li class="list-group-item">
+                                    <a href="#" class="list-group-link text-decoration-none{% if tutorial_url == currentVideoUrl %} active-link{% endif %}" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                        {{ forloop.counter }}) {{ tutorial.title }}
+                                    </a>
+                                </li>
                             {% endwith %}
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
+                        {% endwith %}
+                    {% else %}
+                        {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                            <li class="list-group-item">
+                                <a href="#" class="list-group-link text-decoration-none{% if tutorial_url == currentVideoUrl %} active-link{% endif %}" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                    {{ forloop.counter }}) {{ tutorial.title }}
+                                </a>
+                            </li>
+                        {% endwith %}
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
              <div class="text-center mt-3">
                 <button type="button" class="btn btn-info me-2" onclick="showPreviousTutorial()">
                     <i class="fas fa-chevron-left"></i> Previous
@@ -134,11 +137,19 @@
                     </strong> <span class="text-muted">{{course.learning_outcomes |safe }}</span></p>
                 </div>
             </div>
+             {% else %}
+                        <!-- Display message when no tutorials are available -->
+                        <div class="card ">
+                            <div class="card-body text-center">
+                                <h5 class="card-title text-muted">There are currently no tutorials available for this course.</h5>
+                                <p class="card-text text-muted">Check back later</p>
+                            </div>
+                        </div>
+           {% endif %}
             <hr>    
         </div>
     </div>
 </div>
-
 <script>
     var currentIndex = 0;
     var tutorialLinks = document.getElementById('tutorialLinks').getElementsByTagName('a');
@@ -181,7 +192,21 @@
             changeVideo(tutorialLinks[currentIndex]);
         }
     }
+
+    // Add event listeners to all tutorial links
+    for (var i = 0; i < tutorialLinks.length; i++) {
+        tutorialLinks[i].addEventListener('click', function() {
+            // Remove 'active' class from all links
+            for (var j = 0; j < tutorialLinks.length; j++) {
+                tutorialLinks[j].classList.remove('active');
+            }
+
+            // Add 'active' class to the clicked link
+            this.classList.add('active');
+        });
+    }
 </script>
+
     </div>
 
     {% comment %} {% include 'student_template/footer.html' %} {% endcomment %}
