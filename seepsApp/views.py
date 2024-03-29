@@ -180,7 +180,7 @@ def add_student(request):
     error_msg = None
     
     if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST)
+        form = StudentRegistrationForm(request.POST, department_name=request.user.username)
         if form.is_valid():
             try:
                 user = form.save()
@@ -191,28 +191,67 @@ def add_student(request):
             error_msg = 'Form is not valid'
     else:
         form = StudentRegistrationForm()
-    
+
     return render(request, 'department_template/add_student.html', {
         'form': form,
         'success_msg': success_msg,
         'error_msg': error_msg
     })
 
-
-
+    
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):
-    # Retrieve all registered students along with their full names
-    students = User.objects.filter(is_student=True).values('username', 'first_name', 'last_name', 'email', 'college', 'phone')
+    # Retrieve the department name of the logged-in user
+    department_name = request.user.username
+    
+    # Retrieve all registered students belonging to the department along with their full names
+    students = User.objects.filter(is_student=True, department_name=department_name).values('username', 'first_name', 'last_name', 'email', 'sex', 'phone')
 
-    # Fetch the total count of students
-    total_students = User.objects.filter(is_student=True).count()
-
+    # Fetch the total count of students belonging to the department
+    total_students = students.count()
+    for student in students:
+        if student['sex'] == 'M':
+            student['sex'] = 'Male'
+        elif student['sex'] == 'F':
+            student['sex'] = 'Female'
     # Pass the list of students and total count to the template
     context = {'students': students, 'total_students': total_students}
 
     return render(request, 'department_template/view_student.html', context)
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_student(request, username):
+    try:
+        student = User.objects.get(username=username, is_student=True, department_name=request.user.username)
+        student.delete()
+        messages.success(request, 'Student deleted successfully!')
+    except User.DoesNotExist:
+        messages.error(request, 'Student not found or you do not have permission to delete.')
+
+    return redirect('view_student')
+
+def update_student(request, username):
+    if request.method == 'POST':
+        student = get_object_or_404(User, username=username, is_student=True, department_name=request.user.username)
+        
+        # Update fields based on form input
+        student.first_name = request.POST.get('first_name')
+       
+        student.email = request.POST.get('email')
+        student.sex = request.POST.get('sex')
+        student.phone = request.POST.get('phone')
+        # Add more fields as needed
+        
+        student.save()
+        
+        messages.success(request, 'Student updated successfully!')
+        return redirect('view_student')  # Redirect to the view_student page after successful update
+    else:
+        return redirect('view_student') 
 
 
 # views.py
@@ -289,7 +328,7 @@ def manage_exam(request):
                 exam = Exam.objects.get(pk=activate_exam_id)
                 exam.is_active = True
                 exam.save()
-                messages.success(request, f'Exam "{exam.name}" has been activated successfully.')
+                messages.success(request, f'Exam {exam.name} has been activated successfully.')
             except Exam.DoesNotExist:
                 messages.error(request, 'Exam not found.')
 
@@ -299,7 +338,7 @@ def manage_exam(request):
                 exam = Exam.objects.get(pk=deactivate_exam_id)
                 exam.is_active = False
                 exam.save()
-                messages.success(request, f'Exam "{exam.name}" has been deactivated successfully.')
+                messages.success(request, f'Exam {exam.name} has been deactivated successfully.')
             except Exam.DoesNotExist:
                 messages.error(request, 'Exam not found.')
 
@@ -321,11 +360,11 @@ def add_exam(request):
             
             exam.save()
             
-            success_msg = f'{exam.name} added successfully!'
+            messages.success(request, 'Exam Added successfully!')
             # Redirect to the manage_exam view after adding the exam
             return redirect('add_exam')
         else:
-            error_msg = 'Form is not valid'
+            messages.error(request, 'Form is not valid.')
     else:
         form = ExamForm()
 
@@ -336,7 +375,29 @@ def add_exam(request):
     })
 
 
+def update_exam(request, exam_id):
+    if request.method == 'POST':
+        exam = Exam.objects.get(pk=exam_id)
+        # Update exam fields based on form input
+        exam.name = request.POST.get('exam_name')
+        exam.timer = request.POST.get('exam_duration')
+        exam.exam_code = request.POST.get('exam_code')
+        # Add more fields as needed
+        exam.save()
+        messages.success(request, 'Exam updated successfully!')
+        return redirect('manage_exam')  # Redirect to the manage_exam page after successful update
+    else:
+        return redirect('manage_exam')  
+    
 
+def delete_exam(request, exam_id):
+    exam = get_object_or_404(Exam, pk=exam_id)
+    if request.method == 'POST':
+        exam.delete()
+        messages.success(request, 'Exam deleted successfully!')
+    return redirect('manage_exam')
+    
+    
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def feedback_management(request):

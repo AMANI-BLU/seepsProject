@@ -23,6 +23,13 @@ urlpatterns = [
     path('add_question/', add_question, name='add_question'),
     path('manage_questions/', manage_questions, name='manage_questions'),
     path('feedback-management/', feedback_management, name='feedback_management'),
+    path('delete_student/<str:username>/', delete_student, name='delete_student'),
+    path('update_student/<str:username>/', update_student, name='update_student'),
+    path('update_exam/<int:exam_id>/', update_exam, name='update_exam'),
+    path('delete_exam/<int:exam_id>/', delete_exam, name='delete_exam'),
+
+
+
     
     path('manage/courses/', manage_courses, name='manage_courses'),
     path('manage/courses/add/', add_course, name='add_course'),

@@ -42,91 +42,122 @@
                   });
                 </script>
               {% endif %}
-<form action="{% url 'add_student' %}" method="post">
-    {% csrf_token %}
+                  <form action="{% url 'add_student' %}" method="post">
+                      {% csrf_token %}
 
-    {% if form.non_field_errors %}
-        <div class="text-danger">
-            <i class="bi bi-exclamation-triangle"></i>
-            {{ form.non_field_errors.as_text }}
-        </div>
-    {% endif %}
+                      {% if form.non_field_errors %}
+                          <div class="text-danger">
+                              <i class="bi bi-exclamation-triangle"></i>
+                              {{ form.non_field_errors.as_text }}
+                          </div>
+                      {% endif %}
 
-    <div class="form-group">
-        <label for="{{ form.first_name.id_for_label }}" class="text-muted">Full Name</label>
-        {{ form.first_name }}
-        {% if form.first_name.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.first_name.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.first_name.id_for_label }}" class="text-muted">Full Name</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-user"></i></span>
+                              </div>
+                              {{ form.first_name }}
+                          </div>
+                          {% if form.first_name.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.first_name.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="form-group">
-        <label for="{{ form.email.id_for_label }}" class="text-muted">Email</label>
-        {{ form.email }}
-        {% if form.email.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.email.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.email.id_for_label }}" class="text-muted">Email</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                              </div>
+                              {{ form.email }}
+                          </div>
+                          {% if form.email.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.email.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="form-group">
-        <label for="{{ form.sex.id_for_label }}" class="text-muted">Sex</label>
-        {{ form.sex }}
-        {% if form.sex.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.sex.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.sex.id_for_label }}" class="text-muted">Sex</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                              </div>
+                              {{ form.sex }}
+                          </div>
+                          {% if form.sex.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.sex.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="form-group">
-        <label for="{{ form.phone.id_for_label }}" class="text-muted">Phone</label>
-        {{ form.phone }}
-        {% if form.phone.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.phone.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.phone.id_for_label }}" class="text-muted">Phone</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                              </div>
+                              {{ form.phone }}
+                          </div>
+                          {% if form.phone.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.phone.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="form-group">
-        <label for="{{ form.password1.id_for_label }}" class="text-muted">Password</label>
-        {{ form.password1 }}
-        {% if form.password1.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.password1.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.password1.id_for_label }}" class="text-muted">Password</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                              </div>
+                              {{ form.password1 }}
+                          </div>
+                          {% if form.password1.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.password1.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="form-group">
-        <label for="{{ form.password2.id_for_label }}" class="text-muted">Confirm Password</label>
-        {{ form.password2 }}
-        {% if form.password2.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.password2.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
+                      <div class="form-group">
+                          <label for="{{ form.password2.id_for_label }}" class="text-muted">Confirm Password</label>
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                              </div>
+                              {{ form.password2 }}
+                          </div>
+                          {% if form.password2.errors %}
+                              <div class="text-danger">
+                                  <i class="bi bi-exclamation-triangle"></i>
+                                  {{ form.password2.errors.as_text }}
+                              </div>
+                          {% endif %}
+                      </div>
 
-    <div class="row">
-        <div class="col-12">
-            <button type="submit" class="btn btn-info btn-block">
-                Register
-            </button>
-        </div>
-    </div>
+                      <div class="row">
+                          <div class="col-12">
+                              <button type="submit" class="btn btn-info btn-block">
+                                  <i class="fas fa-user-plus"></i> Register
+                              </button>
+                          </div>
+                      </div>
 
-</form>
+                  </form>
+
 
 
             </div>

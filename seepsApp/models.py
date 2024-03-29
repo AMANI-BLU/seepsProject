@@ -7,7 +7,8 @@ class User(AbstractUser):
     is_student = models.BooleanField('Is student', default=False)
     college = models.CharField(max_length=255, blank=True, null=True)
     department_name = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=20, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True) 
+    sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female'), ('O', 'Other')), blank=True, null=True)
     
 class Exam(models.Model):
     name = models.CharField(max_length=255)

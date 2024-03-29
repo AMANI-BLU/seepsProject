@@ -229,41 +229,6 @@ class LoginForm(forms.Form):
     )
 
 
-# class AdminRegistrationForm(UserCreationForm):
-#     username = forms.CharField(
-#         widget=forms.TextInput(
-#             attrs={
-#                 "class": "form-control"
-#             }
-#         )
-#     )
-#     email = forms.EmailField(
-#         widget=forms.EmailInput(
-#             attrs={
-#                 "class": "form-control"
-#             }
-#         )
-#     )
-#     password1 = forms.CharField(
-#         widget=forms.PasswordInput(
-#             attrs={
-#                 "class": "form-control"
-#             }
-#         )
-#     )
-#     password2 = forms.CharField(
-#         widget=forms.PasswordInput(
-#             attrs={
-#                 "class": "form-control"
-#             }
-#         )
-#     )
-
-#     class Meta:
-#         model = User
-#         fields = ('username', 'email', 'password1', 'password2')
-
-
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
@@ -344,9 +309,8 @@ class DepartmentRegistrationForm(UserCreationForm):
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import User
+
+
 
 class StudentRegistrationForm(UserCreationForm):
     first_name = forms.CharField(
@@ -392,6 +356,10 @@ class StudentRegistrationForm(UserCreationForm):
         })
     )
 
+    def __init__(self, *args, **kwargs):
+        self.department_name = kwargs.pop('department_name', None)
+        super(StudentRegistrationForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = User
         fields = ('first_name', 'email', 'sex',  'phone', 'password1', 'password2')
@@ -399,16 +367,34 @@ class StudentRegistrationForm(UserCreationForm):
     def generate_username(self):
         first_name = self.cleaned_data.get('first_name')
         email = self.cleaned_data.get('email')
-        # Here you can generate a unique username based on department name and email
-        # For example, you can concatenate them and use a hashing algorithm to ensure uniqueness
-        # Here's a simple example:
         username = f"{first_name}_{email}".replace('@', '_').replace('.', '_')
         return username
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.is_student = True
-        user.username = self.generate_username()  # Set the generated username
+        user.username = self.generate_username()
+        user.department_name = self.department_name
         if commit:
             user.save()
         return user
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email already exists")
+        return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if not phone.isdigit():
+            raise forms.ValidationError("Phone number must contain only digits")
+        return phone
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords do not match")
+        return cleaned_data

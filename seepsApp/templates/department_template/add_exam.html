@@ -26,86 +26,104 @@
 
     <section class="content">
       <div class="container-fluid">
+
+          {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
         <div class="login-box w-100">
           <div class="card card-outline card-info">
             <div class="card-body">
-              {% if success_msg %}
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                <script>
-                  Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    text: '{{ success_msg }}',
-                    showConfirmButton: false,
-                    timer: 6000,
-                  });
-                </script>
-              {% endif %}
+             
 
-              <form action="{% url 'add_exam' %}" method="post">
-                {% csrf_token %}
+             <form action="{% url 'add_exam' %}" method="post">
+  {% csrf_token %}
 
-                {% if form.non_field_errors %}
-                  <div class="text-danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ form.non_field_errors.as_text }}
-                  </div>
-                {% endif %}
+  {% if form.non_field_errors %}
+    <div class="text-danger">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ form.non_field_errors.as_text }}
+    </div>
+  {% endif %}
 
-                <div class="column-container">
-                  <div class="column">
-                    <div class="form-group">
-                      <label for="{{ form.name.id_for_label }}" class="text-muted">Exam Name</label>
-                      {{ form.name }}
-                      {% if form.name.errors %}
-                        <div class="text-danger">
-                          <i class="bi bi-exclamation-triangle"></i>
-                          {{ form.name.errors.as_text }}
-                        </div>
-                      {% endif %}
-                    </div>
+  <div class="column-container">
+    <div class="column">
+      <div class="form-group">
+        <label for="{{ form.name.id_for_label }}" class="text-muted">Exam Name</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+          </div>
+          {{ form.name }}
+        </div>
+        {% if form.name.errors %}
+          <div class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ form.name.errors.as_text }}
+          </div>
+        {% endif %}
+      </div>
 
-                    <div class="form-group">
-                      <label for="{{ form.timer.id_for_label }}" class="text-muted">Timer</label>
-                      {{ form.timer }}
-                      {% if form.timer.errors %}
-                        <div class="text-danger">
-                          <i class="bi bi-exclamation-triangle"></i>
-                          {{ form.timer.errors.as_text }}
-                        </div>
-                      {% endif %}
-                    </div>
+      <div class="form-group">
+        <label for="{{ form.timer.id_for_label }}" class="text-muted">Timer</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fas fa-clock"></i></span>
+          </div>
+          {{ form.timer }}
+        </div>
+        {% if form.timer.errors %}
+          <div class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ form.timer.errors.as_text }}
+          </div>
+        {% endif %}
+      </div>
 
-                    <div class="form-group">
-                      <label for="{{ form.exam_code.id_for_label }}" class="text-muted">Exam Code</label>
-                      {{ form.exam_code }}
-                      {% if form.exam_code.errors %}
-                        <div class="text-danger">
-                          <i class="bi bi-exclamation-triangle"></i>
-                          {{ form.exam_code.errors.as_text }}
-                        </div>
-                      {% endif %}
-                    </div>
+      <div class="form-group">
+        <label for="{{ form.exam_code.id_for_label }}" class="text-muted">Exam Code</label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+          </div>
+          {{ form.exam_code }}
+        </div>
+        {% if form.exam_code.errors %}
+          <div class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ form.exam_code.errors.as_text }}
+          </div>
+        {% endif %}
+      </div>
 
-   
-                    
-                    <!-- Add more fields as needed -->
-                  </div>
+      <!-- Add more fields as needed -->
+    </div>
 
-                  <div class="column">
-                    <!-- Add more fields as needed -->
+    <div class="column">
+      <!-- Add more fields as needed -->
 
-                    <div class="row">
-                      <div class="col-12">
-                        <button type="submit" class="btn btn-info btn-block">
-                          Add Exam
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+      <div class="row">
+        <div class="col-12">
+          <button type="submit" class="btn btn-info btn-block">
+            <i class="fas fa-plus"></i> Add Exam
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
             </div>
           </div>
         </div>

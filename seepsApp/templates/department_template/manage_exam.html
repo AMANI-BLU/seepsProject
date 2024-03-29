@@ -1,5 +1,3 @@
-<!-- department_template/manage_exam.html -->
-
 {% extends 'base.html' %}
 
 {% block title %}Department | Manage Exams{% endblock %}
@@ -37,7 +35,21 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-
+                    {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
                     <!-- Manage Exams Section -->
                     <div class="card card-outline card-info">
                         <div class="card-header">
@@ -55,7 +67,7 @@
                                         <th>No.</th>
                                         <th>Name</th>
                                         <th>Time in minutes</th>
-                                        <th>Number of Questions</th>  <!-- New column header -->
+                                        <th>Number of Questions</th>
                                         <th>Exam Code</th>
                                         <th class="exclude-export">Action</th>
                                     </tr>
@@ -66,10 +78,10 @@
                                             <td>{{ forloop.counter }}</td>
                                             <td>{{ exam.name }}</td>
                                             <td>{{ exam.timer }}</td>
-                                            <td>{{ exam.num_questions }}</td>  <!-- New data cell for number of questions -->
+                                            <td>{{ exam.num_questions }}</td>
                                             <td>{{ exam.exam_code }}</td>
                                             <td class="d-flex align-items-center">
-                                                {% if not exam.is_active %}
+                                              {% if not exam.is_active %}
                                                     <form method="post" class="me-3">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="activate_exam_id" value="{{ exam.id }}">
@@ -85,11 +97,16 @@
                                                             <i class="fas fa-times"></i> Deactivate
                                                         </button>
                                                     </form>
-                                                {% endif %}
-                                                <button type="button" class="btn btn-danger" data-toggle="modal"
-                                                        data-target="#deleteModal{{ forloop.counter }}">
-                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                {% endif %}&nbsp;&nbsp;
+                                                <!-- Update Button -->
+                                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#updateExamModal{{ exam.id }}">
+                                                    <i class="fas fa-edit fa-sm me-1"></i> Edit
+                                                </button>&nbsp;&nbsp;
+                                                <!-- Delete Button -->
+                                                <button type="button" class="btn btn-danger ms-2" data-toggle="modal" data-target="#deleteExamModal{{ exam.id }}">
+                                                     <i class="fas fa-trash-alt fa-sm me-1"></i> Delete 
                                                 </button>
+
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -103,52 +120,122 @@
             <!-- /.content -->
         </div>
 
-        <!-- Add Exam Modal -->
-        <div class="modal fade" id="addExamModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title"><i class="fas fa-plus"></i> Add New Exam</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       
+
+        <!-- Update Exam Modals -->
+{% for exam in exams %}
+<div class="modal fade" id="updateExamModal{{ exam.id }}" tabindex="-1" role="dialog" aria-labelledby="updateExamModalLabel{{ exam.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateExamModalLabel{{ exam.id }}">Update Exam</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Update Form -->
+                <form action="{% url 'update_exam' exam.id %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="exam_name">Exam Name</label>
+                        <div class="input-group">
+                            <span class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            </span>
+                            <input type="text" class="form-control" id="exam_name" name="exam_name" value="{{ exam.name }}">
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <!-- Add your form for adding a new exam here -->
-                        <form method="post" class="form">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <button type="submit" class="btn btn-primary">Add Exam</button>
-                        </form>
+                    <div class="form-group">
+                        <label for="exam_duration">Exam Duration(in minutes)</label>
+                        <div class="input-group">
+                            <span class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                            </span>
+                            <input type="text" class="form-control" id="exam_duration" name="exam_duration" value="{{ exam.timer }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="exam_code">Exam Code</label>
+                        <div class="input-group">
+                            <span class="input-group-prepend">
+                                <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                            </span>
+                            <input type="text" class="form-control" id="exam_code" name="exam_code" value="{{ exam.exam_code }}">
+                        </div>
+                    </div>
+                    <!-- Add more form fields as needed -->
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+
+
+        <!-- Delete Exam Modals -->
+        {% for exam in exams %}
+            <div class="modal fade" id="deleteExamModal{{ exam.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteExamModalLabel{{ exam.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteExamModalLabel{{ exam.id }}">Delete Exam</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete the exam "{{ exam.name }}"?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <form action="{% url 'delete_exam' exam.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <!-- /.modal-content -->
             </div>
-            <!-- /.modal-dialog -->
-        </div>
-        <script>
-            $(document).ready(function () {
-                $('#examsTable').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        {
-                            extend: 'excelHtml5',
-                            text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        }
-                    ]
-                });
-            });
-        </script>
+        {% endfor %}
+
+    <script>
+    $(document).ready(function () {
+        $('#examsTable').DataTable({
+            dom: 'Bfrtip',
+            responsive: true, // Enable responsive feature
+            language: { // Customize language settings
+                search: '', // Remove the search label
+                searchPlaceholder: 'Search...', // Add placeholder for search input
+            },
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                    className: 'btn btn-light',
+                    exportOptions: {
+                        columns: ':not(.exclude-export)'
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                    className: 'btn btn-light',
+                    exportOptions: {
+                        columns: ':not(.exclude-export)'
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
+
 
         {% include 'department_template/footer.html' %}
     </div>
