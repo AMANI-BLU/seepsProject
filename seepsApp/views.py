@@ -31,23 +31,20 @@ def login_view(request):
 
     if request.method == 'POST':
         if form.is_valid():
-            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, email=email, password=password)
 
-            if user is not None and user.is_staff and user.is_superuser:
+            if user is not None:
                 login(request, user)
-                return redirect('home')
-            elif user is not None and user.is_department:
-                login(request, user)
-                return redirect('department_home')
-            elif user is not None and user.is_student:
-                login(request, user)
-                return redirect('student_home')
+                if user.is_staff and user.is_superuser:
+                    return redirect('home')
+                elif user.is_department:
+                    return redirect('department_home')
+                elif user.is_student:
+                    return redirect('student_home')
             else:
-                msg = 'Invalid credentials'
-        else:
-            msg = 'Error validating form'
+                msg = 'Invalid email or password. Please try again.'
 
     return render(request, 'login.html', {'form': form, 'msg': msg})
 #/Login View/ 
@@ -71,10 +68,6 @@ def home(request):
     }
     return render(request, 'admin_template/dashboard.html', context)
 
-@login_required(login_url='login_view')
-@user_passes_test(is_admin, login_url='NoPage')
-def add_department(request):
-     return render(request,'admin_template/add_department.html')
  
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
@@ -96,8 +89,7 @@ def feedback(request):
 #     else:
 #         form = AdminRegistrationForm()
 #     return render(request, 'register_admin.html', {'form': form, 'msg': msg})
-
-#Admin Add Department Form
+# Admin Add Department Form
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def add_department(request):
@@ -108,10 +100,9 @@ def add_department(request):
         form = DepartmentRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.is_department = True  # Set is_customer to True
+            user.is_department = True  # Set is_department to True
             user.save()
             success_msg = 'Department added successfully!'
-            # return redirect('add_department')
         else:
             error_msg = 'Form is not valid'
     else:
@@ -127,10 +118,9 @@ def add_department(request):
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def view_department(request):
-    # Retrieve all registered departments with necessary fields
-    departments = User.objects.filter(is_department=True).values('username', 'email', 'college', 'phone')
+    # Retrieve all registered departments with necessary fields, including username
+    departments = User.objects.filter(is_department=True).values('username', 'department_name', 'email', 'college', 'phone')
     return render(request, 'admin_template/view_department.html', {'departments': departments})
-
 
 #Admin Delete Department
 @login_required(login_url='login_view')
@@ -181,11 +171,8 @@ def department_home(request):
 
     return render(request, 'department_template/dashboard.html', context)
 
+from django.contrib import messages
 
-# Department Add Student View
-# views.py
-from .forms import StudentRegistrationForm
-# views.py
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def add_student(request):
@@ -193,14 +180,17 @@ def add_student(request):
     error_msg = None
     
     if request.method == 'POST':
-        form = StudentRegistrationForm(request.POST, department_username=request.user.username)
+        form = StudentRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            success_msg = 'Student added successfully!'
+            try:
+                user = form.save()
+                success_msg = 'Student added successfully!'
+            except Exception as e:
+                error_msg = f'An error occurred: {str(e)}'
         else:
             error_msg = 'Form is not valid'
     else:
-        form = StudentRegistrationForm(department_username=request.user.username)
+        form = StudentRegistrationForm()
     
     return render(request, 'department_template/add_student.html', {
         'form': form,
@@ -210,19 +200,15 @@ def add_student(request):
 
 
 
-
-
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):
-    # Retrieve the logged-in department's username
-    department_username = request.user.username
+    # Retrieve all registered students along with their full names
+    students = User.objects.filter(is_student=True).values('username', 'first_name', 'last_name', 'email', 'college', 'phone')
 
-    # Retrieve all registered students for the logged-in department
-    students = User.objects.filter(is_student=True, department_name=department_username).values('username', 'email', 'college', 'phone')
+    # Fetch the total count of students
+    total_students = User.objects.filter(is_student=True).count()
 
-    # Fetch the total count of students for the logged-in department
-    total_students = User.objects.filter(is_student=True, department_name=department_username).count()
     # Pass the list of students and total count to the template
     context = {'students': students, 'total_students': total_students}
 
@@ -468,10 +454,15 @@ def add_tutorial(request):
 @login_required(login_url='login_view')
 @user_passes_test(is_student, login_url='NoPage')
 def student_home(request):
+    # Retrieve the first name of the current user
+    first_name = request.user.first_name
+    
     department_name = request.user.department_name
     # Retrieve all active courses from the database
-    courses = Course.objects.filter(department_name=department_name,is_active=True)
-    return render(request, 'student_template/student_home.html', {'courses': courses})
+    courses = Course.objects.filter(department_name=department_name, is_active=True)
+    
+    return render(request, 'student_template/student_home.html', {'first_name': first_name, 'courses': courses})
+
 
 @login_required(login_url='login_view')
 @user_passes_test(lambda user: user.is_student, login_url='NoPage')

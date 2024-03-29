@@ -1,202 +1,200 @@
-{% extends 'base.html' %}
+    {% extends 'base.html' %}
 
-{% block title %}Department | Manage Student{% endblock %}
+    {% block title %}Department | Manage Student{% endblock %}
 
-{% block content %}
-    <!-- Main content -->
-    <div class="wrapper">
-        {% include 'department_template/navbar.html' %}
-        {% include 'department_template/aside.html' %}
+    {% block content %}
+        <!-- Main content -->
+        <div class="wrapper">
+            {% include 'department_template/navbar.html' %}
+            {% include 'department_template/aside.html' %}
 
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                      <div class="btn-group">
-                          <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                              aria-expanded="false">
-                              <i class="fas fa-plus"></i> Add New
-                          </button>
-                          <div class="dropdown-menu">
-                              <a class="dropdown-item" href="{% url 'add_student' %}">Add Manually</a>
-                              <a class="dropdown-item" href="#">Read from File</a>
-                          </div>
-                      </div>
-                  </div>
+            <!-- Content Wrapper. Contains page content -->
+            <div class="content-wrapper">
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                                aria-expanded="false">
+                                <i class="fas fa-plus"></i> Add New
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'add_student' %}">Add Manually</a>
+                                <a class="dropdown-item" href="#">Read from File</a>
+                            </div>
+                        </div>
+                    </div>
 
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
-                                <li class="breadcrumb-item active">Manage Student</li>
-                            </ol>
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
+                                    <li class="breadcrumb-item active">Manage Student</li>
+                                </ol>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- /.content-header -->
+                <!-- /.content-header -->
 
-            <!-- Main content -->
-            <section class="content">
-                <div class="container-fluid">
+                <!-- Main content -->
+                <section class="content">
+                    <div class="container-fluid">
 
-                    <!-- Manage Students Section -->
-                    <div class="card card-outline card-info">
-                        <div class="card-header">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h3 class="card-title">Student List</h3>
+                        <!-- Manage Students Section -->
+                        <div class="card card-outline card-info">
+                            <div class="card-header">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h3 class="card-title">Student List</h3>
+                                    </div>
+                                    
                                 </div>
-                                
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <!-- Add New Student Button -->
-                            <!-- Students Table -->
-                            <table id="departmentsTable" class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>College</th>
-                                        <th class="exclude-export">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Sample Data -->
-                                    {% for student in students %}
-                                    <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>{{ student.username }}</td>
-                                        <td>{{ student.email }}</td>
-                                        <td>{{ student.phone }}</td>
-                                        <td>{{ student.college }}</td>
-                                        <td>
-                                            <!-- Button to trigger the modal -->
-                                            <button type="button" class="btn btn-danger" data-toggle="modal"
-                                                data-target="#deleteModal{{ forloop.counter }}">
-                                                <i class="fas fa-trash-alt"></i> Delete
-                                            </button>
+                            <div class="card-body">
+                                <!-- Add New Student Button -->
+                                <!-- Students Table -->
+                                <table id="departmentsTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th class="exclude-export">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Sample Data -->
+                                        {% for student in students %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.email }}</td>
+                                            <td>{{ student.phone }}</td>
+                                            <td>
+                                                <!-- Button to trigger the modal -->
+                                                <button type="button" class="btn btn-danger" data-toggle="modal"
+                                                    data-target="#deleteModal{{ forloop.counter }}">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
 
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="deleteModal{{ forloop.counter }}" tabindex="-1"
-                                                role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteModalLabel">Delete
-                                                                Student</h5>
-                                                            <button type="button" class="close"
-                                                                data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p>Are you sure you want to delete the department with
-                                                                email: {{ student.email }}?</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-info"
-                                                                data-dismiss="modal">Close</button>
-                                                            <!-- Link to trigger the deletion -->
-                                                            {% comment %} <a href="{% url 'delete_department' email=department.email %}"
-                                                                class="btn btn-outline-danger">Delete</a> {% endcomment %}
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="deleteModal{{ forloop.counter }}" tabindex="-1"
+                                                    role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog" role="document">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="deleteModalLabel">Delete
+                                                                    Student</h5>
+                                                                <button type="button" class="close"
+                                                                    data-dismiss="modal" aria-label="Close">
+                                                                    <span aria-hidden="true">&times;</span>
+                                                                </button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p>Are you sure you want to delete the department with
+                                                                    email: {{ student.email }}?</p>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-outline-info"
+                                                                    data-dismiss="modal">Close</button>
+                                                                <!-- Link to trigger the deletion -->
+                                                                {% comment %} <a href="{% url 'delete_department' email=department.email %}"
+                                                                    class="btn btn-outline-danger">Delete</a> {% endcomment %}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
 
-                                    <!-- Add more rows for additional students -->
-                                </tbody>
-                            </table>
+                                        <!-- Add more rows for additional students -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- /.container-fluid -->
-            </section>
-            <!-- /.content -->
-        </div>
-
-        <!-- Add Student Modal -->
-        <div class="modal fade" id="addStudentModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title"><i class="fas fa-user-plus"></i> Add New Student</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Add your form for adding a new student here -->
-                        <form id="addStudentForm">
-                            <div class="mb-3">
-                                <label for="studentName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="studentName" name="studentName"
-                                    placeholder="Enter student name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="studentEmail" name="studentEmail"
-                                    placeholder="Enter student email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentPhone" class="form-label">Phone no.</label>
-                                <input type="tel" class="form-control" id="studentPhone" name="studentPhone"
-                                    placeholder="Enter student phone number" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="studentPassword"
-                                    name="studentPassword" placeholder="Enter password" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword"
-                                    name="confirmPassword" placeholder="Confirm password" required>
-                            </div>
-                            <button type="button" class="btn btn-info" onclick="submitForm()"><i
-                                    class="fas fa-plus"></i> Add Student</button>
-                        </form>
-                    </div>
-                </div>
-                <!-- /.modal-content -->
+                    <!-- /.container-fluid -->
+                </section>
+                <!-- /.content -->
             </div>
-            <!-- /.modal-dialog -->
-        </div>
-        <script>
-            $(document).ready(function () {
-                $('#departmentsTable').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        {
-                            extend: 'excelHtml5',
-                            text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        }
-                    ]
-                });
-            });
-        </script>
 
-        {% include 'department_template/footer.html' %}
-    </div>
-    <!-- ./wrapper -->
-{% endblock %}
+            <!-- Add Student Modal -->
+            <div class="modal fade" id="addStudentModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title"><i class="fas fa-user-plus"></i> Add New Student</h4>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Add your form for adding a new student here -->
+                            <form id="addStudentForm">
+                                <div class="mb-3">
+                                    <label for="studentName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="studentName" name="studentName"
+                                        placeholder="Enter student name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="studentEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="studentEmail" name="studentEmail"
+                                        placeholder="Enter student email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="studentPhone" class="form-label">Phone no.</label>
+                                    <input type="tel" class="form-control" id="studentPhone" name="studentPhone"
+                                        placeholder="Enter student phone number" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="studentPassword" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="studentPassword"
+                                        name="studentPassword" placeholder="Enter password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword"
+                                        name="confirmPassword" placeholder="Confirm password" required>
+                                </div>
+                                <button type="button" class="btn btn-info" onclick="submitForm()"><i
+                                        class="fas fa-plus"></i> Add Student</button>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <script>
+                $(document).ready(function () {
+                    $('#departmentsTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                                className: 'btn btn-light',
+                                exportOptions: {
+                                    columns: ':not(.exclude-export)'
+                                }
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                                className: 'btn btn-light',
+                                exportOptions: {
+                                    columns: ':not(.exclude-export)'
+                                }
+                            }
+                        ]
+                    });
+                });
+            </script>
+
+            {% include 'department_template/footer.html' %}
+        </div>
+        <!-- ./wrapper -->
+    {% endblock %}

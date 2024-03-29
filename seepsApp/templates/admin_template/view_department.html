@@ -59,6 +59,7 @@
                                     <tr>
                                         <th>No.</th>
                                         <th>Name</th>
+                                        <th>Username</th>
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>College</th>
@@ -70,7 +71,8 @@
                                     {% for department in departments %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td>{{ department.username }}</td>
+                                        <td>{{ department.department_name }}</td>
+                                         <td>{{ department.username }}</td>
                                         <td>{{ department.email }}</td>
                                         <td>{{ department.phone }}</td>
                                         <td>{{ department.college }}</td>

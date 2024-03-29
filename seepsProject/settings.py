@@ -79,6 +79,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.postgresql',
+        # 'USER':'postgres',
+        # 'HOST':'localhost',
+        # 'PASSWORD':'aman1234',
+        # 'NAME':'seeps'
     }
 }
 
@@ -134,3 +139,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'seepsApp.User'
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
+    'seepsApp.backend.EmailAuthBackend',  # Your custom authentication backend
+]

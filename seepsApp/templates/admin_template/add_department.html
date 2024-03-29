@@ -60,7 +60,7 @@
                   </script>
                 {% endif %} {% endcomment %}
 
-  <form action="{% url 'add_department' %}" method="post">
+ <form action="{% url 'add_department' %}" method="post">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -71,12 +71,12 @@
     {% endif %}
 
     <div class="form-group">
-        <label for="{{ form.username.id_for_label }}" class="text-muted">Username</label>
-        {{ form.username }}
-        {% if form.username.errors %}
+        <label for="{{ form.department_name.id_for_label }}" class="text-muted">Department Name</label>
+        {{ form.department_name }}
+        {% if form.department_name.errors %}
             <div class="text-danger">
                 <i class="bi bi-exclamation-triangle"></i>
-                {{ form.username.errors.as_text }}
+                {{ form.department_name.errors.as_text }}
             </div>
         {% endif %}
     </div>
@@ -136,7 +136,6 @@
         {% endif %}
     </div>
 
-    
     <div class="row">
         <div class="col-12">
             <button type="submit" class="btn btn-info btn-block">
@@ -145,8 +144,8 @@
         </div>
     </div>
 
-    
 </form>
+
 
 
 

@@ -210,15 +210,12 @@ class QuestionForm(forms.ModelForm):
 
 # No need to override __init__, is_valid, or save methods for basic Django admin usage
 
-
-
-    
 class LoginForm(forms.Form):
-    username = forms.CharField(
-        widget= forms.TextInput(
+    email = forms.EmailField(
+        widget=forms.EmailInput(
             attrs={
                 "class": "form-control",
-                "placeholder":"username"
+                "placeholder": "Email"
             }
         )
     )
@@ -226,50 +223,56 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                "placeholder":"password"
+                "placeholder": "Password"
             }
         )
     )
 
-class AdminRegistrationForm(UserCreationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                "class": "form-control"
-            }
-        )
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(
-            attrs={
-                "class": "form-control"
-            }
-        )
-    )
-    password1 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control"
-            }
-        )
-    )
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                "class": "form-control"
-            }
-        )
-    )
 
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password1', 'password2')
+# class AdminRegistrationForm(UserCreationForm):
+#     username = forms.CharField(
+#         widget=forms.TextInput(
+#             attrs={
+#                 "class": "form-control"
+#             }
+#         )
+#     )
+#     email = forms.EmailField(
+#         widget=forms.EmailInput(
+#             attrs={
+#                 "class": "form-control"
+#             }
+#         )
+#     )
+#     password1 = forms.CharField(
+#         widget=forms.PasswordInput(
+#             attrs={
+#                 "class": "form-control"
+#             }
+#         )
+#     )
+#     password2 = forms.CharField(
+#         widget=forms.PasswordInput(
+#             attrs={
+#                 "class": "form-control"
+#             }
+#         )
+#     )
+
+#     class Meta:
+#         model = User
+#         fields = ('username', 'email', 'password1', 'password2')
+
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
 
 class DepartmentRegistrationForm(UserCreationForm):
-    username = forms.CharField(
+    department_name = forms.CharField(
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "Enter your username"
+            "placeholder": "Enter department name"
         })
     )
     email = forms.EmailField(
@@ -305,7 +308,7 @@ class DepartmentRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'college', 'phone', 'password1', 'password2')
+        fields = ('department_name', 'email', 'college', 'phone', 'password1', 'password2')
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -319,72 +322,37 @@ class DepartmentRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Phone number must contain only numeric digits.')
         return phone
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = self.generate_username()
+        if commit:
+            user.save()
+        return user
 
-class StudentRegistrationForm(UserCreationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter your username"
-        })
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter your email"
-        })
-    )
-    college = forms.CharField(
-        widget=forms.TextInput(attrs={
-            "class": "form-conztrol",
-            "placeholder": "Enter your college"
-        })
-    )
-    phone = forms.CharField(
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter your phone number"
-        })
-    )
-    password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter your password"
-        })
-    )
-    password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Confirm your password"
-        })
-    )
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'college', 'phone', 'password1', 'password2')
-    
-    def clean_email(self):
+    def generate_username(self):
+        department_name = self.cleaned_data.get('department_name')
         email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError('This email address is already in use.')
-        return email
-
-    def clean_phone(self):
-        phone = self.cleaned_data.get('phone')
-        if not phone.isdigit():
-            raise forms.ValidationError('Phone number must contain only numeric digits.')
-        return phone
+        # Here you can generate a unique username based on department name and email
+        # For example, you can concatenate them and use a hashing algorithm to ensure uniqueness
+        # Here's a simple example:
+        username = f"{department_name}_{email}".replace('@', '_').replace('.', '_')
+        return username
 
 
-# forms.py
+
+
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 
 class StudentRegistrationForm(UserCreationForm):
-    username = forms.CharField(
+    first_name = forms.CharField(
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "Enter your username"
+            "placeholder": "Enter your full name"
         })
     )
     email = forms.EmailField(
@@ -393,12 +361,18 @@ class StudentRegistrationForm(UserCreationForm):
             "placeholder": "Enter your email"
         })
     )
-    college = forms.CharField(
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Enter your college"
+    sex_choices = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other')
+    )
+    sex = forms.ChoiceField(
+        choices=sex_choices,
+        widget=forms.Select(attrs={
+            "class": "form-control"
         })
     )
+    
     phone = forms.CharField(
         widget=forms.TextInput(attrs={
             "class": "form-control",
@@ -420,16 +394,21 @@ class StudentRegistrationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'college', 'phone', 'password1', 'password2')
+        fields = ('first_name', 'email', 'sex',  'phone', 'password1', 'password2')
 
-    def __init__(self, *args, **kwargs):
-        self.department_username = kwargs.pop('department_username', None)
-        super(StudentRegistrationForm, self).__init__(*args, **kwargs)
+    def generate_username(self):
+        first_name = self.cleaned_data.get('first_name')
+        email = self.cleaned_data.get('email')
+        # Here you can generate a unique username based on department name and email
+        # For example, you can concatenate them and use a hashing algorithm to ensure uniqueness
+        # Here's a simple example:
+        username = f"{first_name}_{email}".replace('@', '_').replace('.', '_')
+        return username
 
     def save(self, commit=True):
-        user = super(StudentRegistrationForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.is_student = True
-        user.department_name = self.department_username  # Set the department for the student
+        user.username = self.generate_username()  # Set the generated username
         if commit:
             user.save()
         return user
