@@ -27,6 +27,12 @@ urlpatterns = [
     path('update_student/<str:username>/', update_student, name='update_student'),
     path('update_exam/<int:exam_id>/', update_exam, name='update_exam'),
     path('delete_exam/<int:exam_id>/', delete_exam, name='delete_exam'),
+    path('update-question/<int:question_id>/', update_question, name='update_question'),
+    path('question/<int:question_id>/delete/', delete_question, name='delete_question'),
+    path('delete/course/<int:course_id>/', delete_course, name='delete_course'),
+
+
+
 
 
 

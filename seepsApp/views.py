@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import User
 import string
-import random
+import os
 
 
 
@@ -296,11 +296,36 @@ def add_question(request):
 
 
 def manage_questions(request):
-    # Retrieve the department username of the logged-in user
     department_username = request.user.username
-    # Filter questions based on the department username
     questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
     return render(request, 'department_template/manage_question.html', {'questions': questions})
+def update_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Question updated successfully!')
+            return redirect('manage_questions')
+        else:
+            messages.error(request, 'Error updating question. Please check the form.')
+    else:
+        form = QuestionForm(instance=question)
+
+    return render(request, 'department_template/manage_question.html', {'form': form, 'question': question})
+
+
+
+def delete_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, 'Question deleted successfully!')
+        return redirect('manage_questions')
+    
+    return redirect('manage_questions')
+
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -415,18 +440,60 @@ def feedback_management(request):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Course
-from .forms import CourseForm  # Import the CourseForm
-
-from django.shortcuts import render, redirect
-from .models import Course
-from .forms import CourseForm
-
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def manage_courses(request):
+    # Retrieve the department name of the logged-in user
     department_name = request.user.username
+
+    # Retrieve courses added by the department
     courses = Course.objects.filter(department_name=department_name)
+
+    # Remove "files/resources/" from the resource path for each course
+    for course in courses:
+        file_name = os.path.basename(course.resource.name)
+        course.resource = file_name
+
+    if request.method == 'POST':
+        activate_course_id = request.POST.get('activate_course_id')
+        deactivate_course_id = request.POST.get('deactivate_course_id')
+
+        if activate_course_id:
+            # Activate the course
+            try:
+                course = Course.objects.get(pk=activate_course_id)
+                course.is_active = True
+                course.save()
+                messages.success(request, f'Course {course.title} has been activated successfully.')
+            except Course.DoesNotExist:
+                messages.error(request, 'Course not found.')
+
+        elif deactivate_course_id:
+            # Deactivate the course
+            try:
+                course = Course.objects.get(pk=deactivate_course_id)
+                course.is_active = False
+                course.save()
+                messages.success(request, f'Course {course.title} has been deactivated successfully.')
+            except Course.DoesNotExist:
+                messages.error(request, 'Course not found.')
+
     return render(request, 'department_template/manage_courses.html', {'courses': courses})
+from django.http import HttpResponseNotFound
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_course(request, course_id):
+    if request.method == 'POST':
+        try:
+            course = Course.objects.get(pk=course_id)
+            course.delete()
+            messages.success(request, f'Course {course.title} deleted successfully.')
+            return redirect('manage_courses')  # Replace 'manage_courses' with the URL name of your manage view for courses
+        except Course.DoesNotExist:
+            return HttpResponseNotFound('<h1>Course not found</h1>')
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
 
 def manage_tutorials(request):
     department_name = request.user.username
@@ -449,17 +516,15 @@ def add_course(request):
         form = CourseForm(request.POST, request.FILES, department_name=department_name)
         if form.is_valid():
             form.save()
-            success_msg = 'Course added successfully!'
+            messages.success(request, 'Course deleted successfully!')
             return redirect('add_course')
         else:
-            error_msg = 'Form is not valid'
+            messages.error(request, 'Form is not valid')
     else:
         form = CourseForm(department_name=department_name)
 
     return render(request, 'department_template/add_course.html', {
-        'form': form,
-        'success_msg': success_msg,
-        'error_msg': error_msg
+        'form': form
     })
 
 

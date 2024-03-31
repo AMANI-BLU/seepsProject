@@ -10,6 +10,22 @@
 
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+
+            {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
@@ -20,7 +36,6 @@
                                     <i class="fas fa-plus"></i> Add New
                                 </button>
                                 <div class="dropdown-menu">
-                                
                                     <a class="dropdown-item" href="{% url 'add_question' %}">Add Question</a>
                                 </div>
                             </div>
@@ -64,61 +79,149 @@
                                 <tbody>
                                     <!-- Sample Data -->
                                     {% for question in questions %}
-                                        <tr>
-                                            <td>{{ forloop.counter }}</td>
-                                            <td style="max-width: 200px; max-height: 200px; overflow: hidden;">{{ question.content|safe }}</td>
-                                            <td>{{ question.exam.name }}</td>
-                                            <td>
-                                                <!-- Add actions for managing questions here -->
-                                            </td>
-                                        </tr>
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td style="max-width: 200px; max-height: 200px; overflow: hidden;">{{ question.content|safe }}</td>
+                                        <td>{{ question.exam.name }}</td>
+                                        <td>
+                                            <!-- Edit Button -->
+                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editQuestionModal{{ question.id }}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                     
+                                                <!-- Delete Button -->
+                                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+
+                                        </td>
+                                    </tr>
+
+                                    <!-- Edit Question Modal -->
+                                    <div class="modal fade" id="editQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalLabel{{ question.id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editQuestionModalLabel{{ question.id }}">Edit Question</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Edit Form -->
+                                                    <form action="{% url 'update_question' question.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <div class="form-group">
+                                                            <label for="question_content">Question Content</label>
+                                                            <textarea class="form-control summernote" id="content" name="content" rows="3">{{ question.content }}</textarea>
+                                                        </div>
+                                                        <!-- Add more form fields as needed -->
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-save"></i> Save Changes
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Edit Question Modal -->
+
                                     {% endfor %}
+
+
+
+                                                                            <!-- Inside the Questions Table Loop -->
+                                        {% for question in questions %}
+                                            <!-- Delete Question Modal -->
+                                            <div class="modal fade" id="deleteQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteQuestionModalLabel{{ question.id }}" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="deleteQuestionModalLabel{{ question.id }}">Delete Question</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to delete the question?</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <form action="{% url 'delete_question' question.id %}" method="post">
+                                                                {% csrf_token %}
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
                 </div>
-    
-
-                <!-- /.container-fluid -->
             </section>
             <!-- /.content -->
         </div>
 
-         <script>
-                $(document).ready(function () {
-            var questionsTable = $('#questionsTable').DataTable({
-                dom: 'Bfrtip',
-                pageLength: 5, // Set the default number of rows per page
-                buttons: [
-                    {
-                        extend: 'excelHtml5',
-                        text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
-                        className: 'btn btn-light',
-                        exportOptions: {
-                            columns: ':not(.exclude-export)'
-                        }
-                    },
-                    {
-                        extend: 'pdfHtml5',
-                        text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
-                        className: 'btn btn-light',
-                        exportOptions: {
-                            columns: ':not(.exclude-export)'
-                        }
-                    }
-                ]
+        <script>
+            $(document).ready(function() {
+                // Initialize Summernote
+                $('.summernote').summernote({
+                    height: 200, // Set the height of the editor
+                    // Add other Summernote options here if needed
+                });
             });
+        </script>
 
-            // Add an event listener to update the page length when the user changes the selection
-            $('#rowsPerPage').on('change', function () {
-                var selectedRows = $(this).val();
-                questionsTable.page.len(selectedRows).draw();
+        <!-- Datatables and other scripts -->
+        <script>
+            $(document).ready(function () {
+                var questionsTable = $('#questionsTable').DataTable({
+                    dom: 'Bfrtip',
+                    pageLength: 5, // Set the default number of rows per page
+                    buttons: [
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
+                            className: 'btn btn-light',
+                            exportOptions: {
+                                columns: ':not(.exclude-export)'
+                            }
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
+                            className: 'btn btn-light',
+                            exportOptions: {
+                                columns: ':not(.exclude-export)'
+                            }
+                        }
+                    ],
+                      responsive: true, // Make the table responsive
+            // Add Bootstrap classes to the table
+            "language": {
+                "search": "_INPUT_", // Search input style
+                "searchPlaceholder": "Search...", // Placeholder for search input
+                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                "paginate": {
+                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                    "next": '<i class="fas fa-angle-right"></i>' // Next button
+                }
+            }
+                });
+
+                // Add an event listener to update the page length when the user changes the selection
+                $('#rowsPerPage').on('change', function () {
+                    var selectedRows = $(this).val();
+                    questionsTable.page.len(selectedRows).draw();
+                });
             });
-        });
-
-                </script>
+        </script>
 
         {% include 'department_template/footer.html' %}
     </div>
