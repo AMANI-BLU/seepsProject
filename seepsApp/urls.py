@@ -31,6 +31,8 @@ urlpatterns = [
     path('question/<int:question_id>/delete/', delete_question, name='delete_question'),
     path('delete/course/<int:course_id>/', delete_course, name='delete_course'),
     path('update_course/<int:course_id>/', update_course, name='update_course'),
+    path('update-tutorial/<int:tutorial_id>/', update_tutorial, name='update_tutorial'),
+    path('delete-tutorial/<int:tutorial_id>/', delete_tutorial, name='delete_tutorial'),
 
 
 

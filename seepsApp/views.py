@@ -23,7 +23,6 @@ def is_admin(user):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 # Login View
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -148,7 +147,7 @@ def delete_department(request, email):
 def department_home(request):
     department_name = request.user.username
     department_username = request.user.username
-
+    students = User.objects.filter(is_student=True, department_name=department_name)
     # Count the number of feedbacks
     feedbacks_count = Feedback.objects.filter(user__department_name=department_username).count()
 
@@ -160,6 +159,13 @@ def department_home(request):
 
     # Count the number of exams
     exams_count = Exam.objects.filter(department_name=department_name).count()
+    male_count = 0
+    female_count = 0
+    for student in students:
+        if student.sex == 'male':  # Corrected: accessing sex directly from student object
+            male_count += 1
+        elif student.sex == 'female':  # Corrected: accessing sex directly from student object
+            female_count += 1   
 
     # Pass the counts to the template
     context = {
@@ -167,6 +173,8 @@ def department_home(request):
         'questions_count': questions_count,
         'exams_count': exams_count,
         'feedbacks_count': feedbacks_count,
+        'male_count': male_count,
+        'female_count': female_count,
     }
 
     return render(request, 'department_template/dashboard.html', context)
@@ -198,7 +206,7 @@ def add_student(request):
         'error_msg': error_msg
     })
 
-    
+
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):
@@ -206,19 +214,33 @@ def view_student(request):
     department_name = request.user.username
     
     # Retrieve all registered students belonging to the department along with their full names
-    students = User.objects.filter(is_student=True, department_name=department_name).values('username', 'first_name', 'last_name', 'email', 'sex', 'phone')
+    students = User.objects.filter(is_student=True, department_name=department_name)
+    
+    # Initialize counters for male and female students
+    male_count = 0
+    female_count = 0
+
+    # Iterate through the students queryset to count male and female students
+    for student in students:
+        if student.sex == 'male':  # Corrected: accessing sex directly from student object
+            male_count += 1
+        elif student.sex == 'female':  # Corrected: accessing sex directly from student object
+            female_count += 1
 
     # Fetch the total count of students belonging to the department
     total_students = students.count()
-    for student in students:
-        if student['sex'] == 'M':
-            student['sex'] = 'Male'
-        elif student['sex'] == 'F':
-            student['sex'] = 'Female'
-    # Pass the list of students and total count to the template
-    context = {'students': students, 'total_students': total_students}
+
+    # Pass the list of students, total count, and counts of male and female students to the template
+    context = {
+        'students': students,
+        'total_students': total_students,
+        'male_count': male_count,
+        'female_count': female_count,
+    }
 
     return render(request, 'department_template/view_student.html', context)
+
+
 from django.contrib import messages
 from django.shortcuts import redirect, render
 
@@ -299,24 +321,38 @@ def manage_questions(request):
     department_username = request.user.username
     questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
     return render(request, 'department_template/manage_question.html', {'questions': questions})
+
 def update_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
+    department_username = request.user.username
     
+    # Fetch all available exams
+    exams = Exam.objects.all()
+
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
-        if form.is_valid():
-            form.save()
+        formset = ChoiceFormSet(request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
+            question = form.save()
+            formset.instance = question
+            formset.save()
             messages.success(request, 'Question updated successfully!')
             return redirect('manage_questions')
         else:
             messages.error(request, 'Error updating question. Please check the form.')
     else:
         form = QuestionForm(instance=question)
+        formset = ChoiceFormSet(instance=form.instance)
 
-    return render(request, 'department_template/manage_question.html', {'form': form, 'question': question})
+    return render(request, 'department_template/manage_question.html', {
+        'form': form,
+        'formset': formset,
+        'question': question,
+        'exams': exams  # Pass exams to the template context
+    })
 
-
-
+    
+    
 def delete_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if request.method == 'POST':
@@ -520,14 +556,11 @@ def delete_course(request, course_id):
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-
 def manage_tutorials(request):
     department_name = request.user.username
     courses = Course.objects.filter(department_name=department_name)
     tutorials = Tutorial.objects.filter(course__in=courses)
-    return render(request, 'department_template/manage_tutorials.html', {'tutorials': tutorials})
-
-
+    return render(request, 'department_template/manage_tutorials.html', {'tutorials': tutorials, 'courses': courses})
 
 from django.contrib import messages
 @login_required(login_url='login_view')
@@ -582,6 +615,28 @@ def add_tutorial(request):
         'form': form,
     })
     
+ 
+def update_tutorial(request, tutorial_id):
+    tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
+    if request.method == 'POST':
+        form = TutorialForm(request.POST, instance=tutorial)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tutorial updated successfully!')
+            return redirect('manage_tutorials')
+    else:
+        form = TutorialForm(instance=tutorial)
+        department_name = request.user.username
+        courses = Course.objects.filter(department_name=department_name)
+    return render(request, 'department_template/update_tutorial.html', {'form': form, 'courses': courses})
+
+
+def delete_tutorial(request, tutorial_id):
+    tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
+    if request.method == 'POST':
+        tutorial.delete()
+        messages.success(request, 'Tutorial deleted successfully!')
+    return redirect('manage_tutorials')
  
 
 ####################### Student Views ############################

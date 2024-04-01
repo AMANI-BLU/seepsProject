@@ -11,21 +11,21 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
 
-            {% if messages %}
-                        {% for message in messages %}
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                            <script>
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    text: "{{ message }}",
-                                    showConfirmButton: false,
-                                    timer: 6000,
-                                });
-                            </script>
-                        {% endfor %}
-                    {% endif %}
+            {% if messages.success %}
+                {% for message in messages %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                {% endfor %}
+            {% endif %}
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
@@ -88,15 +88,12 @@
                                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editQuestionModal{{ question.id }}">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                     
-                                                <!-- Delete Button -->
-                                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
-                                                    <i class="fas fa-trash-alt"></i> Delete
-                                                </button>
-
+                                            <!-- Delete Button -->
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
                                         </td>
                                     </tr>
-
                                     <!-- Edit Question Modal -->
                                     <div class="modal fade" id="editQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="editQuestionModalLabel{{ question.id }}" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
@@ -115,8 +112,28 @@
                                                             <label for="question_content">Question Content</label>
                                                             <textarea class="form-control summernote" id="content" name="content" rows="3">{{ question.content }}</textarea>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="exam">Exam</label>
+                                                            <select class="form-control" id="exam" name="exam">
+                                                                {% for question in questions %}
+                                                                    <option value="{{ exam.id }}" {% if question.exam.id == exam.id %}selected{% endif %}>{{ question.exam}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <h5>Choices:</h5>
+                                                        {% for choice in question.choice_set.all %}
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="correct_choice" id="choice{{ choice.id }}" value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %}>
+                                                                <label class="form-check-label" for="choice{{ choice.id }}">
+                                                                    {{ choice.text }}
+                                                                    {% if choice.is_correct %}
+                                                                        <span class="badge badge-success">Correct</span>
+                                                                    {% endif %}
+                                                                </label>
+                                                            </div>
+                                                        {% endfor %}
                                                         <!-- Add more form fields as needed -->
-                                                        <button type="submit" class="btn btn-primary">
+                                                        <button type="submit" class="btn btn-info">
                                                             <i class="fas fa-save"></i> Save Changes
                                                         </button>
                                                     </form>
@@ -125,43 +142,11 @@
                                         </div>
                                     </div>
                                     <!-- End Edit Question Modal -->
-
                                     {% endfor %}
-
-
-
-                                                                            <!-- Inside the Questions Table Loop -->
-                                        {% for question in questions %}
-                                            <!-- Delete Question Modal -->
-                                            <div class="modal fade" id="deleteQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteQuestionModalLabel{{ question.id }}" aria-hidden="true">
-                                                <div class="modal-dialog" role="document">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteQuestionModalLabel{{ question.id }}">Delete Question</h5>
-                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                <span aria-hidden="true">&times;</span>
-                                                            </button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <p>Are you sure you want to delete the question?</p>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <form action="{% url 'delete_question' question.id %}" method="post">
-                                                                {% csrf_token %}
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-danger">Delete</button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-
                                 </tbody>
                             </table>
                         </div>
                     </div>
-
                 </div>
             </section>
             <!-- /.content -->
@@ -201,18 +186,18 @@
                             }
                         }
                     ],
-                      responsive: true, // Make the table responsive
-            // Add Bootstrap classes to the table
-            "language": {
-                "search": "_INPUT_", // Search input style
-                "searchPlaceholder": "Search...", // Placeholder for search input
-                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
-                "paginate": {
-                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
-                    "next": '<i class="fas fa-angle-right"></i>' // Next button
-                }
-            }
+                    responsive: true, // Make the table responsive
+                    // Add Bootstrap classes to the table
+                    "language": {
+                        "search": "_INPUT_", // Search input style
+                        "searchPlaceholder": "Search...", // Placeholder for search input
+                        "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                        "paginate": {
+                            "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                            "next": '<i class="fas fa-angle-right"></i>' // Next button
+                        }
+                    }
                 });
 
                 // Add an event listener to update the page length when the user changes the selection
