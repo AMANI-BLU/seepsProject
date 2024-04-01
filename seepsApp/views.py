@@ -479,6 +479,32 @@ def manage_courses(request):
                 messages.error(request, 'Course not found.')
 
     return render(request, 'department_template/manage_courses.html', {'courses': courses})
+
+def update_course(request, course_id):
+    if request.method == 'POST':
+        try:
+            # Retrieve the course object based on the course_id
+            course = Course.objects.get(pk=course_id)
+            # Update course fields based on form input
+            course.title = request.POST.get('course_title')
+            course.description = request.POST.get('course_description')
+            course.prerequisites = request.POST.get('course_prerequisites')
+            course.learning_outcomes = request.POST.get('course_learning_outcomes')
+            course.is_active = request.POST.get('course_is_active') == 'on'  # Convert checkbox value to boolean
+            # Handle updating resource file
+            if 'course_resource' in request.FILES:
+                course.resource = request.FILES['course_resource']
+            # Handle updating thumbnail file
+            if 'course_thumbnail' in request.FILES:
+                course.thumbnail = request.FILES['course_thumbnail']
+            # Save the updated course
+            course.save()
+            messages.success(request, 'Course updated successfully!')
+        except Course.DoesNotExist:
+            messages.error(request, 'Course not found!')
+    return redirect('manage_courses')  # Redirect to the manage_courses page after update
+
+
 from django.http import HttpResponseNotFound
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
@@ -544,6 +570,7 @@ def add_tutorial(request):
         form = TutorialForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Tutorial Added successfully!')
             return redirect('add_tutorial')  # Redirect to the same page after adding a tutorial
     else:
         department_name = request.user.username  # Get department name from user
@@ -554,26 +581,8 @@ def add_tutorial(request):
     return render(request, 'department_template/add_tutorial.html', {
         'form': form,
     })
-
-# def edit_course(request, course_id):
-#     course = get_object_or_404(Course, id=course_id)
-#     if request.method == 'POST':
-#         course.title = request.POST.get('title')
-#         course.description = request.POST.get('description')
-#         course.resource = request.FILES.get('resource') or course.resource
-#         course.thumbnail = request.FILES.get('thumbnail') or course.thumbnail
-#         course.is_active = request.POST.get('is_active')
-#         course.save()
-#         return redirect('manage_courses')
-#     return render(request, 'department_template/edit_course.html', {'course': course})
-
-# def delete_course(request, course_id):
-#     course = get_object_or_404(Course, id=course_id)
-#     if request.method == 'POST':
-#         course.delete()
-#         return redirect('manage_courses')
-#     return render(request, 'department_template/delete_course.html', {'course': course})
-
+    
+ 
 
 ####################### Student Views ############################
 #Student Home Page
