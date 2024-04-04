@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Department | Import Student{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Import Student</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="myfile" id="myfile" onchange="displayFile()">
+            <button type="submit">Upload</button>
+        </form>
+        <div id="fileTable"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>
+    <script>
+        function displayFile() {
+            var fileInput = document.getElementById('myfile');
+            var fileTable = document.getElementById('fileTable');
+            fileTable.innerHTML = ''; // Clear previous content
+            
+            if (fileInput.files.length > 0) {
+                var file = fileInput.files[0];
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var data = new Uint8Array(event.target.result);
+                    var workbook = XLSX.read(data, { type: 'array' });
+                    var sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    var html = XLSX.utils.sheet_to_html(sheet);
+                    fileTable.innerHTML = html;
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+    </script>
+</div>
+{% endblock %}

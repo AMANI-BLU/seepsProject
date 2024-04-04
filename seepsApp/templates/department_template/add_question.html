@@ -76,6 +76,17 @@
                   {% endif %}
                 </div>
 
+                <div class="form-group">
+                  <label for="{{ form.answer_description.id_for_label }}" class="text-muted">Answer Description</label>
+                  {{ form.answer_description }}
+                  {% if form.answer_description.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.answer_description.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
                 {{ form.choices.management_form }}
 
                 {% for choice_form in form.choices %}
@@ -112,22 +123,25 @@
           </div>
         </div>
       </div>
-
-    
     </section>
   </div>
-  <script>
-  $(function () {
-    // Summernote
-    $('#summernote').summernote()
-
-    // CodeMirror
-    CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
-      mode: "htmlmixed",
-      theme: "monokai"
-    });
-  })
-</script>
   {% include 'department_template/footer.html' %}
 </div>
+
+<!-- Initialize Summernote -->
+<script>
+$(document).ready(function() {
+    $('.summernote').summernote({
+        height: 150,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['height', ['height']]
+        ]
+    });
+});
+</script>
 {% endblock %}

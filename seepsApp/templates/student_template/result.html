@@ -1,8 +1,5 @@
-<!-- student_template/result.html -->
 {% extends 'student_template/base.html' %}
-
 {% block title %}Student | Exam Result{% endblock %}
-
 {% block content %}
 <div class="container mt-5">
   <div class="card shadow" style="margin-top:70px;">
@@ -10,42 +7,104 @@
       <h2 class="text-center">Exam Result</h2>
     </div>
     <div class="card-body">
-      <div class="result-summary mb-4">
-        <p class="mb-1">
-          <strong class="text-success">Correctly Answered:</strong>
-          <span class="text-success font-weight-bold">{{ result.score }}</span>
-        </p>
-        <p class="mb-1">
-          <strong>Total Questions:</strong>
-          <span>{{ result.exam.question_set.count }}</span>
-        </p>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="result-summary mb-4">
+            <p class="mb-1">
+              <i class="fas fa-star text-warning"></i>
+              <strong>Score:</strong>
+              <span class="font-weight-bold">{{ result.score }}</span>
+            </p>
+            <p class="mb-1">
+              <i class="fas fa-question-circle text-info"></i>
+              <strong>Total Questions:</strong>
+              <span>{{ result.exam.question_set.count }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="alert alert-info">
+            <p class="mb-0">Below are your selected answers and the correct answers for each question within description:</p>
+          </div>
+        </div>
       </div>
-
+      <hr>
       <!-- Display more result details as needed -->
 
       {% for question in questions_with_choices %}
-        <div class="mb-4">
-          <h4>{{ forloop.counter }}) {{ question.content|safe }}</h4>
-          <div class="list-group">
-            {% for choice in question.choice_set.all %}
-              <label class="list-group-item">
-                {% if forloop.counter == 1 %}A{% elif forloop.counter == 2 %}B{% elif forloop.counter == 3 %}C{% elif forloop.counter == 4 %}D{% endif %}) {{ choice.text }}
-              </label>
-            {% endfor %}
-          </div>
-          
-          {% if question.correct_choice %}
-            <p class="mt-2">
-              <strong class="text-success">Correct Answer:</strong>
-              <span class="text-success font-weight-bold">{{ question.correct_choice.text }}</span>
-            </p>
-          {% endif %}
+      <div class="mb-4">
+        <h4>{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4>
+        <div class="list-group">
+          {% for choice in question.choice_set.all %}
+          <label class="list-group-item" id="choice_{{ choice.id }}" data-correct-answer="{{ question.correct_choice.id }}">
+            <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}" style="display: none;">
+            {{ choice.text }}
+          </label>
+          {% endfor %}
         </div>
+        <p class="mt-2">
+          <i class="fas fa-check-circle text-success"></i>
+          <strong class="text-muted">Correct Answer:</strong>
+          <span class="font-weight-bold text-info">{{ question.correct_choice.text }}</span>
+          <br>
+          <i class="fas fa-user-check text-info"></i>
+          <strong class="text-muted">Selected Answer:</strong>
+          <span id="selected-answer-{{ question.id }}"></span>
+           {% if question.answer_description %}
+          <div class="alert alert-info mt-3" role="alert">
+            <strong><i class="fas fa-info-circle"></i> Answer Description:</strong>
+            {{ question.answer_description |slice:"3:"|safe }}
+          </div>
+          {% endif %}
+        </p>
+      </div>
       {% endfor %}
+
     </div>
     <div class="card-footer text-muted text-center">
-      <a href="{% url 'student_home' %}" class="btn btn-primary">Go to Dashboard</a>
+      <button class="btn btn-success" onclick="printResult()"><i class="fas fa-print"></i> Print Result</button>
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const selectedChoices = {{ selected_choices|safe }};
+  const choices = document.querySelectorAll('.list-group-item');
+
+  choices.forEach(choice => {
+    const choiceId = choice.querySelector('input[type="radio"]').value;
+    const questionId = choice.querySelector('input[type="radio"]').name.split('_')[1];
+    const selectedAnswer = selectedChoices[questionId];
+    const correctAnswer = choice.dataset.correctAnswer;
+    
+    // Check if this choice is selected
+    if (selectedAnswer && selectedAnswer === choiceId) {
+      // Display selected answer
+      const selectedAnswerSpan = document.createElement('span');
+      selectedAnswerSpan.textContent = choice.querySelector('input[type="radio"]').nextSibling.textContent.trim();
+      document.getElementById('selected-answer-' + questionId).appendChild(selectedAnswerSpan);
+      
+      // Check if the selected choice matches the correct answer
+      const isCorrect = selectedAnswer === correctAnswer;
+      
+      // Highlight the selected choice based on correctness
+      if (isCorrect) {
+        // Highlight correct choices in green
+        choice.classList.add('bg-success');
+      } else {
+        // Highlight incorrect choices in red
+        choice.classList.add('bg-danger');
+      }
+    } else if (choiceId === correctAnswer) {
+      // Highlight the correct answer in green
+      choice.classList.add('bg-success');
+    }
+  });
+});
+
+function printResult() {
+  window.print();
+}
+</script>
+
 {% endblock %}

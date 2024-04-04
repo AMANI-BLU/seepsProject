@@ -174,41 +174,35 @@ ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, can_del
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['exam', 'content','answer_description']
+        fields = ['exam', 'content', 'answer_description']
+        widgets = {
+            'exam': forms.Select(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'id': 'summernote', 'placeholder': 'Enter Question here..'}),
+            'answer_description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter answer description here..'}),
+        }
 
-    # Use formset attribute instead of choices
     choices = ChoiceFormSet()
 
     def __init__(self, *args, **kwargs):
         department_username = kwargs.pop('department_username', None)
         super(QuestionForm, self).__init__(*args, **kwargs)
         
-        self.fields['content'].widget.attrs.update({
-            'class': 'form-control',
-            'id':'summernote',
-            'placeholder': 'Enter Question here..',
-        })
-        self.fields['exam'].widget.attrs.update({
-            'class': 'form-control',
-           
-        })
-        self.fields['answer_description'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Enter answer description here..',
-        })
-
         if department_username:
             # If department_username is provided, this is a department adding a question
             self.fields['exam'].queryset = Exam.objects.filter(department_name=department_username)
         else:
             # If department_username is not provided, this is an admin adding a question
             self.fields['exam'].queryset = Exam.objects.all()
-
-
-    # def __init__(self, department_username, *args, **kwargs):
-    #     super(QuestionForm, self).__init__(*args, **kwargs)
-    #     # Limit available exams to those belonging to the department
-    #     self.fields['exam'].queryset = Exam.objects.filter(department_name=department_username)
+            
+        # Initialize Summernote for content and answer_description fields
+        self.fields['content'].widget.attrs.update({
+            'class': 'form-control summernote',
+            'placeholder': 'Enter Question here..',
+        })
+        self.fields['answer_description'].widget.attrs.update({
+            'class': 'form-control summernote',
+            'placeholder': 'Enter answer description here..',
+        })
 
 
 

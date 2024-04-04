@@ -108,22 +108,19 @@
     showMessage('Keyboard shortcuts are disabled during the exam.');
   });
 
-  // Prevent navigating away from the exam page
-  window.onbeforeunload = function(event) {
-    return 'Are you sure you want to leave this page? Your exam progress will be lost.';
-  };
+  
 
   // Prevent opening new tabs or windows
   window.open = function() {
     showMessage('Opening new tabs or windows is disabled during the exam.');
     return false;
-  };
+  }; 
 
   // Prevent refreshing the page
   window.addEventListener('beforeunload', function(event) {
     event.preventDefault();
     showMessage('Refreshing the page is disabled during the exam.');
-  });
+  }); 
 
   // Prevent exiting fullscreen with the Escape key
   document.addEventListener('fullscreenchange', function(event) {

@@ -299,8 +299,8 @@ def update_student(request, username):
 
 # views.py
 from .forms import QuestionForm, ChoiceFormSet
+
 @login_required(login_url='login_view')
-# @user_passes_test(is_department, login_url='NoPage')
 def add_question(request):
     success_msg = None
     error_msg = None
@@ -328,9 +328,6 @@ def add_question(request):
         'success_msg': success_msg,
         'error_msg': error_msg
     })
-
-
-
 
 ######################/Department Views/#########################
 
@@ -732,6 +729,12 @@ def exam_detail(request, exam_id):
 # views.py
 from django.shortcuts import render, redirect
 from .models import Result, Exam, Question, Choice
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Exam, Question, Choice, Result
+from django.shortcuts import redirect
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Result, Exam, Question, Choice
 
 def submit_exam(request, exam_id):
     exam = Exam.objects.get(pk=exam_id)
@@ -740,12 +743,22 @@ def submit_exam(request, exam_id):
     if request.method == 'POST':
         # Calculate the number of correct answers
         correct_answers = 0
+
+        # Initialize dictionary to store user answers
+        user_answers = {}
+
         for question in questions:
             selected_choice_id = request.POST.get(f'question_{question.id}', None)
             if selected_choice_id:
                 selected_choice = Choice.objects.get(pk=selected_choice_id)
                 if selected_choice.is_correct:
                     correct_answers += 1
+
+                # Store user answer in session
+                user_answers[str(question.id)] = selected_choice_id
+
+        # Store user answers in session
+        request.session['user_answers'] = user_answers
 
         # Store the result in the database
         result = Result.objects.create(student=request.user, exam=exam, score=correct_answers)
@@ -757,14 +770,6 @@ def submit_exam(request, exam_id):
         })
 
     return redirect('view_exams')  # Redirect to the view_exams page if it's not a POST request
-
-from django.shortcuts import render, get_object_or_404
-
-# views.py
-# views.py
-from django.shortcuts import render, redirect
-from .models import Result, Exam, Question, Choice
-
 def result(request, result_id):
     result = get_object_or_404(Result, pk=result_id)
     
@@ -780,12 +785,17 @@ def result(request, result_id):
         question.correct_choice = correct_choice
         questions_with_choices.append(question)
 
+    # Retrieve user answers from the session
+    user_answers = request.session.get('user_answers', {})
+
+    # Serialize the selected choices into a dictionary
+    selected_choices = {str(question.id): str(user_answers.get(str(question.id))) for question in questions}
+
     return render(request, 'student_template/result.html', {
         'result': result,
         'questions_with_choices': questions_with_choices,
+        'selected_choices': selected_choices,
     })
-
-
 
 # views.py
 from django.shortcuts import render, redirect
