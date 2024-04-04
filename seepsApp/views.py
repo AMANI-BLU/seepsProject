@@ -299,7 +299,6 @@ def update_student(request, username):
 
 # views.py
 from .forms import QuestionForm, ChoiceFormSet
-
 @login_required(login_url='login_view')
 def add_question(request):
     success_msg = None
@@ -324,10 +323,11 @@ def add_question(request):
 
     return render(request, 'department_template/add_question.html', {
         'form': form,
-        'formset': formset,
+        'formset': formset,  # Pass the formset to the template
         'success_msg': success_msg,
         'error_msg': error_msg
     })
+
 
 ######################/Department Views/#########################
 
@@ -395,6 +395,9 @@ def manage_exam(request):
     # Retrieve exams added by the department along with the number of questions for each exam
     exams = Exam.objects.filter(department_name=department_name).annotate(num_questions=Count('question'))
 
+    # Retrieve difficulty choices
+    DIFFICULTY_CHOICES = Exam.DIFFICULTY_CHOICES
+
     if request.method == 'POST':
         activate_exam_id = request.POST.get('activate_exam_id')
         deactivate_exam_id = request.POST.get('deactivate_exam_id')
@@ -419,8 +422,7 @@ def manage_exam(request):
             except Exam.DoesNotExist:
                 messages.error(request, 'Exam not found.')
 
-    return render(request, 'department_template/manage_exam.html', {'exams': exams})
-
+    return render(request, 'department_template/manage_exam.html', {'exams': exams, 'DIFFICULTY_CHOICES': DIFFICULTY_CHOICES})
 
 
 @login_required(login_url='login_view')
@@ -459,6 +461,8 @@ def update_exam(request, exam_id):
         exam.name = request.POST.get('exam_name')
         exam.timer = request.POST.get('exam_duration')
         exam.exam_code = request.POST.get('exam_code')
+        exam.attempts_allowed = request.POST.get('attempts_allowed')
+        exam.difficulty =  request.POST.get('exam_difficulty')
         # Add more fields as needed
         exam.save()
         messages.success(request, 'Exam updated successfully!')
@@ -669,7 +673,8 @@ def student_home(request):
     
     return render(request, 'student_template/student_home.html', {'first_name': first_name, 'courses': courses})
 
-
+from django.db.models import Count
+from .models import Attempt
 @login_required(login_url='login_view')
 @user_passes_test(lambda user: user.is_student, login_url='NoPage')
 def view_exams(request):
@@ -678,6 +683,13 @@ def view_exams(request):
 
     # Filter exams based on the department name and only include activated exams
     exams = Exam.objects.filter(department_name=department_name, is_active=True)
+
+    # Iterate through each exam and calculate the attempts count for each exam
+    for exam in exams:
+        # Get the count of attempts for the current exam
+        attempts_count = Attempt.objects.filter(exam=exam).count()
+        # Assign the attempts count to the exam object
+        exam.attempts_count = attempts_count
 
     return render(request, 'student_template/view_exams.html', {'exams': exams})
 
@@ -770,6 +782,8 @@ def submit_exam(request, exam_id):
         })
 
     return redirect('view_exams')  # Redirect to the view_exams page if it's not a POST request
+
+
 def result(request, result_id):
     result = get_object_or_404(Result, pk=result_id)
     
@@ -813,8 +827,9 @@ from .models import Exam  # Import your Exam model
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib import messages
 from .models import Exam  # Import your Exam model
-
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect
+from django.contrib import messages
 
 @login_required(login_url='login_view')
 def enter_exam_code(request, exam_id):
@@ -823,22 +838,41 @@ def enter_exam_code(request, exam_id):
     # Retrieve the number of questions for the exam
     num_questions = exam.question_set.count()
 
+    # Get the maximum attempts allowed for the exam
+    max_attempts = exam.attempts_allowed
+
+    # Get the session key for the exam code
+    session_key = f'exam_code_{exam_id}'
+
+    # Initialize attempt count to 0
+    attempt_count = request.session.get(f'attempt_count_{exam_id}', 0)
+
+    # Calculate attempts remaining
+    attempts_remaining = max_attempts - attempt_count
+
     if request.method == 'POST':
         entered_exam_code = request.POST.get('exam_code', '').strip()
 
         if entered_exam_code:
             if entered_exam_code == exam.exam_code:
-                # Store the entered exam code in the session
-                request.session[f'exam_code_{exam_id}'] = entered_exam_code
-                # Redirect to the exam details page if the entered code is correct
-                return redirect('exam_detail', exam_id=exam_id)
+                # Check if the attempt count is less than the maximum allowed attempts
+                if attempt_count < max_attempts:
+                    # Increment the attempt count
+                    attempt_count += 1
+                    # Store the updated attempt count in the session
+                    request.session[f'attempt_count_{exam_id}'] = attempt_count
+                    # Store the entered exam code in the session
+                    request.session[session_key] = entered_exam_code
+                    # Redirect to the exam detail page if the entered code is correct and attempts are within limit
+                    return redirect('exam_detail', exam_id=exam_id)
+                else:
+                    messages.error(request, 'You have reached the maximum number of attempts for this exam.')
             else:
                 messages.error(request, 'Invalid exam code. Please try again.')
         else:
             messages.error(request, 'Please enter a valid exam code.')
 
-    return render(request, 'student_template/enter_exam_code.html', {'exam': exam, 'num_questions': num_questions})
-
+    return render(request, 'student_template/enter_exam_code.html', {'exam': exam, 'num_questions': num_questions, 'attempts_remaining': attempts_remaining})
 
 from django.shortcuts import render, redirect
 from django.contrib import messages

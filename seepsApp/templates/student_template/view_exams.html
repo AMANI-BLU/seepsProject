@@ -23,8 +23,9 @@
                             <div class="card-body">
                                 <h3>{{ exam.name }}</h3>
                                 <p class="card-text">
-                                    Some quick example text to build on the card title and make up
-                                    the bulk of the card's content.
+                                    This exam is designed to test your understanding of {{ exam.subject }} concepts. It contains a variety of questions covering different topics.
+                                   
+                                    You will have {{ exam.timer }} minutes to complete the exam. Make sure to manage your time wisely.
                                 </p>
                                 <!-- student_template/view_exams.html -->
                                 <!-- ... existing code ... -->
@@ -40,7 +41,7 @@
 
                                 <div class="ribbon-wrapper ribbon-lg">
                                     <div class="ribbon bg-info">
-                                        Exam Taken
+                                       {{ exam.difficulty }}
                                     </div>
                                 </div>
                             </div>

@@ -4,6 +4,37 @@
 
 {% block content %}
 <div class="container mt-5 pt-4 content-container">
+
+  {% if messages.success %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+
+                        {%else%}
+                           {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'info',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
   <div class="row mt-6">
     <div class="container mt-4">
       <div class="card card-outline card-info">
@@ -17,7 +48,7 @@
                 <tbody>
                   <tr>
                     <td><h6>Student Name</h6></td>
-                    <td>{{ request.user.first_name  }}</td>
+                    <td>{{ request.user.first_name }}</td>
                   </tr>
                   <!-- Add other relevant user information as needed -->
                   <tr>
@@ -32,6 +63,11 @@
                     <td><h6>Time Given</h6></td>
                     <td>{{ exam.timer }} minutes</td>
                   </tr>
+                 <tr>
+                    <td><h6>Attempts Remaining</h6></td>
+                    <td>{{ attempts_remaining }}</td>
+                </tr>
+
                   <tr>
                     <td><h6>Exam Code</h6></td>
                     <td>

@@ -10,15 +10,35 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True) 
     sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female'), ('O', 'Other')), blank=True, null=True)
     
+# models.py
+
+from django.db import models
 class Exam(models.Model):
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+
     name = models.CharField(max_length=255)
     department_name = models.CharField(max_length=255, blank=True, null=True)
     timer = models.PositiveIntegerField()
-    exam_code = models.CharField(max_length=10)  # Add this line for the exam code
+    exam_code = models.CharField(max_length=10)
     is_active = models.BooleanField(default=False)
+    attempts_allowed = models.IntegerField(default=3)  # Add attempts allowed field
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium')
 
     def __str__(self):
         return self.name
+
+
+class Attempt(models.Model):
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='attempts')
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attempt by {self.student.username} on {self.exam.name}"
     
 # models.py
 # models.py

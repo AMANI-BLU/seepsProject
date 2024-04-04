@@ -8,11 +8,24 @@ from .models import Exam
 # forms.py
 from django import forms
 from .models import *
+# forms.py
+
+from django import forms
+from .models import Exam
 
 class ExamForm(forms.ModelForm):
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+
+    attempts_allowed = forms.IntegerField(label='Attempts Allowed', min_value=1)
+    difficulty = forms.ChoiceField(choices=DIFFICULTY_CHOICES)
+
     class Meta:
         model = Exam
-        fields = ['name', 'timer','exam_code']
+        fields = ['name', 'timer', 'exam_code', 'attempts_allowed', 'difficulty']
 
     def __init__(self, *args, **kwargs):
         self.department_name = kwargs.pop('department_name', None)
@@ -29,9 +42,19 @@ class ExamForm(forms.ModelForm):
             'placeholder': 'Timer in minutes',
             'type': 'time',  # This is the attribute for the time picker
         })
+
         self.fields['exam_code'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Enter exam code',
+        })
+
+        self.fields['attempts_allowed'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter number of attempts allowed',
+        })
+
+        self.fields['difficulty'].widget.attrs.update({
+            'class': 'form-control',
         })
 
     def save(self, commit=True):
@@ -40,6 +63,7 @@ class ExamForm(forms.ModelForm):
         if commit:
             exam.save()
         return exam
+
 
 class FeedbackForm(forms.ModelForm):
     class Meta:
@@ -170,7 +194,6 @@ class ChoiceForm(forms.ModelForm):
         }
 
 ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, can_delete=False, extra=4)
-
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
@@ -189,11 +212,15 @@ class QuestionForm(forms.ModelForm):
         
         if department_username:
             # If department_username is provided, this is a department adding a question
-            self.fields['exam'].queryset = Exam.objects.filter(department_name=department_username)
+            queryset = Exam.objects.filter(department_name=department_username)
         else:
             # If department_username is not provided, this is an admin adding a question
-            self.fields['exam'].queryset = Exam.objects.all()
-            
+            queryset = Exam.objects.all()
+
+        # Modify the queryset to include difficulty level in each exam choice
+        choices = [(exam.id, f"{exam.name} ({exam.difficulty})") for exam in queryset]
+        self.fields['exam'].choices = choices
+        
         # Initialize Summernote for content and answer_description fields
         self.fields['content'].widget.attrs.update({
             'class': 'form-control summernote',

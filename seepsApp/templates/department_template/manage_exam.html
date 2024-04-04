@@ -120,9 +120,7 @@
             <!-- /.content -->
         </div>
 
-       
-
-        <!-- Update Exam Modals -->
+    <!-- Update Exam Modals -->
 {% for exam in exams %}
 <div class="modal fade" id="updateExamModal{{ exam.id }}" tabindex="-1" role="dialog" aria-labelledby="updateExamModalLabel{{ exam.id }}" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -135,46 +133,69 @@
             </div>
             <div class="modal-body">
                 <!-- Update Form -->
-                <form action="{% url 'update_exam' exam.id %}" method="post">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="exam_name">Exam Name</label>
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-user"></i></span>
-                            </span>
-                            <input type="text" class="form-control" id="exam_name" name="exam_name" value="{{ exam.name }}">
-                        </div>
+            <!-- Update Form -->
+            <form action="{% url 'update_exam' exam.id %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="text-muted" for="exam_name">Exam Name</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                        </span>
+                        <input type="text" class="form-control" id="exam_name" name="exam_name" value="{{ exam.name }}">
                     </div>
-                    <div class="form-group">
-                        <label for="exam_duration">Exam Duration(in minutes)</label>
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                            </span>
-                            <input type="text" class="form-control" id="exam_duration" name="exam_duration" value="{{ exam.timer }}">
-                        </div>
+                </div>
+                <!-- Add difficulty field -->
+                <div class="form-group">
+                    <label class="text-muted" for="exam_difficulty">Difficulty</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-cogs"></i></span> <!-- Icon for difficulty -->
+                        </span>
+                        <select class="form-control" id="exam_difficulty" name="exam_difficulty">
+                            {% for difficulty, label in DIFFICULTY_CHOICES %}
+                            <option value="{{ difficulty }}" {% if exam.difficulty == difficulty %} selected {% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="form-group">
-                        <label for="exam_code">Exam Code</label>
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-barcode"></i></span>
-                            </span>
-                            <input type="text" class="form-control" id="exam_code" name="exam_code" value="{{ exam.exam_code }}">
-                        </div>
+                </div>
+                <div class="form-group">
+                    <label class="text-muted" for="exam_duration">Exam Duration (in minutes)</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                        </span>
+                        <input type="text" class="form-control" id="exam_duration" name="exam_duration" value="{{ exam.timer }}">
                     </div>
-                    <!-- Add more form fields as needed -->
-                    <button type="submit" class="btn btn-info">
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </form>
+                </div>
+                <div class="form-group">
+                    <label class="text-muted" for="exam_code">Exam Code</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                        </span>
+                        <input type="text" class="form-control" id="exam_code" name="exam_code" value="{{ exam.exam_code }}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="text-muted">Number of Attempts</label>
+                    <div class="input-group">
+                        <span class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-list"></i></span>
+                        </span>
+                        <input type="number" class="form-control" name="attempts_allowed" value="{{ exam.attempts_allowed }}">
+                    </div>
+                </div>
+                <!-- Add more form fields as needed -->
+                <button type="submit" class="btn btn-info">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
             </div>
         </div>
     </div>
 </div>
 {% endfor %}
-
 
 
 
