@@ -1,184 +1,157 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    
-    <link rel="stylesheet" href="{% static "fontawesome-free/css/all.min.css" %}">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bbootstrap 4 -->
-    <link rel="stylesheet" href="{% static 'tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="{% static "icheck-bootstrap/icheck-bootstrap.min.css" %}">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="{% static "jqvmap/jqvmap.min.css" %}">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'  %}">
-    <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="{% static "overlayScrollbars/css/OverlayScrollbars.min.css" %}">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="{% static "daterangepicker/daterangepicker.css" %}">
-    <!-- summernote -->
-    <link rel="stylesheet" href="{% static "summernote/summernote-bs4.css" %}">
-    <link rel="stylesheet" href="{% static "plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" %}">
-    <!-- Toastr -->
-    <link rel="stylesheet" href="{% static "plugins/toastr/toastr.min.css" %}">
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
-    <link rel="stylesheet" href="{% static "plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" %}">
-    <link rel="stylesheet" href="{% static "plugins/datatables-responsive/css/responsive.bootstrap4.min.css" %}">
-    <link rel="stylesheet" href="{% static "plugins/datatables-buttons/css/buttons.bootstrap4.min.css" %}">
-    <title>seeps</title>
+{% extends 'student_template/base.html' %}
 
-</head>
-<body>
+{% block title %}Exam Detail{% endblock %}
+
+{% block content %}
 <div class="container mt-5">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow">
-<a href="#" class="navbar-brand">
-                    <h5 class="text-muted"> {{ exam.name }}.<span class="text-info">Exam</span></h5>
-                </a>
-        <div class="ml-auto">
-        <span class="text-dark me-5" id="timerNavbar">
-   <i class="fas fa-clock"></i>
- Time Remaining: {{ exam.timer }}:00
-</span>
-<div class="progress">
-                <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar"
-                     style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-        </div>
-        
-    </nav>
-<br>
-    <div class="card shadow p-3 mb-5 bg-white rounded">
-     <div class="card-header bg-info text-white text-center">
-        <div style="display:none;">
-           
-            <div class="progress">
-                <div id="timerProgressBar" class="progress-bar bg-success" role="progressbar"
-                     style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-            </div>
-            <p id="timer" class="text-center text-white">Timer: {{ exam.timer }}:00</p>
-          </div>
+  <div class="card shadow p-3 mb-5 bg-white rounded">
+    <div class="card-header bg-info text-white text-center">
+      <h5>{{ exam.name }} - Exam</h5>
     </div>
-        <div class="card-body">
-            <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
-                {% csrf_token %}
-                                {% for question in questions %}
-                        {% if forloop.counter0|divisibleby:2 %}
-                            <div class="page">
-                        {% endif %}
-                        <div class="mb-4">
-                      <h4>{{ forloop.counter }}){{ question.content|safe }}</h4>
-                
-                      <div class="list-group">
-                                {% for choice in question.choice_set.all %}
-                                    <label class="list-group-item list-group-item-action">
-                                        <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
-                                        {% if forloop.counter == 1 %}A{% elif forloop.counter == 2 %}B{% elif forloop.counter == 3 %}C{% elif forloop.counter == 4 %}D{% endif %})  {{ choice.text }}
-                                    </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-
-                <div class="text-center">
-                   <button type="submit" class="btn btn-info btn-lg">
-    <i class="fas fa-check-circle"></i> Submit Exam
-</button>
-
-                </div>
-            </form>
-        </div>
+    <div class="card-body">
+      <div class="text-center">
+        <span id="timer">Time Remaining: {{ exam.timer }}:00</span>
+      </div>
+      <!-- Progress bar -->
+      <div class="progress mt-3 mb-3">
+        <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+      <!-- Your exam content here -->
+      <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
+        {% csrf_token %}
+       {% for question in questions %}
+  <div class="mb-4">
+<h4>{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4>
+    <div class="list-group">
+      {% for choice in question.choice_set.all %}
+        <label class="list-group-item list-group-item-action">
+          <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
+          {{ choice.text }}
+        </label>
+      {% endfor %}
     </div>
+  </div>
+{% endfor %}
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-info btn-lg">
+            <i class="fas fa-check-circle"></i> Submit Exam
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
-<!-- Add the following script inside the <script> tag in your HTML -->
+<!-- Button to enter fullscreen -->
+<button id="fullscreenButton" class="btn btn-primary" onclick="openFullscreen()">Enter Fullscreen</button>
+
+<!-- SweetAlert library -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- JavaScript to prevent navigation away, opening new tabs, fullscreen, and update timer -->
 <script>
+  // Fullscreen mode
+  function openFullscreen() {
+    var elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) { /* Firefox */
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE/Edge */
+      elem.msRequestFullscreen();
+    }
+  }
 
-    const timerElement = document.getElementById('timer');
-    const progressBar = document.getElementById('timerProgressBar');
-    const timerNavbar = document.getElementById('timerNavbar');
-    let timer = {{ exam.timer }} * 60;
+  // Timer
+  var timerElement = document.getElementById('timer');
+  var progressBar = document.getElementById('timerProgressBar');
+  var timer = {{ exam.timer }} * 60;
 
-    function updateTimer() {
-        const minutes = Math.floor(timer / 60);
-        const seconds = timer % 60;
-        const progressPercentage = (timer / ({{ exam.timer }} * 60)) * 100;
+  function updateTimer() {
+    var minutes = Math.floor(timer / 60);
+    var seconds = timer % 60;
+    var progressPercentage = (timer / ({{ exam.timer }} * 60)) * 100;
 
-        timerElement.textContent = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        progressBar.style.width = `${progressPercentage}%`;
-        timerNavbar.textContent = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    // Set timer text content
+    timerElement.textContent = 'Time Remaining: ' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    
+    // Set progress bar width
+    progressBar.style.width = progressPercentage + '%';
 
-        if (timer === 0) {
-            document.getElementById('examForm').submit();
-        } else {
-            timer--;
-            setTimeout(updateTimer, 1000);
-        }
+    // Change progress bar color to red when 3 minutes left
+    if (timer <= 120) {
+      progressBar.classList.add('bg-danger');
     }
 
-    updateTimer();
+    if (timer === 0) {
+      document.getElementById('examForm').submit();
+    } else {
+      timer--;
+      setTimeout(updateTimer, 1000);
+    }
+  }
+
+  updateTimer();
+
+  // Disable right-click context menu
+  window.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+    showMessage('Right-click context menu is disabled during the exam.');
+  });
+
+  // Disable keyboard shortcuts
+  window.addEventListener('keydown', function(event) {
+    event.preventDefault();
+    showMessage('Keyboard shortcuts are disabled during the exam.');
+  });
+
+  // Prevent navigating away from the exam page
+  window.onbeforeunload = function(event) {
+    return 'Are you sure you want to leave this page? Your exam progress will be lost.';
+  };
+
+  // Prevent opening new tabs or windows
+  window.open = function() {
+    showMessage('Opening new tabs or windows is disabled during the exam.');
+    return false;
+  };
+
+  // Prevent refreshing the page
+  window.addEventListener('beforeunload', function(event) {
+    event.preventDefault();
+    showMessage('Refreshing the page is disabled during the exam.');
+  });
+
+  // Prevent exiting fullscreen with the Escape key
+  document.addEventListener('fullscreenchange', function(event) {
+    if (!document.fullscreenElement) {
+      openFullscreen(); // Re-enter fullscreen if user exits
+    }
+  });
+
+  // Disable all links on the page
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    links[i].addEventListener('click', function(event) {
+      event.preventDefault();
+      showMessage('Links are disabled during the exam.');
+    });
+  }
+
+  // Custom function to display messages using SweetAlert
+  function showMessage(message) {
+    Swal.fire({
+      toast: true,
+      text: message,
+      icon: 'warning',
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 5000 // Auto close after 5 seconds
+    });
+  }
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-<!-- jQuery -->
-<!-- SweetAlert2 -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script src="{% static "jquery/jquery.min.js"  %}"></script>
-<!-- jQuery UI 1.11.4 -->
-<script src="{% static "jquery-ui/jquery-ui.min.js"  %}"></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-<script>
-    $.widget.bridge('uibutton', $.ui.button)
-</script>
-<!-- Bootstrap 4 -->
-<script src="{% static "bootstrap/js/bootstrap.bundle.min.js"  %}"></script>
-<!-- ChartJS -->
-<script src="{% static "chart.js/Chart.min.js"  %}"></script>
-<!-- Sparkline -->
-<script src="{% static "sparklines/sparkline.js"  %}"></script>
-<!-- JQVMap -->
-<script src="{% static "jqvmap/jquery.vmap.min.js"  %}"></script>
-<script src="{% static "jqvmap/maps/jquery.vmap.usa.js"  %}"></script>
-<!-- jQuery Knob Chart -->
-<script src="{% static "jquery-knob/jquery.knob.min.js"  %}"></script>
-<!-- daterangepicker -->
-<script src="{% static "moment/moment.min.js"  %}"></script>
-<script src="{% static "daterangepicker/daterangepicker.js"  %}"></script>
-<!-- Tempusdominus Bootstrap 4 -->
-<script src="{% static "tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"  %}"></script>
-<!-- Summernote -->
-<script src="{% static "summernote/summernote-bs4.min.js"  %}"></script>
-<!-- overlayScrollbars -->
-<script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
-<!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.js'  %}"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{% static 'dist/js/pages/dashboard.js'  %}"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{% static 'dist/js/demo.js'%}"></script>
-<script src="{% static "plugins/sweetalert2/sweetalert2.min.js" %}"></script>
-<!-- Toastr -->
-<script src="{% static "plugins/toastr/toastr.min.js" %}"></script>
-
-<!-- DataTables  & Plugins -->
-<script src="{% static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
-<script src="{% static "plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"%}"></script>
-<script src="{% static "plugins/datatables-responsive/js/dataTables.responsive.min.js"%}"></script>
-<script src="{% static "plugins/datatables-responsive/js/responsive.bootstrap4.min.js"%}"></script>
-<script src="{% static "plugins/datatables-buttons/js/dataTables.buttons.min.js"%}"></script>
-<script src="{% static "plugins/datatables-buttons/js/buttons.bootstrap4.min.js"%}"></script>
-<script src="{% static "plugins/jszip/jszip.min.js"%}"></script>
-<script src="{% static "plugins/pdfmake/pdfmake.min.js"%}"></script>
-<script src="{% static "plugins/pdfmake/vfs_fonts.js"%}"></script>
-<script src="{% static "plugins/datatables-buttons/js/buttons.html5.min.js"%}"></script>
-<script src="{% static "plugins/datatables-buttons/js/buttons.print.min.js"%}"></script>
-<script src="{% static "plugins/datatables-buttons/js/buttons.colVis.min.js"%}"></script>
-</body>
-</html>
+{% endblock %}

@@ -33,6 +33,7 @@ urlpatterns = [
     path('update_course/<int:course_id>/', update_course, name='update_course'),
     path('update-tutorial/<int:tutorial_id>/', update_tutorial, name='update_tutorial'),
     path('delete-tutorial/<int:tutorial_id>/', delete_tutorial, name='delete_tutorial'),
+    path('import_student/', import_student, name='import_student'),
 
 
 

@@ -1,7 +1,9 @@
-# admin.py
-from django.contrib import admin
-from .models import *
 from .forms import ExamForm, QuestionForm, ChoiceForm
+from django.contrib import admin
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
+from import_export.admin import ImportExportModelAdmin
+from .models import *
 
 class ChoiceInline(admin.TabularInline):
     model = Choice
@@ -10,7 +12,20 @@ class ChoiceInline(admin.TabularInline):
     max_num = 4
     can_delete = False
 
-class QuestionAdmin(admin.ModelAdmin):
+class QuestionResource(resources.ModelResource):
+    exam = fields.Field(
+        column_name='exam',
+        attribute='exam',
+        widget=ForeignKeyWidget(Exam, 'name')
+    )
+
+    class Meta:
+        model = Question
+        fields = ('content', 'exam')
+        export_order = ('content', 'exam')
+
+class QuestionAdmin(ImportExportModelAdmin):
+    resource_class = QuestionResource
     form = QuestionForm
     inlines = [ChoiceInline]
     list_display = ['content', 'exam']

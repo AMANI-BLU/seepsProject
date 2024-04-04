@@ -174,7 +174,7 @@ ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, can_del
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['exam', 'content']
+        fields = ['exam', 'content','answer_description']
 
     # Use formset attribute instead of choices
     choices = ChoiceFormSet()
@@ -191,6 +191,10 @@ class QuestionForm(forms.ModelForm):
         self.fields['exam'].widget.attrs.update({
             'class': 'form-control',
            
+        })
+        self.fields['answer_description'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Enter answer description here..',
         })
 
         if department_username:

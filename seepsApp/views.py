@@ -181,6 +181,27 @@ def department_home(request):
 
 from django.contrib import messages
 
+from django.shortcuts import render
+from .resources import StudentResource
+from tablib import Dataset
+
+def import_student(request):
+    if request.method == 'POST':
+        my_model_resource = StudentResource()
+        dataset = Dataset()
+        new_data = request.FILES['myfile'].read()
+        dataset.load(new_data, format='xlsx')
+        result = my_model_resource.import_data(dataset, dry_run=True)  # First dry run to check for errors
+        if not result.has_errors():
+            my_model_resource.import_data(dataset, dry_run=False)  # Import data for real
+            messages.success(request, 'Student Imported successfully!')
+        else:
+            errors = result.base_errors
+            return render(request, 'base.html', {'errors': errors})
+    return render(request, 'department_template/read_student.html')
+
+
+
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def add_student(request):
@@ -278,7 +299,6 @@ def update_student(request, username):
 
 # views.py
 from .forms import QuestionForm, ChoiceFormSet
-
 @login_required(login_url='login_view')
 # @user_passes_test(is_department, login_url='NoPage')
 def add_question(request):
@@ -308,7 +328,6 @@ def add_question(request):
         'success_msg': success_msg,
         'error_msg': error_msg
     })
-
 
 
 
@@ -679,6 +698,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Exam, Question  # Import your Exam and Question models
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Exam, Question
+from random import shuffle
+
 def exam_detail(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
 
@@ -692,7 +716,8 @@ def exam_detail(request, exam_id):
     del request.session[f'exam_code_{exam_id}']
 
     # Use prefetch_related to fetch choices along with questions in a single query
-    questions = Question.objects.filter(exam=exam).prefetch_related('choice_set')
+    questions = list(Question.objects.filter(exam=exam).prefetch_related('choice_set'))
+    shuffle(questions)  # Shuffle the questions
 
     context = {
         'exam': exam,
