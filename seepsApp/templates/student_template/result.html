@@ -4,7 +4,8 @@
 <div class="container mt-5">
   <div class="card shadow" style="margin-top:70px;">
     <div class="card-header bg-info text-white">
-      <h2 class="text-center">Exam Result</h2>
+      <h3 class="text-center">Exam Result</h3>
+      <h4 class="text-center">{{ result.score}} out of {{ result.exam.question_set.count }}</h4>
     </div>
     <div class="card-body">
       <div class="row">
@@ -62,7 +63,7 @@
 
     </div>
     <div class="card-footer text-muted text-center">
-      <button class="btn btn-success" onclick="printResult()"><i class="fas fa-print"></i> Print Result</button>
+      <button class="btn btn-info" onclick="printResult()"><i class="fas fa-print"></i> Print Result</button>
     </div>
   </div>
 </div>

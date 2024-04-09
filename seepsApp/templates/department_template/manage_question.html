@@ -83,7 +83,7 @@
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
                                         <td style="max-width: 200px; max-height: 200px; overflow: hidden;">{{ question.content|safe }}</td>
-                                        <td>{{ question.exam.name }}</td>
+                                        <td>{{ question.exam.name }} ({{question.exam.difficulty}})</td>
                                         <td>
                                             <!-- Edit Button -->
                                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editQuestionModal{{ question.id }}">
@@ -117,7 +117,7 @@
                                                             <label for="exam">Exam</label>
                                                             <select class="form-control" id="exam" name="exam">
                                                                 {% for question in questions %}
-                                                                    <option value="{{ exam.id }}" {% if question.exam.id == exam.id %}selected{% endif %}>{{ question.exam}}</option>
+                                                                    <option value="{{ exam.id }}" {% if question.exam.id == exam.id %}selected{% endif %}>{{ question.exam.name}}({{question.exam.difficulty}})</option>
                                                                 {% endfor %}
                                                             </select>
                                                         </div>
