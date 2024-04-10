@@ -34,17 +34,18 @@
         {% endfor %}
 
         
-          <button type="submit" class="btn btn-info btn-lg">
+        
+          <div class="text-center">
+              <button type="submit" class="btn btn-info btn-lg">
             <i class="fas fa-check-circle"></i> Submit Exam
           </button>
-          <div class="text-center" style="display:none;">
-          <!-- Save and load progress buttons -->
+          {% comment %} <!-- Save and load progress buttons -->
           <button id="saveButton" class="btn btn-success btn-lg">
             <i class="fas fa-save"></i> Save Progress
           </button>
           <button id="loadButton" class="btn btn-primary btn-lg">
             <i class="fas fa-download"></i> Load Progress
-          </button>
+          </button> {% endcomment %}
         </div>
       </form>
     </div>
@@ -136,7 +137,7 @@
     }
   }
 
-  document.getElementById('saveButton').addEventListener('click', function() {
+  {% comment %} document.getElementById('saveButton').addEventListener('click', function() {
     saveProgress();
     showMessage('Progress saved!');
   });
@@ -144,7 +145,7 @@
   document.getElementById('loadButton').addEventListener('click', function() {
     loadProgress();
     showMessage('Progress loaded!');
-  });
+  }); {% endcomment %}
 
   // Auto-load progress on page load
   loadProgress();
