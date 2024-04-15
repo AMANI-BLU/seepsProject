@@ -31,7 +31,7 @@
             <a href="#" class="dropdown-item"  data-toggle="modal" data-target="#modal-default">
               <i class="fas fa-user-circle"></i>&nbsp;&nbsp;&nbsp;Profile
             </a>
-            <a href="#" class="dropdown-item" data-toggle="modal" data-target="#changePasswordModal">
+            <a href="{% url "change_password" %}" class="dropdown-item">
               <i class="fas fa-key"></i>&nbsp;&nbsp;&nbsp;Change Password
             </a>
             <div class="dropdown-divider"></div>
@@ -127,8 +127,7 @@
 
 
 
-      
-<!-- Change Password Modal -->
+  <!-- Change Password Modal -->
 <div class="modal fade" id="changePasswordModal">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -139,26 +138,30 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="changePasswordForm">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="old_password">Old Password:</label>
-                        <input type="password" class="form-control" id="old_password" name="old_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password1">New Password:</label>
-                        <input type="password" class="form-control" id="new_password1" name="new_password1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password2">Confirm New Password:</label>
-                        <input type="password" class="form-control" id="new_password2" name="new_password2" required>
-                    </div>
-                    <button type="button" class="btn btn-info" onclick="changePassword()">Change Password</button>
-                </form>
+               <!-- navbar.html -->
+
+              <form method="post" action="{% url 'change_password' %}">
+                  {% csrf_token %}
+                  <div class="form-group">
+                      <label for="old_password">Old Password:</label>
+                      <input type="password" class="form-control" id="old_password" name="old_password" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="new_password1">New Password:</label>
+                      <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                  </div>
+                  <div class="form-group">
+                      <label for="new_password2">Confirm New Password:</label>
+                      <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                  </div>
+                  <button type="submit" class="btn btn-info">Change Password</button>
+              </form>
+
             </div>
         </div>
     </div>
 </div>
+
      <!-- Dark/Light Mode Toggle Script -->
     <script>
       const darkModeToggle = document.getElementById('darkModeToggle');

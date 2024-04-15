@@ -205,6 +205,30 @@ def department_home(request):
 
     return render(request, 'department_template/dashboard.html', context)
 
+# views.py
+
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to maintain the user's session
+            messages.success(request, 'Your password was successfully updated!')
+            if is_department(request.user):
+                return redirect('department_home')
+            elif is_student(request.user):
+                return redirect('student_home')
+            elif is_admin(request.user):
+                return redirect('home')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {'form': form})
+
+
 from django.contrib import messages
 
 from django.shortcuts import render
