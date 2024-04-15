@@ -114,39 +114,7 @@
                                   {{ form.phone.errors.as_text }}
                               </div>
                           {% endif %}
-                      </div>
-
-                      <div class="form-group">
-                          <label for="{{ form.password1.id_for_label }}" class="text-muted">Password</label>
-                          <div class="input-group">
-                              <div class="input-group-prepend">
-                                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                              </div>
-                              {{ form.password1 }}
-                          </div>
-                          {% if form.password1.errors %}
-                              <div class="text-danger">
-                                  <i class="bi bi-exclamation-triangle"></i>
-                                  {{ form.password1.errors.as_text }}
-                              </div>
-                          {% endif %}
-                      </div>
-
-                      <div class="form-group">
-                          <label for="{{ form.password2.id_for_label }}" class="text-muted">Confirm Password</label>
-                          <div class="input-group">
-                              <div class="input-group-prepend">
-                                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                              </div>
-                              {{ form.password2 }}
-                          </div>
-                          {% if form.password2.errors %}
-                              <div class="text-danger">
-                                  <i class="bi bi-exclamation-triangle"></i>
-                                  {{ form.password2.errors.as_text }}
-                              </div>
-                          {% endif %}
-                      </div>
+                      </div>      
 
                       <div class="row">
                           <div class="col-12">

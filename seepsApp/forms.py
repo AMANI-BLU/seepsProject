@@ -16,8 +16,8 @@ from .models import Exam
 class ExamForm(forms.ModelForm):
     DIFFICULTY_CHOICES = [
         ('easy', 'Easy'),
-        ('medium', 'Medium'),
-        ('hard', 'Hard'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
     ]
 
     attempts_allowed = forms.IntegerField(label='Attempts Allowed', min_value=1)
@@ -197,6 +197,7 @@ ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, can_del
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
+        file = forms.FileField()
         fields = ['exam', 'content', 'answer_description']
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
@@ -256,7 +257,9 @@ class LoginForm(forms.Form):
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+
+import random
+import string
 
 class DepartmentRegistrationForm(UserCreationForm):
     department_name = forms.CharField(
@@ -283,23 +286,26 @@ class DepartmentRegistrationForm(UserCreationForm):
             "placeholder": "Enter your phone number"
         })
     )
+
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
             "placeholder": "Enter your password"
-        })
+        }),
+        required=False  # Set to False to avoid validation errors
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
             "placeholder": "Confirm your password"
-        })
+        }),
+        required=False  # Set to False to avoid validation errors
     )
 
     class Meta:
         model = User
         fields = ('department_name', 'email', 'college', 'phone', 'password1', 'password2')
-    
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
@@ -312,9 +318,20 @@ class DepartmentRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Phone number must contain only numeric digits.')
         return phone
 
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+        password2 = cleaned_data.get("password2")
+        if password1 != password2:
+            raise forms.ValidationError(
+                "Passwords do not match"
+            )
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.username = self.generate_username()
+        password = self.generate_password()  # Generate a random password
+        user.set_password(password)  # Set the password
         if commit:
             user.save()
         return user
@@ -322,19 +339,18 @@ class DepartmentRegistrationForm(UserCreationForm):
     def generate_username(self):
         department_name = self.cleaned_data.get('department_name')
         email = self.cleaned_data.get('email')
-        # Here you can generate a unique username based on department name and email
-        # For example, you can concatenate them and use a hashing algorithm to ensure uniqueness
-        # Here's a simple example:
         username = f"{department_name}_{email}".replace('@', '_').replace('.', '_')
         return username
 
-
+    def generate_password(self):
+        length = 12
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for i in range(length))
 
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
-
 
 
 class StudentRegistrationForm(UserCreationForm):
@@ -361,7 +377,6 @@ class StudentRegistrationForm(UserCreationForm):
             "class": "form-control"
         })
     )
-    
     phone = forms.CharField(
         widget=forms.TextInput(attrs={
             "class": "form-control",
@@ -372,13 +387,15 @@ class StudentRegistrationForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
             "placeholder": "Enter your password"
-        })
+        }),
+        required=False  # Set to False to avoid validation errors
     )
     password2 = forms.CharField(
         widget=forms.PasswordInput(attrs={
             "class": "form-control",
             "placeholder": "Confirm your password"
-        })
+        }),
+        required=False  # Set to False to avoid validation errors
     )
 
     def __init__(self, *args, **kwargs):
@@ -395,14 +412,10 @@ class StudentRegistrationForm(UserCreationForm):
         username = f"{first_name}_{email}".replace('@', '_').replace('.', '_')
         return username
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.is_student = True
-        user.username = self.generate_username()
-        user.department_name = self.department_name
-        if commit:
-            user.save()
-        return user
+    def generate_password(self):
+        length = 12
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for _ in range(length))
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -423,3 +436,14 @@ class StudentRegistrationForm(UserCreationForm):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match")
         return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_student = True
+        user.username = self.generate_username()
+        user.department_name = self.department_name
+        password = self.generate_password()  # Generate a random password
+        user.set_password(password)  # Set the password
+        if commit:
+            user.save()
+        return user

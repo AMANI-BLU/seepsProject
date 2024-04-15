@@ -147,3 +147,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default Django authentication backend
     'seepsApp.backend.EmailAuthBackend',  # Your custom authentication backend
 ]
+# SMTP Configuration (Replace with your SMTP settings)
+EMAIL_HOST = 'smtp.gmail.com'  # SMTP server address
+EMAIL_PORT = 587  # SMTP server port (587 for TLS)
+EMAIL_USE_TLS = True  # Use TLS encryption
+EMAIL_HOST_USER = 'amansolgod@gmail.com'  # SMTP username (your email)
+EMAIL_HOST_PASSWORD = 'xdtlcdveysvumamf'  # SMTP password
+DEFAULT_FROM_EMAIL = 'amansolgod@gmail.com'

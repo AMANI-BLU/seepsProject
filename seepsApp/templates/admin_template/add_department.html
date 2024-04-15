@@ -1,163 +1,118 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin | add department{% endblock %}
+{% block title %}Admin | Add Department{% endblock %}
 
 {% block content %}
-  <div class="wrapper">
+<div class="wrapper">
     {% include 'admin_template/navbar.html' %}
     {% include 'admin_template/aside.html' %}
 
     <div class="content-wrapper">
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1 class="text-secondary">Department Creation Form</h1>
-          </div>
-          <div class="col-sm-6">
-           <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="{% url "view_department" %}">Manage Department</a></li>
-              <li class="breadcrumb-item active">Add Department</li>
-            </ol>
-          </div>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="text-secondary">Department Creation Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{% url "view_department" %}">Manage Department</a></li>
+                            <li class="breadcrumb-item active">Add Department</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
         </div>
-        </div>
-      </div>
 
-      <section class="content">
-        <div class="container-fluid">
-          <div class="login-box w-100">
-            <div class="card card-outline card-info">
-              <div class="card-body">
-               
+        <section class="content">
+            <div class="container-fluid">
+                <div class="login-box w-100">
+                    <div class="card card-outline card-info">
+                        <div class="card-body">
 
-                {% if success_msg %}
-                  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                  <script>
-                    Swal.fire({
-                      toast: true,
-                      position: 'top-end',
-                      icon: 'success',
-                      text: '{{ success_msg }}',
-                      showConfirmButton: false,
-                      timer: 6000,
-                    });
-                  </script>
-                {% endif %}
+                            {% if success_msg %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: '{{ success_msg }}',
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                            {% endif %}
 
-                {% comment %} {% if error_msg %}
-                  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                  <script>
-                    Swal.fire({
-                      toast: true,
-                      position: 'top-end',
-                      icon: 'error',
-                      title: 'Error!',
-                      text: '{{ error_msg }}',
-                      showConfirmButton: false,
-                      timer: 5000,
-                    });
-                  </script>
-                {% endif %} {% endcomment %}
+                            <form action="{% url 'add_department' %}" method="post">
+                                {% csrf_token %}
 
- <form action="{% url 'add_department' %}" method="post">
-    {% csrf_token %}
+                                {% if form.non_field_errors %}
+                                <div class="text-danger">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    {{ form.non_field_errors.as_text }}
+                                </div>
+                                {% endif %}
 
-    {% if form.non_field_errors %}
-        <div class="text-danger">
-            <i class="bi bi-exclamation-triangle"></i>
-            {{ form.non_field_errors.as_text }}
-        </div>
-    {% endif %}
+                                <div class="form-group">
+                                    <label for="{{ form.department_name.id_for_label }}" class="text-muted">Department Name</label>
+                                    {{ form.department_name }}
+                                    {% if form.department_name.errors %}
+                                    <div class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {{ form.department_name.errors.as_text }}
+                                    </div>
+                                    {% endif %}
+                                </div>
 
-    <div class="form-group">
-        <label for="{{ form.department_name.id_for_label }}" class="text-muted">Department Name</label>
-        {{ form.department_name }}
-        {% if form.department_name.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.department_name.errors.as_text }}
+                                <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}"class="text-muted">Email</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {{ form.email.errors.as_text }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.college.id_for_label }}"class="text-muted">College</label>
+                                    {{ form.college }}
+                                    {% if form.college.errors %}
+                                    <div class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {{ form.college.errors.as_text }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.phone.id_for_label }}"class="text-muted">Phone</label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        {{ form.phone.errors.as_text }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-info btn-block">
+                                            Register
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endif %}
+        </section>
     </div>
-
-    <div class="form-group">
-        <label for="{{ form.email.id_for_label }}"class="text-muted">Email</label>
-        {{ form.email }}
-        {% if form.email.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.email.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="form-group">
-        <label for="{{ form.college.id_for_label }}"class="text-muted">College</label>
-        {{ form.college }}
-        {% if form.college.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.college.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="form-group">
-        <label for="{{ form.phone.id_for_label }}"class="text-muted">Phone</label>
-        {{ form.phone }}
-        {% if form.phone.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.phone.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="form-group">
-        <label for="{{ form.password1.id_for_label }}"class="text-muted">Password</label>
-        {{ form.password1 }}
-        {% if form.password1.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.password1.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="form-group">
-        <label for="{{ form.password2.id_for_label }}"class="text-muted">Confirm Password</label>
-        {{ form.password2 }}
-        {% if form.password2.errors %}
-            <div class="text-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                {{ form.password2.errors.as_text }}
-            </div>
-        {% endif %}
-    </div>
-
-    <div class="row">
-        <div class="col-12">
-            <button type="submit" class="btn btn-info btn-block">
-                Register
-            </button>
-        </div>
-    </div>
-
-</form>
-
-
-
-
-              </div>
-            </div>
-          </div>
-        </div>
-      
-      </section>
-
-    
-    </div>
-      {% include 'admin_template/footer.html' %}
-  </div>
+    {% include 'admin_template/footer.html' %}
+</div>
 {% endblock %}

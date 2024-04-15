@@ -11,7 +11,6 @@ import os
 
 
 
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Define a custom test function to check if the user is a department or other
 def is_department(user):
@@ -39,7 +38,7 @@ def login_view(request):
                 if user.is_staff and user.is_superuser:
                     return redirect('home')
                 elif user.is_department:
-                    return redirect('department_home')
+                    return redirect('department_home')  # Render a template informing the user to verify their account
                 elif user.is_student:
                     return redirect('student_home')
             else:
@@ -89,29 +88,56 @@ def feedback(request):
 #         form = AdminRegistrationForm()
 #     return render(request, 'register_admin.html', {'form': form, 'msg': msg})
 # Admin Add Department Form
+# File: views.py
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def add_department(request):
     success_msg = None
     error_msg = None
-    
+
     if request.method == 'POST':
         form = DepartmentRegistrationForm(request.POST)
         if form.is_valid():
+            # Generate the password
+            password = form.generate_password()
+
+            # Create a user instance with the generated password
             user = form.save(commit=False)
             user.is_department = True  # Set is_department to True
+            user.password = make_password(password)  # Hash the password
             user.save()
+
             success_msg = 'Department added successfully!'
+            
+            # Send email
+            subject = 'Department Account Verification'
+            html_message = render_to_string('email/department_account_email.html', {
+                'user': user,
+                'password': password,  # Pass the generated password to the email template
+            })
+            plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
+            from_email = settings.DEFAULT_FROM_EMAIL
+            to_email = user.email
+            send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
         else:
             error_msg = 'Form is not valid'
     else:
         form = DepartmentRegistrationForm()
-    
+
     return render(request, 'admin_template/add_department.html', {
         'form': form,
         'success_msg': success_msg,
         'error_msg': error_msg
     })
+
+
 
 #Admin View Department List
 @login_required(login_url='login_view')
@@ -211,9 +237,27 @@ def add_student(request):
     if request.method == 'POST':
         form = StudentRegistrationForm(request.POST, department_name=request.user.username)
         if form.is_valid():
+            # Generate the password
+            password = form.generate_password()
+
             try:
-                user = form.save()
+                user = form.save(commit=False)
+                user.is_student = True
+                user.set_password(password)  # Hash the password
+                user.save()
                 success_msg = 'Student added successfully!'
+
+                # Send email
+                subject = 'Student Account Verification'
+                html_message = render_to_string('email/student_account_email.html', {
+                    'user': user,
+                    'password': password,  # Pass the generated password to the email template
+                    # 'login_url': 'http://127.0.0.1:8000/login/',  # Provide the login URL
+                })
+                plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
             except Exception as e:
                 error_msg = f'An error occurred: {str(e)}'
         else:
@@ -226,8 +270,9 @@ def add_student(request):
         'success_msg': success_msg,
         'error_msg': error_msg
     })
-
-
+    
+    
+    
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):

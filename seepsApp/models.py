@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+import uuid
 
 class User(AbstractUser):
     is_admin = models.BooleanField('Is admin', default=False)
@@ -10,14 +13,17 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, null=True) 
     sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female'), ('O', 'Other')), blank=True, null=True)
     
+   
+  # Generate a UUID as a verification token
+    
 # models.py
 
 from django.db import models
 class Exam(models.Model):
     DIFFICULTY_CHOICES = [
         ('easy', 'Easy'),
-        ('medium', 'Medium'),
-        ('hard', 'Hard'),
+        ('intermediate', 'Intermediate'),
+        ('advanced', 'Advanced'),
     ]
 
     name = models.CharField(max_length=255)
@@ -26,7 +32,7 @@ class Exam(models.Model):
     exam_code = models.CharField(max_length=10)
     is_active = models.BooleanField(default=False)
     attempts_allowed = models.IntegerField(default=3)  # Add attempts allowed field
-    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium')
+    difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES, default='intermediate')
 
     def __str__(self):
         return self.name
