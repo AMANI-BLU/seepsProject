@@ -1,0 +1,24 @@
+<!-- department_template/import_question.html -->
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="file">Choose a file:</label>
+        <input type="file" class="form-control-file" id="file" name="file">
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+{% if imported_questions %}
+<h2>Imported Questions:</h2>
+<ul>
+    {% for question, choices in imported_questions %}
+    <li>{{ question }}</li>
+    <ul>
+        {% for choice in choices %}
+        <li>{{ choice }}</li>
+        {% endfor %}
+    </ul>
+    {% endfor %}
+</ul>
+{% endif %}
