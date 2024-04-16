@@ -13,7 +13,59 @@
     <div class="content-wrapper">
     
       <!-- /.content-header -->
-
+  {% if messages %}
+              {% for message in messages %}
+                  {% if message.tags == 'success' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'success',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'error' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'error',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'warning' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'warning',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'info' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'info',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% endif %}
+              {% endfor %}
+          {% endif %}
       <!-- Main content -->
        <!-- Main content -->
       <section class="content mt-5">
@@ -26,31 +78,61 @@
             </div>
             <div class="card-body">
               
-                <!-- Students Table -->
-                <table id="feedbackTable" class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Message</th>
-                            <th>Sent At</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                <tbody>
-                        {% for feedback in student_feedback %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ feedback.user.username }}</td>
-                            <td>{{ feedback.user.email }}</td>
-                            <td>{{ feedback.feedback_text }}</td>
-                            <td>{{ feedback.created_at }}</td>
-                            <td>{{ feedback.created_at }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+         <table id="feedbackTable" class="table table-bordered table-striped">
+                  <thead>
+                      <tr>
+                          <th>No.</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Message</th>
+                          <th>Sent At</th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for feedback in student_feedback %}
+                      <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{ feedback.user.first_name }}</td>
+                          <td>{{ feedback.user.email }}</td>
+                          <td>{{ feedback.feedback_text }}</td>
+                          <td>{{ feedback.created_at }}</td>
+                          <td>
+                              <!-- Button to trigger the delete confirmation modal -->
+                              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ feedback.id }}">
+                                  <i class="fas fa-trash-alt"></i> Delete
+                              </button>
+
+                              <!-- Delete Modal -->
+                              <div class="modal fade" id="deleteModal{{ feedback.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ feedback.id }}" aria-hidden="true">
+                                  <div class="modal-dialog" role="document">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h5 class="modal-title" id="deleteModalLabel{{ feedback.id }}">Delete Feedback</h5>
+                                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                              </button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>Are you sure you want to delete this feedback?</p>
+                                          </div>
+                                          <div class="modal-footer">
+                                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                              <!-- Form for deleting feedback -->
+                                              <form method="post" action="{% url 'delete_feedback' %}">
+                                                  {% csrf_token %}
+                                                  <input type="hidden" name="feedback_id" value="{{ feedback.id }}">
+                                                  <button type="submit" class="btn btn-danger">Delete</button>
+                                              </form>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
 
             </div>
           </div>
@@ -61,46 +143,6 @@
       <!-- /.content -->
     </div>
  
-
-     <!-- Add Student Modal -->
-    <div class="modal fade" id="addStudentModal">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"><i class="fas fa-user-plus"></i> Add New Student</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- Add your form for adding a new student here -->
-            <form id="addStudentForm">
-              <div class="mb-3">
-                <label for="studentName" class="form-label">Name</label>
-                <input type="text" class="form-control" id="studentName" name="studentName" placeholder="Enter student name" required>
-              </div>
-              <div class="mb-3">
-                <label for="studentEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" id="studentEmail" name="studentEmail" placeholder="Enter student email" required>
-              </div>
-              <div class="mb-3">
-                <label for="studentPhone" class="form-label">Phone no.</label>
-                <input type="tel" class="form-control" id="studentPhone" name="studentPhone" placeholder="Enter student phone number" required>
-              </div>
-              <div class="mb-3">
-                <label for="studentPassword" class="form-label">Password</label>
-                <input type="password" class="form-control" id="studentPassword" name="studentPassword" placeholder="Enter password" required>
-              </div>
-              <div class="mb-3">
-                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
-              </div>
-              <button type="button" class="btn btn-info" onclick="submitForm()"><i class="fas fa-plus"></i> Add Student</button>
-            </form>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
 
             <script>
                 $(document).ready(function () {

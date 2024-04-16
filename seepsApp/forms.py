@@ -257,9 +257,8 @@ class LoginForm(forms.Form):
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-
-import random
 import string
+import random
 
 class DepartmentRegistrationForm(UserCreationForm):
     department_name = forms.CharField(
@@ -339,8 +338,24 @@ class DepartmentRegistrationForm(UserCreationForm):
     def generate_username(self):
         department_name = self.cleaned_data.get('department_name')
         email = self.cleaned_data.get('email')
-        username = f"{department_name}_{email}".replace('@', '_').replace('.', '_')
+        combined = self.combine_randomly(department_name, email)
+        combined = combined.replace(" ", "")  # Remove spaces
+        combined = combined[:6]  # Limit to 6 characters
+        username = f"{combined}_{random.randint(100, 999)}"  # Adding random numbers to ensure uniqueness
         return username
+
+
+
+    def combine_randomly(self, str1, str2):
+        combined = ''
+        min_len = min(len(str1), len(str2))
+        max_len = max(len(str1), len(str2))
+        for i in range(max_len):
+            if i < min_len:
+                combined += random.choice([str1[i], str2[i]])
+            else:
+                combined += str1[i] if len(str1) > len(str2) else str2[i]
+        return combined
 
     def generate_password(self):
         length = 12
@@ -444,6 +459,30 @@ class StudentRegistrationForm(UserCreationForm):
         user.department_name = self.department_name
         password = self.generate_password()  # Generate a random password
         user.set_password(password)  # Set the password
+        if commit:
+            user.save()
+        return user
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'department_name', 'email', 'phone', 'sex', 'profile_picture']
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        if self.instance.is_superuser:
+            self.fields['department_name'].required = False
+            del self.fields['department_name']
+            self.fields['username'] = forms.CharField(max_length=150, required=True)
+        elif self.instance.is_student:
+            self.fields['first_name'] = forms.CharField(max_length=150, required=True)
+            self.fields['department_name'].required = False
+            del self.fields['department_name']
+
+    def save(self, commit=True):
+        user = super(ProfileUpdateForm, self).save(commit=False)
+        if hasattr(user, 'username'):
+            user.username = self.cleaned_data.get('username', user.username)
         if commit:
             user.save()
         return user

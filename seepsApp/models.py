@@ -12,7 +12,8 @@ class User(AbstractUser):
     department_name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True) 
     sex = models.CharField(max_length=1, choices=(('M', 'Male'), ('F', 'Female'), ('O', 'Other')), blank=True, null=True)
-    
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+ 
    
   # Generate a UUID as a verification token
     

@@ -12,6 +12,8 @@ urlpatterns = [
     path('add_department/', add_department,name ="add_department" ),
     path('view_department/', view_department,name ="view_department" ),
     path('delete_department/<str:email>/', delete_department, name='delete_department'),
+    path('update/<str:username>/', update_department, name='update_department'),
+
       
     
     #department urls
@@ -36,6 +38,9 @@ urlpatterns = [
     path('delete-tutorial/<int:tutorial_id>/', delete_tutorial, name='delete_tutorial'),
     path('import_student/', import_student, name='import_student'),
     path('change-password/', change_password, name='change_password'),
+    path('profile/', profile, name='profile'),
+    path('delete-feedback/', delete_feedback, name='delete_feedback'),
+
 
     
 

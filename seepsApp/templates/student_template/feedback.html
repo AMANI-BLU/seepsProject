@@ -25,22 +25,57 @@
 <div class="row mt-6">
     <!-- Your existing content goes here -->
 </div>
-
-<!-- Display success message from Django messages framework -->
-{% if messages %}
+ {% if messages %}
     {% for message in messages %}
-        <script>
-            // Use SweetAlert2 to display Django messages
-            Swal.fire({
-                icon: '{{ message.tags }}',
-                title: '{{ message.tags|title }}',
-                text: '{{ message }}',
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 6000,
-            });
-        </script>
+        {% if message.tags == 'success' %}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 6000,
+                });
+            </script>
+        {% elif message.tags == 'error' %}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 6000,
+                });
+            </script>
+        {% elif message.tags == 'warning' %}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'warning',
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 6000,
+                });
+            </script>
+        {% elif message.tags == 'info' %}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'info',
+                    text: "{{ message }}",
+                    showConfirmButton: false,
+                    timer: 6000,
+                });
+            </script>
+        {% endif %}
     {% endfor %}
 {% endif %}
 

@@ -159,6 +159,24 @@ def delete_department(request, email):
         pass
     # Redirect to a view where you want to display the updated list of departments
     return redirect('view_department')
+
+def update_department(request, username):
+    if request.method == 'POST':
+        department_user = get_object_or_404(User, username=username, is_department=True,)
+        
+        # Update fields based on form input
+        department_user.department_name = request.POST.get('department_name')
+        department_user.email = request.POST.get('email')
+        department_user.phone = request.POST.get('phone')
+        department_user.college = request.POST.get('college')
+        # Add more fields as needed
+        
+        department_user.save()
+        
+        messages.success(request, 'Department updated successfully!')
+        return redirect('view_department')  # Redirect to the view_department page after successful update
+    else:
+        return redirect('view_department')
 ###########################/Admin Views/###############################
 
 
@@ -229,6 +247,25 @@ def change_password(request):
     return render(request, 'change_password.html', {'form': form})
 
 
+
+from .forms import ProfileUpdateForm
+
+
+def profile(request):
+    if request.method == 'POST':
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully.')
+            return redirect('profile')  # Redirect to profile page after successful update
+        else:
+            messages.error(request, 'Failed to update profile. Please correct the errors.')
+    else:
+        form = ProfileUpdateForm(instance=request.user)
+    return render(request, 'profile.html', {'form': form})
+
+
+
 from django.contrib import messages
 
 from django.shortcuts import render
@@ -251,6 +288,19 @@ def import_student(request):
     return render(request, 'department_template/read_student.html')
 
 
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
+from .models import Feedback
+
+@require_POST
+def delete_feedback(request):
+    feedback_id = request.POST.get('feedback_id')
+    feedback = get_object_or_404(Feedback, id=feedback_id)
+    feedback.delete()
+    # Add a success message
+    messages.success(request, 'Feedback deleted successfully!')
+    return redirect('feedback_management')  # Redirect to the feedback page after deletion
 
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
@@ -352,7 +402,6 @@ def update_student(request, username):
         
         # Update fields based on form input
         student.first_name = request.POST.get('first_name')
-       
         student.email = request.POST.get('email')
         student.sex = request.POST.get('sex')
         student.phone = request.POST.get('phone')
