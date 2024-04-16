@@ -1,0 +1,283 @@
+{% if user.is_student %}
+    {% include 'student_template/base.html' %}
+{% else %}
+    {% include 'base.html' %}
+{% endif %}
+{% load static %}
+
+
+
+{% block content %}
+<div class="wrapper">
+  {% if user.is_department %}
+    {% include 'department_template/navbar.html' %}
+     {% include 'department_template/aside.html' %}
+  {% elif user.is_staff and user.is_superuser %}
+    {% include 'admin_template/aside.html' %}
+    {% include 'admin_template/navbar.html' %}
+  {% elif user.is_student %}
+    {% include 'student_template/navbar.html' %}
+  {% endif %}
+
+  {% if messages %}
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            text: "{{ message }}",
+            showConfirmButton: false,
+            timer: 6000,
+          });
+        </script>
+      {% elif message.tags == 'error' %}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            text: "{{ message }}",
+            showConfirmButton: false,
+            timer: 6000,
+          });
+        </script>
+      {% elif message.tags == 'warning' %}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'warning',
+            text: "{{ message }}",
+            showConfirmButton: false,
+            timer: 6000,
+          });
+        </script>
+      {% elif message.tags == 'info' %}
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'info',
+            text: "{{ message }}",
+            showConfirmButton: false,
+            timer: 6000,
+          });
+        </script>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            {% if user.is_superuser %}
+              <h1 class="text-muted">Update Profile</h1>
+            {% elif user.is_department %}
+                <h1 class="text-muted">Update Profile</h1>
+            {% endif %}
+                      
+          </div>
+          {% if user.is_superuser %}
+              <div class="col-sm-6">
+                  <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="{% url "home" %}">Dashboard</a></li>
+                      <li class="breadcrumb-item active">Update Profile</li>
+                  </ol>
+              </div>
+          
+          {% elif user.is_department %}
+              <div class="col-sm-6">
+                  <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="{% url "department_home" %}">Dashboard</a></li>
+                      <li class="breadcrumb-item active">Update Profile</li>
+                  </ol>
+              </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-3">
+            <!-- Profile Image -->
+            <div class="card card-info card-outline">
+              <div class="card-body box-profile">
+                <div class="text-center">
+                  {% if user.profile_picture %}
+                      <img class="profile-user-img img-fluid img-circle" src="{{ user.profile_picture.url }}" alt="User profile picture"  style="width: 100px; height: 100px;">
+                  {% else %}
+                      <!-- If profile picture is not available, display a placeholder image -->
+                      <img class="profile-user-img img-fluid img-circle" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture">
+                  {% endif %}
+                </div>
+
+                <h3 class="profile-username text-center">
+                  {% if user.is_department %}
+                    {{ user.department_name }}
+                  {% elif user.is_student%}
+                    {{ user.first_name }}
+                  {% elif user.is_staff and user.is_superuser %}
+                    {{ user.username }}
+                  {% endif %}
+                </h3>
+
+                <p class="text-muted text-center">{{ user.email }}</p>
+
+               <div class="text-center">
+                  <button type="button" class="btn btn-info" id="changeProfileBtn">
+                      <i class="fas fa-image"></i> Change Profile Picture
+                  </button>
+              </div>
+
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+
+          <div class="col-md-9">
+            <!-- Profile Settings -->
+            <div class="card card-info card-outline">
+              <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                  <li class="nav-item"><a class="nav-link text-info text-bold">Profile Details</a></li>
+                </ul>
+              </div>
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="active tab-pane" id="settings">
+                    <!-- Profile Update Form -->
+                    <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
+                      {% csrf_token %}
+                      <div class="form-group row">
+                        <label for="inputName" class="col-sm-2 col-form-label text-muted">Name</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                              {% if user.is_superuser %}
+                                  <input type="text" class="form-control" id="inputName" name="username" value="{{ user.username }}" required>
+                              {% elif user.is_student %}
+                                  <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>
+                              {% else %}
+                                  <input type="text" class="form-control" id="inputName" name="department_name" value="{{ user.department_name }}" required>
+                              {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label text-muted">Email</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="email" class="form-control" id="inputEmail" name="email" value="{{ user.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="profilePictureInput" name="profile_picture" style="display: none;" accept="image/*">
+
+                    {% if user.is_student %}
+                    <div class="form-group row">
+                        <label for="inputSex" class="col-sm-2 col-form-label text-muted">Sex</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                </div>
+                                <select class="form-control" id="inputSex" name="sex">
+                                    <option value="M" {% if user.sex == "M" %}selected{% endif %}>Male</option>
+                                    <option value="F" {% if user.sex == "F" %}selected{% endif %}>Female</option>
+                                    <option value="O" {% if user.sex == "O" %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if user.is_student or user.is_department %}
+                        <div class="form-group row">
+                            <label for="inputPhone" class="col-sm-2 col-form-label text-muted">Phone</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inputPhone" name="phone" value="{{user.phone}}">
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Update</button>
+                        </div>
+                    </div>
+
+                    </form>
+                    <!-- End Profile Update Form -->
+                  </div>
+                  <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+     <script>
+        // Function to trigger the file input when the button is clicked
+        document.getElementById('changeProfileBtn').addEventListener('click', function() {
+            document.getElementById('profilePictureInput').click();
+        });
+
+        // Function to handle the change event of the file input
+        document.getElementById('profilePictureInput').addEventListener('change', function(event) {
+            var file = event.target.files[0]; // Get the selected file
+
+            // Check if a file is selected
+            if (file) {
+                var reader = new FileReader();
+
+                // Read the file as a data URL
+                reader.readAsDataURL(file);
+
+                // When the file is loaded, set the src attribute of the image element to the data URL
+                reader.onload = function() {
+                    var image = document.querySelector('.profile-user-img');
+                    image.src = reader.result;
+                };
+            }
+        });
+    </script>
+{% if user.is_superuser %}
+    {% include 'admin_template/footer.html' %}
+{% elif user.is_department %}
+    {% include 'department_template/footer.html' %}
+{% endif %}
+
+</div>
+{% endblock %}
