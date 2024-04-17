@@ -414,9 +414,6 @@ def update_student(request, username):
     else:
         return redirect('view_student') 
 
-
-# views.py
-from .forms import QuestionForm, ChoiceFormSet
 @login_required(login_url='login_view')
 def add_question(request):
     success_msg = None
@@ -437,19 +434,42 @@ def add_question(request):
             print("Form errors outside if:", form.errors, formset.errors)
     else:
         form = QuestionForm(department_username=department_username)
-        formset = ChoiceFormSet(instance=form.instance)
+        # Determine the number of extra forms based on the number of additional choice fields submitted
+        num_extra = len(request.POST.getlist('form-0-text')) - 1 if request.POST.get('form-0-text') else 2
+        formset = ChoiceFormSet(instance=Question(), extra=num_extra)
 
     return render(request, 'department_template/add_question.html', {
         'form': form,
-        'formset': formset,  # Pass the formset to the template
+        'formset': formset,
         'success_msg': success_msg,
         'error_msg': error_msg
     })
 
-
 ######################/Department Views/#########################
 
 
+def add_resource(request):
+    if request.method == 'POST':
+        form = ResourceForm(request.POST, request.FILES)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.department_name = request.user.username  # Assuming department_name is associated with the user
+            resource.save()
+            messages.success(request, 'Resource added successfully!')
+            return redirect('manage_resources')
+    else:
+        form = ResourceForm()
+    return render(request, 'department_template/add_resource.html', {'form': form})
+
+def manage_resources(request):
+    # Get the department username of the logged-in user
+    department_username = request.user.username
+    
+    # Fetch all resources associated with the department username
+    resources = Resource.objects.filter(department_name=department_username)
+    
+    # Pass the resources to the template context
+    return render(request, 'department_template/manage_resources.html', {'resources': resources})
 
 def manage_questions(request):
     department_username = request.user.username

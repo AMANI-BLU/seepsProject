@@ -40,6 +40,9 @@ urlpatterns = [
     path('change-password/', change_password, name='change_password'),
     path('profile/', profile, name='profile'),
     path('delete-feedback/', delete_feedback, name='delete_feedback'),
+    path('manage-resources/', manage_resources, name='manage_resources'),
+      path('add-resource/', add_resource, name='add_resource'),
+
 
 
     

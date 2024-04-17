@@ -73,14 +73,20 @@
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-user"></i>&nbsp;&nbsp;{{request.user.first_name}}
                             </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <!-- Add user-related dropdown items here -->
-                                <a class="dropdown-item" href="{% url "profile" %}">Profile</a>
-                                <a class="dropdown-item" href="#">Settings</a>
+                                <a class="dropdown-item" href="{% url 'profile' %}">
+                                    <i class="nav-icon fas fa-user"></i>&nbsp;&nbsp;&nbsp;Profile
+                                </a>
+                                <a class="dropdown-item" href="{% url "change_password" %}">
+                                    <i class="nav-icon fas fa-lock"></i>&nbsp;&nbsp;&nbsp;Change Password
+                                </a>
                                 <div class="dropdown-divider"></div>
-<a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
-              <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
-             </a>                            </div>
+                                <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
+                                    <i class="nav-icon fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
+                                </a>
+                            </div>
+
                         </li>
                     </ul>
                 </div>

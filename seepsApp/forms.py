@@ -182,27 +182,32 @@ class CourseForm(forms.ModelForm):
 from django import forms
 from django.forms.models import inlineformset_factory
 from .models import Question, Choice, Exam
-
 class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ['text', 'is_correct']
         widgets = {
             'is_correct': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-             
-            'text': forms.TextInput(attrs={'class':'form-control','placeholder':'enter choice here..'})
+            'text': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter choice here..'})
         }
 
-ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, can_delete=False, extra=4)
+# Custom formset class to dynamically set extra forms
+class BaseChoiceFormSet(forms.BaseInlineFormSet):
+    def __init__(self, *args, **kwargs):
+        extra = kwargs.pop('extra', 2)
+        super().__init__(*args, **kwargs)
+        self.extra = extra
+
+ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, formset=BaseChoiceFormSet, can_delete=False)
+
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        file = forms.FileField()
         fields = ['exam', 'content', 'answer_description']
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'id': 'summernote', 'placeholder': 'Enter Question here..'}),
-            'answer_description': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Enter answer description here..'}),
+            'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
+            'answer_description': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter answer description here..'}),
         }
 
     choices = ChoiceFormSet()
@@ -212,17 +217,12 @@ class QuestionForm(forms.ModelForm):
         super(QuestionForm, self).__init__(*args, **kwargs)
         
         if department_username:
-            # If department_username is provided, this is a department adding a question
             queryset = Exam.objects.filter(department_name=department_username)
         else:
-            # If department_username is not provided, this is an admin adding a question
             queryset = Exam.objects.all()
 
-        # Modify the queryset to include difficulty level in each exam choice
         choices = [(exam.id, f"{exam.name} ({exam.difficulty})") for exam in queryset]
         self.fields['exam'].choices = choices
-        
-        # Initialize Summernote for content and answer_description fields
         self.fields['content'].widget.attrs.update({
             'class': 'form-control summernote',
             'placeholder': 'Enter Question here..',
@@ -231,9 +231,6 @@ class QuestionForm(forms.ModelForm):
             'class': 'form-control summernote',
             'placeholder': 'Enter answer description here..',
         })
-
-
-
 # No need to override __init__, is_valid, or save methods for basic Django admin usage
 
 class LoginForm(forms.Form):
@@ -486,3 +483,12 @@ class ProfileUpdateForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+
+
+class ResourceForm(forms.ModelForm):
+    class Meta:
+        model = Resource
+        fields = ['name', 'description', 'file']
+

@@ -8,8 +8,6 @@ from .models import *
 class ChoiceInline(admin.TabularInline):
     model = Choice
     form = ChoiceForm
-    extra = 4
-    max_num = 4
     can_delete = False
 
 class QuestionResource(resources.ModelResource):

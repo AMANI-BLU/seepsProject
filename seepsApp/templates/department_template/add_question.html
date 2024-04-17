@@ -6,7 +6,7 @@
 <div class="wrapper">
   {% include 'department_template/navbar.html' %}
   {% include 'department_template/aside.html' %}
-
+  
   <div class="content-wrapper">
     <div class="content-header">
       <div class="container-fluid">
@@ -29,135 +29,31 @@
         <div class="login-box w-100">
           <div class="card card-outline card-info">
             <div class="card-body">
-             {% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'success' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'error' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'warning' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'warning',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'info' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'info',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% endif %}
-    {% endfor %}
-{% endif %}
-
-
+              {% if messages %}
+                <!-- Your message display code -->
+              {% endif %}
+              
               <form action="{% url 'add_question' %}" method="post">
                 {% csrf_token %}
-
-                {% if form.non_field_errors %}
-                  <div class="text-danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ form.non_field_errors.as_text }}
-                  </div>
-                {% endif %}
-
-                <div class="form-group">
-                  <label for="{{ form.exam.id_for_label }}" class="text-muted">Exam</label>
-                  {{ form.exam }}
-                  {% if form.exam.errors %}
-                    <div class="text-danger">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      {{ form.exam.errors.as_text }}
-                    </div>
-                  {% endif %}
-                </div>
-
-                <div class="form-group">
-                  <label for="{{ form.content.id_for_label }}" class="text-muted">Question Content</label>
-                  {{ form.content }}
-                  {% if form.content.errors %}
-                    <div class="text-danger">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      {{ form.content.errors.as_text }}
-                    </div>
-                  {% endif %}
-                </div>
-
-                <div class="form-group">
-                  <label for="{{ form.answer_description.id_for_label }}" class="text-muted">Answer Description</label>
-                  {{ form.answer_description }}
-                  {% if form.answer_description.errors %}
-                    <div class="text-danger">
-                      <i class="bi bi-exclamation-triangle"></i>
-                      {{ form.answer_description.errors.as_text }}
-                    </div>
-                  {% endif %}
-                </div>
-
+                
+                <!-- Main question fields -->
+                {{ form.as_p }}
+                
+                <!-- Formset management form -->
                 {{ form.choices.management_form }}
-
-                {% for choice_form in form.choices %}
-                  <div class="form-group">
-                    <label for="{{ choice_form.text.id_for_label }}" class="text-muted">Choice</label>
-                    {{ choice_form.text }}
-                    {% if choice_form.text.errors %}
-                      <div class="text-danger">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        {{ choice_form.text.errors.as_text }}
-                      </div>
-                    {% endif %}
-
-                    <label for="{{ choice_form.is_correct.id_for_label }}" class="text-muted">Is Correct? </label>
-                    {{ choice_form.is_correct }}
-                    {% if choice_form.is_correct.errors %}
-                      <div class="text-danger">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        {{ choice_form.is_correct.errors.as_text }}
-                      </div>
-                    {% endif %}
-                  </div>
-                {% endfor %}
-
-                <div class="row">
-                  <div class="col-12">
-                    <button type="submit" class="btn btn-info btn-block">
-                      Add Question
-                    </button>
-                  </div>
+                
+                <!-- Dynamic choice fields container -->
+                <div class="choices-container">
+                  {% for choice_form in form.choices %}
+                    {{ choice_form.as_p }}
+                  {% endfor %}
                 </div>
+                
+                <!-- Button to add more choice fields dynamically -->
+                <button type="button" id="add-choice-btn" class="btn btn-secondary mt-2">Add Choice</button>
+                
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-info btn-block mt-2">Add Question</button>
               </form>
             </div>
           </div>
@@ -168,20 +64,22 @@
   {% include 'department_template/footer.html' %}
 </div>
 
-<!-- Initialize Summernote -->
 <script>
-$(document).ready(function() {
-    $('.summernote').summernote({
-        height: 150,
-        toolbar: [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['strikethrough', 'superscript', 'subscript']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['height', ['height']]
-        ]
-    });
-});
+  var choiceCount = {{ form.choices.total_form_count }};
+  
+  document.getElementById('add-choice-btn').addEventListener('click', function() {
+    var choicesContainer = document.querySelector('.choices-container');
+    var newChoiceField = `
+      <div class="form-group">
+        <label for="id_choices-${choiceCount}-text" class="text-muted">Choice</label>
+        <input type="text" name="choices-${choiceCount}-text" class="form-control" id="id_choices-${choiceCount}-text">
+        <label for="id_choices-${choiceCount}-is_correct" class="text-muted">Is Correct?</label>
+        <input type="checkbox" name="choices-${choiceCount}-is_correct" class="form-check-input" id="id_choices-${choiceCount}-is_correct">
+      </div>
+    `;
+    choicesContainer.insertAdjacentHTML('beforeend', newChoiceField);
+    choiceCount++;
+  });
 </script>
+
 {% endblock %}

@@ -114,4 +114,15 @@ class Feedback(models.Model):
 
     def __str__(self):
         return f'Feedback from {self.user.username} at {self.created_at}'
-    
+
+
+from django.db import models
+
+class Resource(models.Model):
+    name = models.CharField(max_length=100)
+    file = models.FileField(upload_to='resources/')
+    description = models.TextField()
+    department_name = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
