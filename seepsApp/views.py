@@ -1063,7 +1063,29 @@ def tutorial_page(request, course_id):
     # Pass the course and tutorials to the template
     return render(request, 'student_template/tutorial_page.html', {'course': course, 'tutorials': tutorials})
 
-    
+from os.path import basename
+from django.shortcuts import render
+from .models import Resource
+
+@login_required(login_url='login_view')
+@user_passes_test(lambda user: user.is_student, login_url='NoPage')
+def materials(request):
+    # Retrieve the logged-in student's department name
+    department_name = request.user.department_name
+
+    # Filter resources based on the student's department name
+    resources = Resource.objects.filter(department_name=department_name)
+
+    # Extract filenames from file paths
+    for resource in resources:
+        resource.filename = basename(resource.file.name)
+
+    context = {
+        'resources': resources,
+    }
+    return render(request, 'student_template/materials.html', context)
+
+
 ####################/Student Views/###############################
 
 

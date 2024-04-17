@@ -490,5 +490,5 @@ class ProfileUpdateForm(forms.ModelForm):
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource
-        fields = ['name', 'description', 'file']
+        fields = ['description', 'file']
 

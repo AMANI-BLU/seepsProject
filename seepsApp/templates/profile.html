@@ -269,6 +269,8 @@
                 reader.onload = function() {
                     var image = document.querySelector('.profile-user-img');
                     image.src = reader.result;
+                    image.style.width = '100px';
+                    image.style.height = '100px';
                 };
             }
         });
