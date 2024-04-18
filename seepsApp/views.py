@@ -476,35 +476,6 @@ def manage_questions(request):
     questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
     return render(request, 'department_template/manage_question.html', {'questions': questions})
 
-def update_question(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    department_username = request.user.username
-    
-    # Fetch all available exams
-    exams = Exam.objects.all()
-
-    if request.method == 'POST':
-        form = QuestionForm(request.POST, instance=question)
-        formset = ChoiceFormSet(request.POST, instance=form.instance)
-        if form.is_valid() and formset.is_valid():
-            question = form.save()
-            formset.instance = question
-            formset.save()
-            messages.success(request, 'Question updated successfully!')
-            return redirect('manage_questions')
-        else:
-            messages.error(request, 'Error updating question. Please check the form.')
-    else:
-        form = QuestionForm(instance=question)
-        formset = ChoiceFormSet(instance=form.instance)
-
-    return render(request, 'department_template/manage_question.html', {
-        'form': form,
-        'formset': formset,
-        'question': question,
-        'exams': exams  # Pass exams to the template context
-    })
-
     
     
 def delete_question(request, question_id):
