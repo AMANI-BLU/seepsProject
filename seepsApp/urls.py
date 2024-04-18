@@ -41,7 +41,11 @@ urlpatterns = [
     path('profile/', profile, name='profile'),
     path('delete-feedback/', delete_feedback, name='delete_feedback'),
     path('manage-resources/', manage_resources, name='manage_resources'),
-      path('add-resource/', add_resource, name='add_resource'),
+    path('add-resource/', add_resource, name='add_resource'),
+    path('delete-resource/<int:resource_id>/', delete_resource, name='delete_resource'),
+        path('update_resource/<int:resource_id>/', update_resource, name='update_resource'),
+
+
 
 
 

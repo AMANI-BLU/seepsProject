@@ -468,8 +468,38 @@ def manage_resources(request):
     # Fetch all resources associated with the department username
     resources = Resource.objects.filter(department_name=department_username)
     
+    for resource in resources:
+        resource.filename = basename(resource.file.name)
+    
     # Pass the resources to the template context
     return render(request, 'department_template/manage_resources.html', {'resources': resources})
+
+def update_resource(request, resource_id):
+    resource = get_object_or_404(Resource, pk=resource_id)
+    if request.method == 'POST':
+        # Update resource fields based on form input
+        resource.description = request.POST.get('description')
+        
+        # Handle file upload
+        if 'file' in request.FILES:
+            resource.file = request.FILES['file']
+        
+        # Add more fields as needed
+        resource.save()
+        messages.success(request, 'Resource updated successfully!')
+        return redirect('manage_resources')  # Redirect to the manage_resources page after successful update
+    else:
+        return redirect('manage_resources')   # Redirect to the manage_resources page if the request method is not POSTect('manage_resources')   # Redirect to the manage_resources page if the request method is not POST
+
+def delete_resource(request, resource_id):
+    if request.method == 'POST':
+        try:
+            resource = Resource.objects.get(pk=resource_id)
+            resource.delete()
+            messages.success(request, 'Resource deleted successfully.')
+        except Resource.DoesNotExist:
+            messages.error(request, 'Resource does not exist.')
+    return redirect('manage_resources')
 
 def manage_questions(request):
     department_username = request.user.username

@@ -74,7 +74,7 @@
                                     {% for resource in resources %}
                                         <tr>
                                             <td>{{ forloop.counter }}</td>
-                                            <td>{{ resource.file.name }}</td>   
+                                            <td>{{ resource.filename }}</td>   
                                             <td>{{ resource.description }}</td>
                                             <td class="d-flex align-items-center">
                                                 <!-- Update Button -->
@@ -99,18 +99,66 @@
         </div>
 
         <!-- Update Resource Modals -->
-        {% for resource in resources %}
+                    <!-- Update Resource Modals -->
+            {% for resource in resources %}
             <div class="modal fade" id="updateResourceModal{{ resource.id }}" tabindex="-1" role="dialog" aria-labelledby="updateResourceModalLabel{{ resource.id }}" aria-hidden="true">
-                <!-- Update Resource Modal Content -->
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateResourceModalLabel{{ resource.id }}">Update Resource</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Update Form -->
+                            <form action="{% url 'update_resource' resource.id %}" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="description{{ resource.id }}">Description</label>
+                                    <textarea class="form-control" id="description{{ resource.id }}" name="description" rows="3">{{ resource.description }}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="file{{ resource.id }}">File</label>
+                                    <input type="file" class="form-control-file" id="file{{ resource.id }}" name="file">
+                                </div>
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
+            {% endfor %}
+
 
         <!-- Delete Resource Modals -->
-        {% for resource in resources %}
+            {% for resource in resources %}
             <div class="modal fade" id="deleteResourceModal{{ resource.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteResourceModalLabel{{ resource.id }}" aria-hidden="true">
-                <!-- Delete Resource Modal Content -->
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteResourceModalLabel{{ resource.id }}">Delete Resource</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this resource?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <form action="{% url 'delete_resource' resource.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
+            {% endfor %}
+
 
         {% include 'department_template/footer.html' %}
     </div>
