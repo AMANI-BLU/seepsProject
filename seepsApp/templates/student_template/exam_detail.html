@@ -32,28 +32,16 @@
             </div>
           </div>
         {% endfor %}
-
         
-        
-          <div class="text-center">
-              <button type="submit" class="btn btn-info btn-lg">
+        <div class="text-center">
+          <button type="submit" class="btn btn-info btn-lg">
             <i class="fas fa-check-circle"></i> Submit Exam
           </button>
-          {% comment %} <!-- Save and load progress buttons -->
-          <button id="saveButton" class="btn btn-success btn-lg">
-            <i class="fas fa-save"></i> Save Progress
-          </button>
-          <button id="loadButton" class="btn btn-primary btn-lg">
-            <i class="fas fa-download"></i> Load Progress
-          </button> {% endcomment %}
         </div>
       </form>
     </div>
   </div>
 </div>
-
-<!-- Button to enter fullscreen -->
-<button id="fullscreenButton" class="btn btn-primary" onclick="openFullscreen()">Enter Fullscreen</button>
 
 <!-- SweetAlert library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -73,6 +61,12 @@
       elem.msRequestFullscreen();
     }
   }
+
+  // Automatically open fullscreen when the page loads
+  window.addEventListener('load', function() {
+    openFullscreen();
+  });
+
 
   // Timer
   var timerElement = document.getElementById('timer');
@@ -136,16 +130,6 @@
       }
     }
   }
-
-  {% comment %} document.getElementById('saveButton').addEventListener('click', function() {
-    saveProgress();
-    showMessage('Progress saved!');
-  });
-
-  document.getElementById('loadButton').addEventListener('click', function() {
-    loadProgress();
-    showMessage('Progress loaded!');
-  }); {% endcomment %}
 
   // Auto-load progress on page load
   loadProgress();

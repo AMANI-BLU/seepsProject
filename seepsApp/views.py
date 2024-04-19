@@ -414,6 +414,8 @@ def update_student(request, username):
     else:
         return redirect('view_student') 
 
+
+
 @login_required(login_url='login_view')
 def add_question(request):
     success_msg = None
@@ -507,15 +509,15 @@ def manage_questions(request):
     return render(request, 'department_template/manage_question.html', {'questions': questions})
 
     
-    
+
 def delete_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if request.method == 'POST':
         question.delete()
         messages.success(request, 'Question deleted successfully!')
-        return redirect('manage_questions')
+        return redirect('manage_questions')  # Correct URL pattern name here
     
-    return redirect('manage_questions')
+    return redirect('manage_questions')  # Correct URL pattern name here
 
 
 from django.shortcuts import render, redirect

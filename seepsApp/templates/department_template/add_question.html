@@ -60,10 +60,7 @@
         </div>
       </div>
     </section>
-  </div>
-  {% include 'department_template/footer.html' %}
-</div>
-
+    
 <script>
   var choiceCount = {{ form.choices.total_form_count }};
   
@@ -81,5 +78,20 @@
     choiceCount++;
   });
 </script>
+<script>
+  $(document).ready(function() {
+    $('.summernote').summernote({
+      height: 100, // set editor height
+      minHeight: null, // set minimum height of editor
+      maxHeight: null, // set maximum height of editor
+      focus: true // set focus to editable area after initializing Summernote
+    });
+  });   
+</script>
+
+
+  </div>
+  {% include 'department_template/footer.html' %}
+</div>
 
 {% endblock %}

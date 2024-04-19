@@ -178,6 +178,7 @@ class CourseForm(forms.ModelForm):
         if commit:
             course.save()
         return course
+   
 
 from django import forms
 from django.forms.models import inlineformset_factory
@@ -186,15 +187,19 @@ class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ['text', 'is_correct']
+        labels = {
+            'text': 'Choice',
+            
+        }
         widgets = {
-            'is_correct': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_correct': forms.CheckboxInput(attrs={'class': 'form-check-input mt-2 ml-2'}),
             'text': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter choice here..'})
         }
 
 # Custom formset class to dynamically set extra forms
 class BaseChoiceFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
-        extra = kwargs.pop('extra', 2)
+        extra = kwargs.pop('extra', 4)
         super().__init__(*args, **kwargs)
         self.extra = extra
 
@@ -204,6 +209,10 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ['exam', 'content', 'answer_description']
+        labels = {
+            'content': 'question',
+            
+        }
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
@@ -231,6 +240,9 @@ class QuestionForm(forms.ModelForm):
             'class': 'form-control summernote',
             'placeholder': 'Enter answer description here..',
         })
+
+
+
 # No need to override __init__, is_valid, or save methods for basic Django admin usage
 
 class LoginForm(forms.Form):
