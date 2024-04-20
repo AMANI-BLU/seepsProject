@@ -503,4 +503,18 @@ class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource
         fields = ['description', 'file']
+        
+        
+from django import forms
+from .models import Exam
 
+class UploadPdfForm(forms.Form):
+    pdf_file = forms.FileField(label='Upload PDF', help_text='Select a PDF file')
+    exam = forms.ChoiceField(choices=(), label='Select Exam', widget=forms.Select(attrs={'class': 'form-control'}))
+
+    def __init__(self, *args, department_queryset=None, **kwargs):
+        super(UploadPdfForm, self).__init__(*args, **kwargs)
+        
+        if department_queryset:
+            choices = [(exam.id, f"{exam.name} ({exam.difficulty})") for exam in department_queryset]
+            self.fields['exam'].choices = choices

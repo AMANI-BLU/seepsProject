@@ -1100,3 +1100,39 @@ def logout_view(request):
 
 def NoPage(request):
     return render(request,'404.html')
+
+from django.shortcuts import render, redirect
+from .forms import UploadPdfForm
+from .utils import extract_questions_with_choices_from_pdf
+from .models import Exam, Question, Choice
+
+def upload_pdf_view(request):
+    questions_with_choices = None
+
+    # Fetch queryset of exams relevant to the user's department
+    department_name = request.user.username  # Assuming you have a user object with department_name
+    exam_queryset = Exam.objects.filter(department_name=department_name)
+
+    if request.method == 'POST':
+        form = UploadPdfForm(request.POST, request.FILES, department_queryset=exam_queryset)
+        if form.is_valid():
+            # Get the selected exam
+            selected_exam = Exam.objects.get(pk=form.cleaned_data['exam'])
+            
+            # Extract questions with choices from the uploaded PDF file
+            pdf_file = request.FILES['pdf_file']
+            questions_with_choices = extract_questions_with_choices_from_pdf(pdf_file)
+
+            # Save questions and choices to the database
+            for qwc in questions_with_choices:
+                question = Question.objects.create(exam=selected_exam, content=qwc['question'])
+                for choice_text in qwc['choices']:
+                    Choice.objects.create(question=question, text=choice_text)
+            
+            # Redirect to a success page or any other desired page
+            return redirect('manage_questions')  # Replace 'manage_exam' with the name of your success page URL pattern
+    else:
+        # Initialize the form with the exam queryset
+        form = UploadPdfForm(department_queryset=exam_queryset)
+    
+    return render(request, 'department_template/import_question.html', {'form': form, 'questions_with_choices': questions_with_choices})
