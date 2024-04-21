@@ -1101,7 +1101,6 @@ def logout_view(request):
 def NoPage(request):
     return render(request,'404.html')
 
-
 from django.shortcuts import render, redirect
 from .forms import UploadPdfForm
 from .utils import extract_questions_with_choices_from_pdf
@@ -1124,16 +1123,40 @@ def upload_pdf_view(request):
             pdf_file = request.FILES['pdf_file']
             questions_with_choices = extract_questions_with_choices_from_pdf(pdf_file)
 
-            # Save questions and choices to the database
-            for qwc in questions_with_choices:
-                question = Question.objects.create(exam=selected_exam, content=qwc['question'])
-                for choice_text in qwc['choices']:
-                    Choice.objects.create(question=question, text=choice_text)
+            # Save the questions and choices in session for preview
+            request.session['questions_with_choices'] = questions_with_choices
+            request.session['selected_exam'] = selected_exam.id
             
-            # Redirect to a success page or any other desired page
-            return redirect('manage_questions')  # Replace 'manage_exam' with the name of your success page URL pattern
+            # Redirect to the preview page
+            return redirect('preview_questions')  # Create a URL pattern named 'preview_questions' for the preview page
     else:
         # Initialize the form with the exam queryset
         form = UploadPdfForm(department_queryset=exam_queryset)
     
-    return render(request, 'department_template/import_question.html', {'form': form, 'questions_with_choices': questions_with_choices})
+    return render(request, 'department_template/import_question.html', {'form': form})
+
+
+def preview_questions_view(request):
+    questions_with_choices = request.session.get('questions_with_choices')
+    selected_exam_id = request.session.get('selected_exam')
+    selected_exam = Exam.objects.get(pk=selected_exam_id) if selected_exam_id else None
+    
+    if not questions_with_choices or not selected_exam:
+        # Redirect to the upload page if session data is missing
+        return redirect('upload_pdf')  # Replace 'upload_pdf' with the name of your upload page URL pattern
+    
+    if request.method == 'POST':
+        # If the user confirms, save questions and choices to the database
+        for qwc in questions_with_choices:
+            question = Question.objects.create(exam=selected_exam, content=qwc['question'])
+            for choice_text in qwc['choices']:
+                Choice.objects.create(question=question, text=choice_text)
+        
+        # Clear session data
+        del request.session['questions_with_choices']
+        del request.session['selected_exam']
+        
+        # Redirect to a success page or any other desired page
+        return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
+    
+    return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})

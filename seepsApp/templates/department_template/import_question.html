@@ -31,21 +31,6 @@
         <button type="submit">Upload</button>
     </form>
 
-    <!-- Display a preview of the questions with choices -->
-    {% if questions_with_choices %}
-    <h2>Preview</h2>
-    <ul>
-        {% for qwc in questions_with_choices %}
-            <li>{{ qwc.question }}</li>
-            <ul>
-                {% for choice in qwc.choices %}
-                    <li>{{ choice }}</li>
-                {% endfor %}
-            </ul>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    
     <!-- Display any errors if form validation fails -->
     {% if form.errors %}
         <ul>

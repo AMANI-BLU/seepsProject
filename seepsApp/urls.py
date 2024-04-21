@@ -46,6 +46,8 @@ urlpatterns = [
         path('update_resource/<int:resource_id>/', update_resource, name='update_resource'),
         
             path('import_question/', upload_pdf_view, name='upload_pdf_view'),
+                path('preview/', preview_questions_view, name='preview_questions'),
+
   
 
 

@@ -45,5 +45,5 @@ def extract_questions_with_choices_from_pdf(pdf_file):
     except Exception as e:
         print(f"Error extracting questions with choices from PDF: {e}")
 
-    print("Extracted questions with choices:", questions_with_choices)
+    # print("Extracted questions with choices:", questions_with_choices)
     return questions_with_choices
