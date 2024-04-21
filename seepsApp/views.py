@@ -1101,6 +1101,7 @@ def logout_view(request):
 def NoPage(request):
     return render(request,'404.html')
 
+
 from django.shortcuts import render, redirect
 from .forms import UploadPdfForm
 from .utils import extract_questions_with_choices_from_pdf

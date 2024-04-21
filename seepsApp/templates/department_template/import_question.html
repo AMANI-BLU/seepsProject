@@ -1,4 +1,3 @@
-<!-- department_template/import_question.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import Questions</title>
     <!-- Add any CSS styling if needed -->
-    <style>
-        /* Add your CSS styles here */
-    </style>
+   
 </head>
 <body>
     <h1>Import Questions</h1>
@@ -33,6 +30,21 @@
         <!-- Submit button -->
         <button type="submit">Upload</button>
     </form>
+
+    <!-- Display a preview of the questions with choices -->
+    {% if questions_with_choices %}
+    <h2>Preview</h2>
+    <ul>
+        {% for qwc in questions_with_choices %}
+            <li>{{ qwc.question }}</li>
+            <ul>
+                {% for choice in qwc.choices %}
+                    <li>{{ choice }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </ul>
+    {% endif %}
     
     <!-- Display any errors if form validation fails -->
     {% if form.errors %}
@@ -43,19 +55,5 @@
         </ul>
     {% endif %}
     
-    <!-- Display any questions with choices extracted from the PDF -->
-    {% if questions_with_choices %}
-        <h2>Extracted Questions with Choices:</h2>
-        <ul>
-            {% for qwc in questions_with_choices %}
-                <li>{{ qwc.question }}</li>
-                <ul>
-                    {% for choice in qwc.choices %}
-                        <li>{{ choice }}</li>
-                    {% endfor %}
-                </ul>
-            {% endfor %}
-        </ul>
-    {% endif %}
 </body>
 </html>

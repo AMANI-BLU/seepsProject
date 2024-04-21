@@ -504,7 +504,6 @@ class ResourceForm(forms.ModelForm):
         model = Resource
         fields = ['description', 'file']
         
-        
 from django import forms
 from .models import Exam
 
