@@ -1139,13 +1139,33 @@ def upload_pdf_view(request):
 def preview_questions_view(request):
     questions_with_choices = request.session.get('questions_with_choices')
     selected_exam_id = request.session.get('selected_exam')
-    selected_exam = Exam.objects.get(pk=selected_exam_id) if selected_exam_id else None
+    selected_exam = None
     
+    # Check if selected_exam_id exists and get the Exam object
+    if selected_exam_id:
+        try:
+            selected_exam = Exam.objects.get(pk=selected_exam_id)
+        except Exam.DoesNotExist:
+            # Handle the case where the Exam object does not exist
+            # You might want to redirect or render an error page
+            pass
+    
+    # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
         # Redirect to the upload page if session data is missing
         return redirect('upload_pdf')  # Replace 'upload_pdf' with the name of your upload page URL pattern
     
     if request.method == 'POST':
+        # Get the selected choices from POST data
+        selected_choices = {}
+        for key, value in request.POST.items():
+            if key.startswith('selected_choice_'):
+                question_number = key.split('_')[2]  # Extract the question number from the key
+                selected_choices[question_number] = value  # Store the selected choice for this question
+                
+        # Now selected_choices dictionary contains the selected choices for each question
+        print("Selected Radios:", selected_choices)
+        
         # If the user confirms, save questions and choices to the database
         for qwc in questions_with_choices:
             question = Question.objects.create(exam=selected_exam, content=qwc['question'])

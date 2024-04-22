@@ -1,36 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview Questions</title>
-</head>
-<body>
-    <h1>Preview Questions</h1>
-    
-    {% if questions_with_choices %}
-        <form method="post">
-            {% csrf_token %}
-            <h2>Exam: {{ selected_exam.name }}</h2>
-            {% for question_with_choices in questions_with_choices %}
-                <div>
-                    <h3>{{ question_with_choices.question }}</h3>
-                    <ul>
-                        {% for choice in question_with_choices.choices %}
-                            <li>
-                                <input type="checkbox" name="correct_choices_{{ forloop.counter }}" value="{{ choice }}">
-                                {{ choice }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endfor %}
-            <button type="submit" name="confirm">Confirm</button>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Preview Questions</title>
+    </head>
+    <body>
+        <h1>Preview Questions</h1>
+        
+        {% if questions_with_choices %}
+            <form method="post">
+                {% csrf_token %}
+                <h2>Exam: {{ selected_exam.name }}</h2>
+                {% for question_with_choices in questions_with_choices %}
+                    <div>
+                        <h3>{{ question_with_choices.question }}</h3>
+                        <ul>
+                            {% for choice in question_with_choices.choices %}
+                                <li>
+                                    <input type="radio" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}" value="{{ choice }}">
+                                    <label for="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ choice }}</label>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+                <button type="submit" name="confirm">Confirm</button>
+                <a href="{% url 'upload_pdf_view' %}">Back to Upload</a>
+            </form>
+        {% else %}
+            <p>No questions to preview.</p>
             <a href="{% url 'upload_pdf_view' %}">Back to Upload</a>
-        </form>
-    {% else %}
-        <p>No questions to preview.</p>
-        <a href="{% url 'upload_pdf_view' %}">Back to Upload</a>
-    {% endif %}
-</body>
-</html>
+        {% endif %}
+    </body>
+    </html>
