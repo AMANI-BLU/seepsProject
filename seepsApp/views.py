@@ -1135,7 +1135,6 @@ def upload_pdf_view(request):
     
     return render(request, 'department_template/import_question.html', {'form': form})
 
-
 def preview_questions_view(request):
     questions_with_choices = request.session.get('questions_with_choices')
     selected_exam_id = request.session.get('selected_exam')
@@ -1153,7 +1152,7 @@ def preview_questions_view(request):
     # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
         # Redirect to the upload page if session data is missing
-        return redirect('upload_pdf')  # Replace 'upload_pdf' with the name of your upload page URL pattern
+        return redirect('upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
     
     if request.method == 'POST':
         # Get the selected choices from POST data
@@ -1162,19 +1161,21 @@ def preview_questions_view(request):
             if key.startswith('selected_choice_'):
                 question_number = key.split('_')[2]  # Extract the question number from the key
                 selected_choices[question_number] = value  # Store the selected choice for this question
-                
-        # Now selected_choices dictionary contains the selected choices for each question
-        print("Selected Radios:", selected_choices)
-        
+
         # If the user confirms, save questions and choices to the database
         for qwc in questions_with_choices:
             question = Question.objects.create(exam=selected_exam, content=qwc['question'])
             for choice_text in qwc['choices']:
-                Choice.objects.create(question=question, text=choice_text)
+                # Check if this choice is selected
+                is_correct = choice_text in selected_choices.values()
+                Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
         
         # Clear session data
         del request.session['questions_with_choices']
         del request.session['selected_exam']
+        
+        # Add success message
+        messages.success(request, 'Questions added successfully!')
         
         # Redirect to a success page or any other desired page
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern

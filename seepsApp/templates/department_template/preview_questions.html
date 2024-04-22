@@ -1,36 +1,72 @@
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Preview Questions</title>
-    </head>
-    <body>
-        <h1>Preview Questions</h1>
-        
-        {% if questions_with_choices %}
-            <form method="post">
-                {% csrf_token %}
-                <h2>Exam: {{ selected_exam.name }}</h2>
-                {% for question_with_choices in questions_with_choices %}
-                    <div>
-                        <h3>{{ question_with_choices.question }}</h3>
-                        <ul>
-                            {% for choice in question_with_choices.choices %}
-                                <li>
-                                    <input type="radio" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}" value="{{ choice }}">
-                                    <label for="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ choice }}</label>
+{% extends 'base.html' %}
+
+{% block title %}Preview Questions{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <h1>Selected File Questions Preview</h1>
+                </div>
+            </div>
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="alert alert-warning alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <h5><i class="icon fas fa-exclamation-triangle"></i> Reminder!</h5>
+                    Please select the correct answers for each question before submitting.
+                </div>
+
+                {% if questions_with_choices %}
+                <form method="post">
+                    {% csrf_token %}
+                    {% comment %} <h2>Exam: {{ name }}</h2> {% endcomment %}
+                    {% for question_with_choices in questions_with_choices %}
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title">{{ question_with_choices.question }}</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                {% for choice in question_with_choices.choices %}
+                                <li class="list-group-item">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}" class="custom-control-input" value="{{ choice }}" required>
+                                        <label class="custom-control-label" for="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ choice }}</label>
+                                    </div>
                                 </li>
-                            {% endfor %}
-                        </ul>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                {% endfor %}
-                <button type="submit" name="confirm">Confirm</button>
-                <a href="{% url 'upload_pdf_view' %}">Back to Upload</a>
-            </form>
-        {% else %}
-            <p>No questions to preview.</p>
-            <a href="{% url 'upload_pdf_view' %}">Back to Upload</a>
-        {% endif %}
-    </body>
-    </html>
+                    {% endfor %}
+                    <button type="submit" name="confirm" class="btn btn-primary mb-4"><i class="fas fa-check"></i> Confirm</button>
+                    <a href="{% url 'upload_pdf_view' %}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+                </form>
+                {% else %}
+                <div class="alert alert-info" role="alert">
+                    No questions to preview.
+                </div>
+                <a href="{% url 'upload_pdf_view' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+                {% endif %}
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+
+    {% include 'department_template/footer.html' %}
+</div>
+<!-- ./wrapper -->
+{% endblock %}

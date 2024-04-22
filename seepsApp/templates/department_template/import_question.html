@@ -1,44 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import Questions</title>
-    <!-- Add any CSS styling if needed -->
-   
-</head>
-<body>
-    <h1>Import Questions</h1>
-    
-    <!-- Display the form -->
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <!-- Display the file upload field -->
-        <div>
-            {{ form.pdf_file.label_tag }}
-            {{ form.pdf_file }}
-            <small>{{ form.pdf_file.help_text }}</small>
-        </div>
-        
-        <!-- Display the exam selection dropdown -->
-        <div>
-            {{ form.exam.label_tag }}
-            {{ form.exam }}
-        </div>
-        
-        <!-- Submit button -->
-        <button type="submit">Upload</button>
-    </form>
+{% extends 'base.html' %}
 
-    <!-- Display any errors if form validation fails -->
-    {% if form.errors %}
-        <ul>
-            {% for field, error in form.errors.items %}
-                <li>{{ field }}: {{ error }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-    
-</body>
-</html>
+{% block title %}Import Questions{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <h1>Import Questions</h1>
+                </div>
+            </div>
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div id="alertContainer"></div> <!-- Alert container -->
+
+                <div class="card card-outline card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Upload Questions PDF</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                {{ form.pdf_file.label_tag }}
+                                {{ form.pdf_file }}
+                                <small class="form-text text-muted">{{ form.pdf_file.help_text }}</small>
+                            </div>
+                            <div class="form-group">
+                                {{ form.exam.label_tag }}
+                                {{ form.exam }}
+                            </div>
+                            <button type="button" id="uploadButton" class="btn btn-info">
+                                <i id="uploadIcon" class="fas fa-upload"></i> Upload
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <ul>
+                        {% for field, error in form.errors.items %}
+                        <li>{{ field }}: {{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+
+    {% include 'department_template/footer.html' %}
+</div>
+<!-- ./wrapper -->
+
+<!-- Script to handle button click event and show loading effect -->
+<script>
+    $(document).ready(function() {
+        $('#uploadButton').on('click', function() {
+            $(this).addClass('disabled').prop('disabled', true);
+            $('#uploadIcon').removeClass('fa-upload').addClass('fa-spinner fa-spin');
+            $('#uploadForm').submit();
+        });
+    });
+</script>
+{% endblock %}
