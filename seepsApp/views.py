@@ -1151,6 +1151,15 @@ def preview_questions_view(request):
     
     # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
+        # Check if questions_with_choices is empty or None
+        if not questions_with_choices:
+            message = "Please upload a file with correct format."
+        else:
+            message = "Please select an exam."
+        
+        # Add the message to the messages framework
+        messages.warning(request, message)
+        
         # Redirect to the upload page if session data is missing
         return redirect('upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
     

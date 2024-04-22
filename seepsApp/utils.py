@@ -33,7 +33,7 @@ def extract_questions_with_choices_from_pdf(pdf_file):
                     question = question_match.group(2).strip()
                 elif question is not None:
                     # Check if the line starts with a letter followed by a closing parenthesis
-                    choice_match = re.match(r'^\s*([A-D])\) (.+)$', line)
+                    choice_match = re.match(r'^\s*([A-Z])\) (.+)$', line)
                     if choice_match:
                         # Add the choice to the list of choices
                         choices.append(choice_match.group(2).strip())
