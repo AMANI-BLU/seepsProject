@@ -19,8 +19,8 @@ def extract_questions_with_choices_from_pdf(pdf_file):
             # Split the page text into lines
             lines = page_text.split('\n')
             for line in lines:
-                # Check if the line starts with a digit followed by a closing parenthesis
-                question_match = re.match(r'^(\d+)\) (.+)$', line)
+                # Check if the line starts with a digit followed by a dot, comma, or a closing parenthesis
+                question_match = re.match(r'^(\d+)[\.\),]|^(\d+)\) (.+)$', line)
                 if question_match:
                     # If there is an existing question, save it along with its choices
                     if question is not None:
@@ -30,10 +30,10 @@ def extract_questions_with_choices_from_pdf(pdf_file):
                         choices = []
                     
                     # Set the current line as the new question
-                    question = question_match.group(2).strip()
+                    question = line.lstrip('1234567890.(), ')
                 elif question is not None:
-                    # Check if the line starts with a letter followed by a closing parenthesis
-                    choice_match = re.match(r'^\s*([A-Z])\) (.+)$', line)
+                    # Check if the line starts with a letter followed by a closing parenthesis, dot, or comma
+                    choice_match = re.match(r'^\s*([A-Z]|[a-z])[\.\),] (.+)$', line)
                     if choice_match:
                         # Add the choice to the list of choices
                         choices.append(choice_match.group(2).strip())
@@ -45,5 +45,4 @@ def extract_questions_with_choices_from_pdf(pdf_file):
     except Exception as e:
         print(f"Error extracting questions with choices from PDF: {e}")
 
-    # print("Extracted questions with choices:", questions_with_choices)
     return questions_with_choices
