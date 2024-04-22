@@ -266,27 +266,6 @@ def profile(request):
 
 
 
-from django.contrib import messages
-
-from django.shortcuts import render
-from .resources import StudentResource
-from tablib import Dataset
-
-def import_student(request):
-    if request.method == 'POST':
-        my_model_resource = StudentResource()
-        dataset = Dataset()
-        new_data = request.FILES['myfile'].read()
-        dataset.load(new_data, format='xlsx')
-        result = my_model_resource.import_data(dataset, dry_run=True)  # First dry run to check for errors
-        if not result.has_errors():
-            my_model_resource.import_data(dataset, dry_run=False)  # Import data for real
-            messages.success(request, 'Student Imported successfully!')
-        else:
-            errors = result.base_errors
-            return render(request, 'base.html', {'errors': errors})
-    return render(request, 'department_template/read_student.html')
-
 
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
@@ -1190,3 +1169,24 @@ def preview_questions_view(request):
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
     
     return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
+
+
+from .forms import EditQuestionForm, EditChoiceFormSet  # Import the EditQuestionForm and EditChoiceFormSet
+
+def edit_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    
+    # Pass department username to the form
+    form = EditQuestionForm(instance=question, department_username=request.user.username)
+    formset = EditChoiceFormSet(instance=question)
+
+    if request.method == 'POST':
+        form = EditQuestionForm(request.POST, instance=question, department_username=request.user.username)
+        formset = EditChoiceFormSet(request.POST, instance=question)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, 'Questions Updated successfully!')
+            return redirect('manage_questions')
+
+    return render(request, 'department_template/edit_question.html', {'form': form, 'formset': formset, 'question': question})

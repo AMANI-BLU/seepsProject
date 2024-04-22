@@ -517,3 +517,45 @@ class UploadPdfForm(forms.Form):
         if department_queryset:
             choices = [(exam.id, f"{exam.name} ({exam.difficulty})") for exam in department_queryset]
             self.fields['exam'].choices = choices
+
+
+# forms.py
+
+
+class EditQuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['exam', 'content', 'answer_description']
+        labels = {
+            'content': 'Question',
+        }
+        widgets = {
+            'exam': forms.Select(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
+            'answer_description': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter answer description here..'}),
+        }
+
+    choices = ChoiceFormSet()
+
+    def __init__(self, *args, **kwargs):
+        department_username = kwargs.pop('department_username', None)
+        super(EditQuestionForm, self).__init__(*args, **kwargs)
+        
+        if department_username:
+            # Filter exams based on the department username
+            queryset = Exam.objects.filter(department_name=department_username)
+        else:
+            queryset = Exam.objects.all()
+
+        choices = [(exam.id, f"{exam.name} ({exam.difficulty})") for exam in queryset]
+        self.fields['exam'].choices = choices
+        self.fields['content'].widget.attrs.update({
+            'class': 'form-control summernote',
+            'placeholder': 'Enter Question here..',
+        })
+        self.fields['answer_description'].widget.attrs.update({
+            'class': 'form-control summernote',
+            'placeholder': 'Enter answer description here..',
+        })
+EditChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, extra=0, can_delete=False)
+

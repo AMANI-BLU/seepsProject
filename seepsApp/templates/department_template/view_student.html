@@ -14,16 +14,12 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
-                                    <i class="fas fa-plus"></i> Add New
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'add_student' %}">Add Manually</a>
-                                    <a class="dropdown-item" href="{% url "import_student" %}">Read from File</a>
-                                </div>
+                           <div class="btn-group">
+                                <a class="btn btn-info" href="{% url 'add_student' %}">
+                                    <i class="fas fa-user-plus"></i> Add New
+                                </a>
                             </div>
+
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
@@ -67,7 +63,7 @@
                         </div>
                         <div class="card-body">
                             <!-- Students Table -->
-                            <table id="departmentsTable" class="table table-bordered table-striped">
+                            <table id="studentsTable" class="table table-hover table-striped">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
@@ -90,12 +86,12 @@
                                             <td>
                                                <!-- Update Button -->
                                                 <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateModal{{ forloop.counter }}">
-                                                    <i class="fas fa-edit"></i> Edit
+                                                    <i class="fas fa-edit"></i>
                                                 </button>
 
                                                 <!-- Delete Button -->
                                                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ forloop.counter }}">
-                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                    <i class="fas fa-trash-alt"></i>
                                                 </button>
 
 
@@ -206,7 +202,7 @@
        <!-- JavaScript Section -->
 <script>
     $(document).ready(function () {
-        $('#departmentsTable').DataTable({
+        $('#studentsTable').DataTable({
             dom: 'Bfrtip',
             buttons: [
                 {

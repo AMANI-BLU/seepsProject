@@ -120,13 +120,14 @@
                                     {% for question in questions %}
                                     <tr>
                                         <td>{{ forloop.counter }}</td>
-                                        <td style="max-width: 200px; max-height: 200px; overflow: hidden;">{{ question.content|safe }}</td>
+                                        <td>{{ question.content|safe }}</td>
                                         <td>{{ question.exam.name }} ({{question.exam.difficulty}})</td>
                                         <td>
                                             <!-- Edit Button -->
-                                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#editQuestionModal{{ question.id }}">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </button>
+                                             <!-- Edit Button -->
+                                        <a href="{% url 'edit_question' question.id %}" class="btn btn-info">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
                                             <!-- Delete Button -->
                                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
                                                 <i class="fas fa-trash-alt"></i> Delete

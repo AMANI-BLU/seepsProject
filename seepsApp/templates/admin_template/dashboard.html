@@ -114,11 +114,10 @@
                 </div>
               </div>
             </div>
-                      <!-- Total Departments Card -->
+            <!-- Total Departments Card -->
             <div class="col-md-6 col-lg-3">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                    
                         <h3>{{ total_departments }}</h3>
                         <p>Total Departments</p>
                     </div>
@@ -131,33 +130,18 @@
           </div>
           <!-- /.row -->
 
-          <!-- Chart Section -->
+          <!-- Calendar Section -->
           <div class="row">
-
-            <!-- Students by Course Chart -->
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
+            <div class="col-md-12">
+              <div class="card">
                 <div class="card-header">
-                  <h3 class="card-title">Students Exam Status</h3>
+                  <h3 class="card-title">Calendar</h3>
                 </div>
                 <div class="card-body">
-                  <canvas id="myChart" width="400" height="200"></canvas>
+                  <div id="calendar"></div>
                 </div>
               </div>
             </div>
-
-            <!-- Male/Female Distribution Donut Chart -->
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
-                <div class="card-header">
-                  <h3 class="card-title">Gender</h3>
-                </div>
-                <div class="card-body">
-                  <canvas id="genderChart" width="400" height="200"></canvas>
-                </div>
-              </div>
-            </div>
-
           </div>
           <!-- /.row -->
 
@@ -165,11 +149,10 @@
       </section>
       <!-- /.content -->
     </div>
- 
-    
 
     {% include 'admin_template/footer.html' %}
   </div>
-  
+
   <!-- ./wrapper -->
 {% endblock %}
+
