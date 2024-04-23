@@ -1,65 +1,45 @@
-<!-- student_template/view_exams.html -->
 {% extends 'student_template/base.html' %}
 
 {% block title %}Student | View Exams{% endblock %}
 
 {% block content %}
-{% load static %}
-<div class="jumbotron pt-4" style="margin-top:75px;">
-    <h3 class="text-muted">Exam Overview</h3>
-    <p class="text-muted">
-        Explore the available exams below. Click on the "Take Exam" button to get started.
-    </p>
-    <hr class="my-4"/>
-</div>
+<div class="container mt-5">
+    <div class="pt-4">
+        <h3 class="text-muted">Exam Overview</h3>
+        <p class="text-muted">Explore the available exams below. Click on the "Take Exam" button to get started.</p>
+        <hr class="my-4">
+    </div>
 
-<div class="row mt-6">
-    <div class="col-md-12 mt-4">
-        {% if exams %}
-            {% for exam in exams %}
-                <div class="card mt-2">
-                    <div class="row g-0">
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h3>{{ exam.name }}</h3>
-                                <p class="card-text">
-                                    This exam is designed to test your understanding of concepts. It contains a variety of questions covering different topics.
-                                   
-                                    You will have {{ exam.timer }} minutes to complete the exam. Make sure to manage your time wisely.
-                                </p>
-                                <!-- student_template/view_exams.html -->
-                                <!-- ... existing code ... -->
-                                <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
-                                <!-- ... existing code ... -->
-
-                            </div>
-                        </div>
-
-                        <div class="col-sm-4">
-                            <div class="position-relative">
-                                <img src="{% static 'dist/img/EX.jpg' %}" alt="Photo 1" class="img-fluid">
-
-                                <div class="ribbon-wrapper ribbon-lg">
-                                    <div class="ribbon bg-info">
-                                       {{ exam.difficulty }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="card ">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-muted">No exams are currently available</h5>
-                    <p class="card-text text-muted">
-                        Check back later
+    <div class="row mt-4">
+        {% for exam in exams %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">{{ exam.name }}</h5>
+                    <p class="card-text">{{ exam.description }}</p>
+                    <p class="card-text">
+                        {% if exam.difficulty == 'easy' %}
+                            <span class="badge badge-success"><i class="fas fa-check-circle"></i> Easy</span>
+                        {% elif exam.difficulty == 'intermediate' %}
+                            <span class="badge badge-success"><i class="fas fa-circle"></i> Intermediate</span>
+                        {% elif exam.difficulty == 'advanced' %}
+                            <span class="badge badge-success"><i class="fas fa-exclamation-circle"></i> Advanced</span>
+                        {% endif %}
                     </p>
-                    <!-- You can add more styling or buttons as needed -->
+                    <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <small class="text-muted"><i class="fas fa-clock"></i> Time to complete: {{ exam.timer }} minutes</small>
                 </div>
             </div>
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
+
+    {% if not exams %}
+    <div class="text-center mt-5">
+        <p class="text-muted">No exams are currently available. Check back later.</p>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

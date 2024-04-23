@@ -72,13 +72,15 @@
                             {% endwith %}
                         {% endwith %}
                     {% else %}
-                        {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
-                            <li class="list-group-item">
-                                <a href="#" class="list-group-link text-decoration-none{% if tutorial_url == currentVideoUrl %} active-link{% endif %}" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
-                                    {{ forloop.counter }}) {{ tutorial.title }}
-                                </a>
-                            </li>
-                        {% endwith %}
+                      {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
+                        <li class="list-group-item">
+                            <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                                {{ forloop.counter }}) {{ tutorial.title }}
+                            </a>
+                        </li>
+                    {% endwith %}
+
+
                     {% endif %}
                 {% endwith %}
             {% endfor %}
@@ -153,31 +155,29 @@
 <script>
     var currentIndex = 0;
     var tutorialLinks = document.getElementById('tutorialLinks').getElementsByTagName('a');
+document.addEventListener('DOMContentLoaded', function() {
+    // Load the URL of the first video
+    var firstLink = document.querySelector('#tutorialLinks li:first-child a');
+    changeVideo(firstLink);
+});
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Load the URL of the first video
-        var firstLink = document.querySelector('#tutorialLinks li:first-child a');
-        changeVideo(firstLink);
+function changeVideo(link) {
+    var videoUrl = link.getAttribute('data-url');
+    document.getElementById('videoPlayer').src = videoUrl;
+
+    // Remove 'active' class from all links
+    var links = document.querySelectorAll('.list-group-item a');
+    links.forEach(function(item) {
+        item.classList.remove('active-link');
     });
 
-    function changeVideo(link) {
-        var videoUrl = link.getAttribute('data-url');
-        document.getElementById('videoPlayer').src = videoUrl;
+    // Add 'active' class to the clicked link
+    link.classList.add('active-link');
 
-        // Remove 'active' class from all links
-        for (var i = 0; i < tutorialLinks.length; i++) {
-            tutorialLinks[i].classList.remove('active');
-        }
+    // Prevent default link behavior
+    event.preventDefault();
+}
 
-        // Add 'active' class to the clicked link
-        link.classList.add('active');
-
-        // Update currentIndex
-        currentIndex = Array.prototype.indexOf.call(tutorialLinks, link);
-
-        // Prevent default link behavior
-        event.preventDefault();
-    }
 
     function showNextTutorial() {
         if (currentIndex < tutorialLinks.length - 1) {
@@ -246,10 +246,7 @@
 <script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'dist/js/adminlte.js'  %}"></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{% static 'dist/js/pages/dashboard.js'  %}"></script>
-<!-- AdminLTE for demo purposes -->
-<script src="{% static 'dist/js/demo.js'%}"></script>
+
  <script src="{% static "plugins/sweetalert2/sweetalert2.min.js" %}"></script>
 <!-- Toastr -->
 <script src="{% static "plugins/toastr/toastr.min.js" %}"></script>
@@ -268,5 +265,19 @@
 <script src="{% static "plugins/datatables-buttons/js/buttons.print.min.js"%}"></script>
 <script src="{% static "plugins/datatables-buttons/js/buttons.colVis.min.js"%}"></script>
 </body>
+<footer class="footer mt-4 py-3 bg-dark">
+  <div class="container">
+    <span class="text-muted">Useful Links</span>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Home</a></li>
+      <li class="list-inline-item"><a href="#">Exam</a></li>
+      <li class="list-inline-item"><a href="#">Study Material</a></li>
+      <li class="list-inline-item"><a href="#">Feedback</a></li>
+    </ul>
+    <p class="text-center mb-0">&copy; 2024 Hu Isy Students</p>
+  </div>
+</footer>
+
+
 </html>
 

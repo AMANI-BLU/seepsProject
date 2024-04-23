@@ -44,10 +44,26 @@
 
     <div class="container mt-5 content-container">
         {% block content %}
-        {% endblock %}
-    </div>
 
-    {% comment %} {% include 'student_template/footer.html' %} {% endcomment %}
+        
+        {% endblock %}
+      
+    </div>
+    
+    <footer class="footer mt-4 py-3 bg-dark">
+        <div class="container">
+            <span class="text-muted">Useful Links</span>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="#">Home</a></li>
+                <li class="list-inline-item"><a href="#">Exam</a></li>
+                <li class="list-inline-item"><a href="#">Study Material</a></li>
+                <li class="list-inline-item"><a href="#">Feedback</a></li>
+            </ul>
+            <p class="text-center mb-0">&copy; 2024 Hu Isy Students</p>
+        </div>
+    </footer>
+    
+
 
    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <!-- jQuery -->
@@ -83,7 +99,7 @@
 <!-- overlayScrollbars -->
 <script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
 <!-- AdminLTE App -->
-<script src="{% static 'dist/js/adminlte.js'  %}"></script>
+{% comment %} <script src="{% static 'dist/js/adminlte.js'  %}"></script> {% endcomment %}
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 {% comment %} <script src="{% static 'dist/js/pages/dashboard.js'  %}"></script> {% endcomment %}
 <!-- AdminLTE for demo purposes -->
@@ -108,5 +124,5 @@
 
 
 </body>
- {% include 'student_template/footer.html' %}
+
 </html>

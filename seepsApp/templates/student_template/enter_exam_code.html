@@ -4,37 +4,35 @@
 
 {% block content %}
 <div class="container mt-5 pt-4 content-container">
-
   {% if messages.success %}
-                        {% for message in messages %}
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                            <script>
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    text: "{{ message }}",
-                                    showConfirmButton: false,
-                                    timer: 6000,
-                                });
-                            </script>
-                        {% endfor %}
-
-                        {%else%}
-                           {% for message in messages %}
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                            <script>
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'info',
-                                    text: "{{ message }}",
-                                    showConfirmButton: false,
-                                    timer: 6000,
-                                });
-                            </script>
-                        {% endfor %}
-                    {% endif %}
+  {% for message in messages %}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        text: "{{ message }}",
+        showConfirmButton: false,
+        timer: 6000,
+    });
+  </script>
+  {% endfor %}
+  {% else %}
+  {% for message in messages %}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'info',
+        text: "{{ message }}",
+        showConfirmButton: false,
+        timer: 6000,
+    });
+  </script>
+  {% endfor %}
+  {% endif %}
   <div class="row mt-6">
     <div class="container mt-4">
       <div class="card card-outline card-info">

@@ -715,7 +715,7 @@ def add_course(request):
         form = CourseForm(request.POST, request.FILES, department_name=department_name)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Course deleted successfully!')
+            messages.success(request, 'Course Added successfully!')
             return redirect('add_course')
         else:
             messages.error(request, 'Form is not valid')
