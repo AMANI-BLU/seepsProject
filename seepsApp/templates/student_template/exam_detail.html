@@ -17,24 +17,31 @@
         <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
       </div>
       <!-- Your exam content here -->
-      <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
+    <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}" onsubmit="handleSubmit()">
         {% csrf_token %}
-       {% for question in questions %}
-          <div class="mb-4">
-            <h4>{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4>
-            <div class="list-group">
-              {% for choice in question.choice_set.all %}
-                <label class="list-group-item list-group-item-action">
-                  <input type="radio" name="question_{{ question.id }}" value="{{ choice.id }}">
-                  {{ choice.text }}
-                </label>
-              {% endfor %}
+     {% for question in questions %}
+  <div class="card card-info mb-4">
+    <div class="card-header">
+      <h4 class="card-title mb-0">{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4>
+    </div>
+    <div class="card-body">
+      <div class="list-group">
+        {% for choice in question.choice_set.all %}
+          <label class="list-group-item list-group-item-action">
+            <div class="icheck-info d-inline">
+              <input type="radio" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}">
+              <label for="choice{{ choice.id }}">{{ choice.text }}</label>
             </div>
-          </div>
+          </label>
         {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
         
         <div class="text-center">
-          <button type="submit" class="btn btn-info btn-lg">
+          <button type="submit" onclick="handleSubmit()" class="btn btn-info btn-lg">
             <i class="fas fa-check-circle"></i> Submit Exam
           </button>
         </div>
@@ -43,40 +50,22 @@
   </div>
 </div>
 
-<!-- SweetAlert library -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<!-- JavaScript to prevent navigation away, opening new tabs, fullscreen, and update timer -->
 <script>
-  // Fullscreen mode
-  function openFullscreen() {
-    var elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.mozRequestFullScreen) { /* Firefox */
-      elem.mozRequestFullScreen();
-    } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE/Edge */
-      elem.msRequestFullscreen();
-    }
+  // Function to handle form submission
+  function handleSubmit() {
+    // Clear progress data from localStorage
+    localStorage.removeItem('examProgress');
+    localStorage.removeItem('timerValue'); // Remove timer value from localStorage
   }
 
-  // Automatically open fullscreen when the page loads
-  window.addEventListener('load', function() {
-    openFullscreen();
-  });
-
-
-  // Timer
   var timerElement = document.getElementById('timer');
   var progressBar = document.getElementById('timerProgressBar');
-  var timer = {{ exam.timer }} * 60;
+  var timerValue = localStorage.getItem('timerValue') ? parseInt(localStorage.getItem('timerValue')) : {{ exam.timer }} * 60;
 
   function updateTimer() {
-    var minutes = Math.floor(timer / 60);
-    var seconds = timer % 60;
-    var progressPercentage = (timer / ({{ exam.timer }} * 60)) * 100;
+    var minutes = Math.floor(timerValue / 60);
+    var seconds = timerValue % 60;
+    var progressPercentage = (timerValue / ({{ exam.timer }} * 60)) * 100;
 
     // Set timer text content
     timerElement.textContent = 'Time Remaining: ' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
@@ -85,19 +74,22 @@
     progressBar.style.width = progressPercentage + '%';
 
     // Change progress bar color to red when 3 minutes left
-    if (timer <= 120) {
+    if (timerValue <= 180) {
       progressBar.classList.add('bg-danger');
     }
 
-    if (timer === 0) {
+    if (timerValue === 0) {
       document.getElementById('examForm').submit();
+      localStorage.removeItem('examProgress');
+      localStorage.removeItem('timerValue');
     } else {
-      timer--;
+      timerValue--;
+      localStorage.setItem('timerValue', timerValue); // Store timer value in localStorage
       setTimeout(updateTimer, 1000);
     }
 
-    // Auto-save progress every 2 seconds
-    if (timer % 2 === 0) {
+    // Auto-save progress every 5 seconds
+    if (timerValue % 5 === 0) {
       saveProgress();
     }
   }
@@ -134,54 +126,7 @@
   // Auto-load progress on page load
   loadProgress();
 
-  // Disable right-click context menu
-  window.addEventListener('contextmenu', function(event) {
-    event.preventDefault();
-    showMessage('Right-click context menu is disabled during the exam.');
-  });
-
-  // Disable keyboard shortcuts
-  window.addEventListener('keydown', function(event) {
-    event.preventDefault();
-    showMessage('Keyboard shortcuts are disabled during the exam.');
-  });
-
-  // Prevent opening new tabs or windows
-  window.open = function() {
-    showMessage('Opening new tabs or windows is disabled during the exam.');
-    return false;
-  }; 
-
-  // Prevent refreshing the page
-  window.addEventListener('beforeunload', function(event) {
-    event.preventDefault();
-    showMessage('Refreshing the page is disabled during the exam.');
-  }); 
-
-  // Prevent exiting fullscreen with the Escape key
-  document.addEventListener('fullscreenchange', function(event) {
-      openFullscreen(); // Re-enter fullscreen if user exits
-  });
-
-  // Disable all links on the page
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    links[i].addEventListener('click', function(event) {
-      event.preventDefault();
-      showMessage('Links are disabled during the exam.');
-    });
-  }
-
-  // Custom function to display messages using SweetAlert
-  function showMessage(message) {
-    Swal.fire({
-      toast: true,
-      text: message,
-      icon: 'info',
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 5000 // Auto close after 5 seconds
-    });
-  }
+  // Code to prevent navigation away, opening new tabs, fullscreen...
 </script>
+
 {% endblock %}
