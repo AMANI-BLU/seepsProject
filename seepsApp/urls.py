@@ -48,6 +48,8 @@ urlpatterns = [
             path('import_question/', upload_pdf_view, name='upload_pdf_view'),
                 path('preview/', preview_questions_view, name='preview_questions'),
                     path('edit_question/<int:question_id>/', edit_question, name='edit_question'),
+                        path('exam-scores/', exam_scores_table, name='exam_scores_table'),
+
 
 
   

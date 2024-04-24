@@ -34,7 +34,8 @@
 
       {% for question in questions_with_choices %}
       <div class="mb-4">
-        <h4>{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4>
+        {% comment %} <h4>{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4> {% endcomment %}
+         <h4>{{ forloop.counter }}) {{ question.content }}</h4>
         <div class="list-group">
           {% for choice in question.choice_set.all %}
           <label class="list-group-item" id="choice_{{ choice.id }}" data-correct-answer="{{ question.correct_choice.id }}">

@@ -11,7 +11,7 @@
     </div>
 
     <div class="row mt-4">
-        {% for exam in exams %}
+        {% for exam, submitted_by_current_user in exams_with_submission %}
         <div class="col-md-6 mb-4">
             <div class="card h-100 shadow">
                 <div class="card-body">
@@ -25,8 +25,15 @@
                         {% elif exam.difficulty == 'advanced' %}
                             <span class="badge badge-success"><i class="fas fa-exclamation-circle"></i> Advanced</span>
                         {% endif %}
+                        {% if submitted_by_current_user %}
+                            <span class="badge badge-info"><i class="fas fa-check"></i> Exam Taken</span>
+                        {% endif %}
                     </p>
-                    <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
+                    {% if submitted_by_current_user %}
+                        <button class="btn btn-info" disabled>Exam Already Taken</button>
+                    {% else %}
+                        <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
+                    {% endif %}
                 </div>
                 <div class="card-footer bg-transparent border-top-0">
                     <small class="text-muted"><i class="fas fa-clock"></i> Time to complete: {{ exam.timer }} minutes</small>
@@ -36,7 +43,7 @@
         {% endfor %}
     </div>
 
-    {% if not exams %}
+    {% if not exams_with_submission %}
     <div class="text-center mt-5">
         <p class="text-muted">No exams are currently available. Check back later.</p>
     </div>

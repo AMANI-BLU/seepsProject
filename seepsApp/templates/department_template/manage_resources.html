@@ -159,6 +159,19 @@
             </div>
             {% endfor %}
 
+    <script>
+    $(document).ready(function () {
+        $('#resourcesTable').DataTable({
+        
+            responsive: true, // Enable responsive feature
+            language: { // Customize language settings
+                search: '', // Remove the search label
+                searchPlaceholder: 'Search...', // Add placeholder for search input
+            },
+    
+        });
+    });
+</script>
 
         {% include 'department_template/footer.html' %}
     </div>

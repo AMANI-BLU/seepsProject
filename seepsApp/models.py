@@ -18,8 +18,8 @@ class User(AbstractUser):
   # Generate a UUID as a verification token
     
 # models.py
-
 from django.db import models
+
 class Exam(models.Model):
     DIFFICULTY_CHOICES = [
         ('easy', 'Easy'),
@@ -34,9 +34,19 @@ class Exam(models.Model):
     is_active = models.BooleanField(default=False)
     attempts_allowed = models.IntegerField(default=3)  # Add attempts allowed field
     difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES, default='intermediate')
+    submitted_by = models.ManyToManyField(User, through='ExamSubmission', related_name='submitted_exams')
 
     def __str__(self):
         return self.name
+
+class ExamSubmission(models.Model):
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    submission_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('exam', 'user')  # Ensure uniqueness of exam submission per user
+
 
 
 class Attempt(models.Model):

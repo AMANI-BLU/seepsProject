@@ -188,32 +188,8 @@
         <script>
             $(document).ready(function () {
                 $('#tutorialsTable').DataTable({
-                    dom: 'Bfrtip',
-                    pageLength: 5, // Set the default number of rows per page
-                    buttons: [
-                        {
-                            extend: 'excelHtml5',
-                            text: '<i class="far fa-file-excel" style="color: green;"></i> to Excel',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            text: '<i class="far fa-file-pdf" style="color: red;"></i> to PDF',
-                            className: 'btn btn-light',
-                            exportOptions: {
-                                columns: ':not(.exclude-export)'
-                            }
-                        }
-                    ]
+                
                 });
-
-  $('#rowsPerPage').on('change', function () {
-                var selectedRows = $(this).val();
-                questionsTable.page.len(selectedRows).draw();
-            });
 
             });
         </script>

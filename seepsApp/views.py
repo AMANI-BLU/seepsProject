@@ -804,14 +804,13 @@ def view_exams(request):
     # Filter exams based on the department name and only include activated exams
     exams = Exam.objects.filter(department_name=department_name, is_active=True)
 
-    # Iterate through each exam and calculate the attempts count for each exam
+    # Retrieve exams along with information about whether each exam has been submitted by the current user
+    exams_with_submission = []
     for exam in exams:
-        # Get the count of attempts for the current exam
-        attempts_count = Attempt.objects.filter(exam=exam).count()
-        # Assign the attempts count to the exam object
-        exam.attempts_count = attempts_count
+        submitted_by_current_user = exam.submitted_by.filter(pk=request.user.pk).exists()
+        exams_with_submission.append((exam, submitted_by_current_user))
 
-    return render(request, 'student_template/view_exams.html', {'exams': exams})
+    return render(request, 'student_template/view_exams.html', {'exams_with_submission': exams_with_submission})
 
 
 
@@ -867,6 +866,7 @@ from django.shortcuts import redirect
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Result, Exam, Question, Choice
+from .models import ExamSubmission
 
 def submit_exam(request, exam_id):
     exam = Exam.objects.get(pk=exam_id)
@@ -895,6 +895,9 @@ def submit_exam(request, exam_id):
         # Store the result in the database
         result = Result.objects.create(student=request.user, exam=exam, score=correct_answers)
 
+        # Record the submission
+        ExamSubmission.objects.create(exam=exam, user=request.user)
+
         return render(request, 'student_template/exam_submitted.html', {
             'correct_answers': correct_answers,
             'total_questions': len(questions),
@@ -902,6 +905,7 @@ def submit_exam(request, exam_id):
         })
 
     return redirect('view_exams')  # Redirect to the view_exams page if it's not a POST request
+  # Redirect to the view_exams page if it's not a POST request
 
 
 def result(request, result_id):
@@ -1190,3 +1194,49 @@ def edit_question(request, question_id):
             return redirect('manage_questions')
 
     return render(request, 'department_template/edit_question.html', {'form': form, 'formset': formset, 'question': question})
+
+from django.db.models import Avg, Max, Min, Count, Subquery, OuterRef
+
+def exam_scores_table(request):
+    # Get the department of the current user
+    user_department = request.user.username
+    
+    # Subquery to count the number of questions for each exam
+    num_questions_subquery = Subquery(
+        Exam.objects.filter(id=OuterRef('exam')).annotate(
+            num_questions=Count('question')
+        ).values('num_questions')
+    )
+    
+    # Aggregate exam scores for each exam in the department
+    aggregate_data = Result.objects.filter(exam__department_name=user_department).values(
+        'exam__name'
+    ).annotate(
+        num_students=Count('exam__examsubmission'),  # Count the number of students for each exam
+        average_score=Avg('score'),
+        highest_score=Max('score'), 
+        lowest_score=Min('score'),
+        num_questions=num_questions_subquery,
+    )
+
+    # Process the aggregated data
+    for data in aggregate_data:
+        # Initialize counters for passed and failed students
+        passed_students_count = 0
+        failed_students_count = 0
+        
+        # Calculate the pass/fail threshold
+        pass_fail_threshold = data['num_questions'] / 2
+        
+        # Check each student's score against the pass/fail threshold
+        for result in Result.objects.filter(exam__name=data['exam__name']):
+            if result.score >= pass_fail_threshold:
+                passed_students_count += 1
+            else:
+                failed_students_count += 1
+        
+        # Add the counts to the data dictionary
+        data['passed_students_count'] = passed_students_count
+        data['failed_students_count'] = failed_students_count
+
+    return render(request, 'department_template/report.html', {'exam_scores_data': aggregate_data})
