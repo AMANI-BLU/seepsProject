@@ -81,9 +81,9 @@
 {% endif %}
 
         <div class="login-box w-100">
-          <div class="card card-outline card-info">
+          <div class="card mb-4 card-outline card-info">
             <div class="card-body">
-              <form action="{% url 'add_exam' %}" method="post">
+              <form action="{% url 'add_exam' %}" method="post"  id="addexam"  novalidate>
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}
@@ -179,13 +179,15 @@
                   <div class="column">
                     <!-- Add more fields as needed -->
 
-                    <div class="row">
-                      <div class="col-12">
-                        <button type="submit" class="btn btn-info btn-block">
-                          <i class="fas fa-plus"></i> Add Exam
-                        </button>
-                      </div>
-                    </div>
+                               <div class="row">
+                                                              
+                                    <div class="col-12">
+                                          <button type="submit" id="uploadButton" class="btn btn-info">
+                                             <i id="uploadIcon" class="fas fa-pencil-alt mr-2"></i>
+                                            <span id="uploadText">Add Exam</span>
+                                        </button>
+                                    </div>
+                                </div>
                   </div>
                 </div>
               </form>
@@ -196,6 +198,16 @@
       </div>
     </section>
   </div>
+  <script>
+    $(document).ready(function() {
+        $('#uploadButton').on('click', function() {
+            $(this).addClass('disabled').prop('disabled', true);
+            $('#uploadIcon').removeClass('fa-user-plus').addClass('fa-spinner fa-spin');
+            $('#uploadText').html('please wait...');
+            $('#addexam').submit();
+        });
+    });
+</script>
   {% include 'department_template/footer.html' %}
 </div>
 {% endblock %}

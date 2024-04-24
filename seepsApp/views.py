@@ -212,8 +212,8 @@ def department_home(request):
     questions_count = Question.objects.filter(exam__department_name=department_username).select_related('exam').count()
     total_students = User.objects.filter(is_student=True, department_name=department_username).count()
     exams_count = Exam.objects.filter(department_name=department_name).count()
-    male_count = sum(1 for student in students if student.sex == 'male')
-    female_count = sum(1 for student in students if student.sex == 'female')
+    male_count = sum(1 for student in students if student.sex == 'Male')
+    female_count = sum(1 for student in students if student.sex == 'Female')
 
     # Fetching data for exam scores table
     aggregate_data = fetch_exam_scores_data(department_name)
@@ -353,7 +353,7 @@ def add_student(request):
                 user.is_student = True
                 user.set_password(password)  # Hash the password
                 user.save()
-                success_msg = 'Student added successfully!'
+                success_msg = 'Student registered successfully!'
 
                 # Send email
                 subject = 'Student Account Verification'
@@ -466,7 +466,7 @@ def add_question(request):
             formset.save()
             success_msg = 'Question added successfully!'
         else:
-            error_msg = 'Form is not valid'
+            # error_msg = 'Form is not valid'
             print("Form errors outside if:", form.errors, formset.errors)
     else:
         form = QuestionForm(department_username=department_username)

@@ -401,9 +401,8 @@ class StudentRegistrationForm(UserCreationForm):
         })
     )
     sex_choices = (
-        ('M', 'Male'),
-        ('F', 'Female'),
-        ('O', 'Other')
+        ('Male', 'Male'),
+        ('Female', 'Female')
     )
     sex = forms.ChoiceField(
         choices=sex_choices,
@@ -459,8 +458,14 @@ class StudentRegistrationForm(UserCreationForm):
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
-        if not phone.isdigit():
-            raise forms.ValidationError("Phone number must contain only digits")
+        
+        # Define the regular expression pattern
+        pattern = r'^(\+2519\d{8}|09\d{8}|07\d{8}|\+2517\d{8})$'
+        
+        # Check if the phone matches the pattern
+        if not re.match(pattern, phone):
+            raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
+        
         return phone
 
     def clean(self):

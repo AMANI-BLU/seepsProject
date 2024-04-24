@@ -185,50 +185,6 @@
       }
     </script>
 
-    <!-- Chart Script -->
-    <!-- Chart.js Script for Students by Course -->
-    <script>
-      var ctx = document.getElementById('myChart').getContext('2d');
-      var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Take Exam', 'Passed', 'Not Passed'],
-          datasets: [{
-            label: 'Students',
-            data: [100,60, 50],
-            backgroundColor: ['#3498db', '#2ecc71', '#f39c12'],
-            borderColor: ['#3498db', '#2ecc71', '#f39c12'],
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    </script>
-
-    <!-- Chart.js Script for Male/Female Distribution Donut Chart -->
-    <script>
-      var genderCtx = document.getElementById('genderChart').getContext('2d');
-      var genderChart = new Chart(genderCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Male', 'Female'],
-          datasets: [{
-            data: [{{male_count}}, {{female_count}}],
-            backgroundColor: ['#3498db', '#e74c3c'],
-            hoverBackgroundColor: ['#2980b9', '#c0392b']
-          }]
-        },
-        options: {
-          cutoutPercentage: 50
-        }
-      });
-    </script>
 
   {% block body_extra %}{% endblock %}
 </body>

@@ -58,7 +58,7 @@
                 </script>
               {% endif %}
 
-              <form action="{% url 'add_tutorial' %}" method="post">
+              <form action="{% url 'add_tutorial' %}" method="post" novalidate>
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}

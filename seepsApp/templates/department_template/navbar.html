@@ -5,16 +5,25 @@
         <li class="nav-item">
           <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
+         <li class="nav-item">
+           <div id="google_translate_element"></div>
+        </li>
       </ul>
 
       <!-- Right navbar links -->
       <ul class="navbar-nav ml-auto">
         
          <!-- Dark/Light Mode Toggle Button -->
+      
+        <!-- Dark/Light Mode Toggle Button -->
         <li class="nav-item">
-          <a class="nav-link" href="#" id="darkModeToggle">
-            <i class="fas fa-adjust"></i>
-          </a>
+            <a class="nav-link" href="#" id="darkModeToggle">
+                {% if is_dark_mode %}
+                <i class="fas fa-sun"></i>
+                {% else %}
+                <i class="fas fa-moon"></i>
+                {% endif %}
+            </a>
         </li>
         
         <li class="nav-item">
@@ -162,29 +171,34 @@
     </div>
 </div>
 
-     <!-- Dark/Light Mode Toggle Script -->
-    <script>
-      const darkModeToggle = document.getElementById('darkModeToggle');
+   
+<!-- Dark/Light Mode Toggle Script -->
+<script>
+    const darkModeToggle = document.getElementById('darkModeToggle');
 
-      // Toggle mode on button click
-      darkModeToggle.addEventListener('click', () => {
+    // Toggle mode on button click
+    darkModeToggle.addEventListener('click', () => {
         if ($('body').hasClass('dark-mode')) {
-          $('body').removeClass('dark-mode');
-          localStorage.setItem('darkMode', 'light');
+            $('body').removeClass('dark-mode');
+            localStorage.setItem('darkMode', 'light');
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
         } else {
-          $('body').addClass('dark-mode');
-          localStorage.setItem('darkMode', 'dark');
+            $('body').addClass('dark-mode');
+            localStorage.setItem('darkMode', 'dark');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
         }
-      });
+    });
 
-      // Check user preference or saved mode in local storage
-      const isDarkMode = localStorage.getItem('darkMode') === 'dark';
+    // Check user preference or saved mode in local storage
+    const isDarkMode = localStorage.getItem('darkMode') === 'dark';
 
-      // Apply dark mode if enabled
-      if (isDarkMode) {
+    // Apply dark mode if enabled
+    if (isDarkMode) {
         $('body').addClass('dark-mode');
-      }
-    </script>
+        darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    }
+</script>
+
 
      <!-- Full screen -->
     <script>
@@ -198,3 +212,12 @@
         }
       }
     </script>
+    
+
+<script type="text/javascript">
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+}
+</script>
+
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
