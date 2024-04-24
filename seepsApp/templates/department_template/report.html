@@ -1,0 +1,246 @@
+<!-- department_template/report.html -->
+{% extends 'base.html' %}
+
+{% block title %}Department | Exam Scores Report{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Exam Scores Report</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.content-header -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="card card-outline card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Aggregate Exam Scores</h3>
+                    </div>
+                    <div class="card-body">
+                        <table id="exam-scores-table" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Exam Name</th>
+                                    <th>Number of Questions</th>
+                                    <th>Number of Students</th>
+                                    <th>Highest Score</th>
+                                    <th>Lowest Score</th>
+                                    <th>Average Score</th>
+                                    <th>Students Passed Exam</th>
+                                    <th>Students Failed Exam</th>
+                                    <th>Action</th> <!-- New column for delete button -->
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in exam_scores_data %}
+                                <tr>
+                                    <td>{{ data.exam__name }}</td>
+                                    <td>{{ data.num_questions }}</td> 
+                                    <td>{{ data.num_students }}</td>
+                                    <td>{{ data.highest_score }}</td>
+                                    <td>{{ data.lowest_score }}</td>
+                                    <td>{{ data.average_score }}</td>
+                                    <td>{{ data.passed_students_count }}</td>
+                                    <td>{{ data.failed_students_count }}</td>
+                                    <td>
+                                        <!-- Button trigger modal -->
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal{{ forloop.counter }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="deleteConfirmationModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel{{ forloop.counter }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteConfirmationModalLabel{{ forloop.counter }}">Confirm Deletion</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Are you sure you want to delete this report?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+                                                        <form action="{% url 'delete_report' data.exam__name %}" method="post">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-outline-danger">Delete</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-outline card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Average Scores</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="averageScoresChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card card-outline card-success">
+                            <div class="card-header">
+                                <h3 class="card-title">Pass/Fail Ratio</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="passFailChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+
+               
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+
+    </div>
+
+    <script>
+        // Prepare data for the average scores chart
+        var examNames = [];
+        var averageScores = [];
+        {% for data in exam_scores_data %}
+            examNames.push("{{ data.exam__name }}");
+            averageScores.push({{ data.average_score }});
+        {% endfor %}
+
+        // Initialize the average scores chart
+        var ctx1 = document.getElementById('averageScoresChart').getContext('2d');
+        var averageScoresChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: examNames,
+                datasets: [{
+                    label: 'Average Score',
+                    data: averageScores,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Prepare data for the pass/fail ratio chart
+        var passedCounts = [];
+        var failedCounts = [];
+        {% for data in exam_scores_data %}
+            passedCounts.push({{ data.passed_students_count }});
+            failedCounts.push({{ data.failed_students_count }});
+        {% endfor %}
+
+        // Initialize the pass/fail ratio chart
+        var ctx2 = document.getElementById('passFailChart').getContext('2d');
+        var passFailChart = new Chart(ctx2, {
+            type: 'pie',
+            data: {
+                labels: examNames,
+                datasets: [{
+                    label: 'Pass/Fail Ratio',
+                    data: passedCounts,
+                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Prepare data for the pass/fail students count chart
+        var passFailStudentsData = [];
+        {% for data in exam_scores_data %}
+            passFailStudentsData.push({
+                examName: "{{ data.exam__name }}",
+                passedStudents: {{ data.passed_students_count }},
+                failedStudents: {{ data.failed_students_count }}
+            });
+        {% endfor %}
+
+        // Initialize the pass/fail students count chart
+        var ctx3 = document.getElementById('passFailStudentsChart').getContext('2d');
+        var passFailStudentsChart = new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: passFailStudentsData.map(data => data.examName),
+                datasets: [{
+                    label: 'Passed Students',
+                    data: passFailStudentsData.map(data => data.passedStudents),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Failed Students',
+                    data: passFailStudentsData.map(data => data.failedStudents),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Initialize DataTable with buttons extension
+        $('#exam-scores-table').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf'
+            ]
+        });
+    </script>
+
+    {% include 'department_template/footer.html' %}
+</div>
+<!-- ./wrapper -->
+{% endblock %}

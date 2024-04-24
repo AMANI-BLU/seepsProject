@@ -1,179 +1,259 @@
-<!-- dashboard.html -->
 {% extends 'base.html' %}
 
 {% block title %}Department | Dashboard{% endblock %}
 
 {% block content %}
-  <!-- Main content -->
-  <div class="wrapper">
+<!-- Main content -->
+<div class="wrapper">
     {% include 'department_template/navbar.html' %}
     {% include 'department_template/aside.html' %}
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            {% if messages %}
-    {% for message in messages %}
-        {% if message.tags == 'success' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'error' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'warning' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'warning',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% elif message.tags == 'info' %}
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'info',
-                    text: "{{ message }}",
-                    showConfirmButton: false,
-                    timer: 6000,
-                });
-            </script>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    {% if messages %}
+                    {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'error' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'warning' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'info' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'info',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
 
-          </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <!-- /.content-header -->
+        <!-- /.content-header -->
 
-      <!-- Main content -->
-      <section class="content">
-        <div class="container-fluid">
-            <div class="row">
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
 
-    
-            <!-- Total Students Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-info">
-                <div class="inner">
-                  <h3>{{ total_students }}</h3>
-                  <p>Total Students</p>
+
+                    <!-- Total Students Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="small-box bg-info">
+                            <div class="inner">
+                                <h3>{{ total_students }}</h3>
+                                <p>Total Students</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <a href="{% url "view_student" %}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Total Feedbacks Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="small-box bg-success">
+                            <div class="inner">
+                                <h3>{{feedbacks_count}}</h3>
+                                <p>Total Feedbacks</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <a href="{% url "feedback_management" %}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Total Exams Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>{{exams_count}}</h3>
+                                <p>Total Exams</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <a href="{% url "manage_exam" %}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
+                    <!-- Total Questions Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="small-box bg-danger">
+                            <div class="inner">
+                                <h3>{{questions_count}}</h3>
+                                <p>Total Questions</p>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-question"></i>
+                            </div>
+                            <a href="{% url "manage_questions" %}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
+                        </div>
+                    </div>
                 </div>
-                <div class="icon">
-                  <i class="fas fa-users"></i>
+                <!-- /.row -->
+
+                <!-- Chart Section -->
+                <div class="row">
+                  <!-- Gender Distribution Pie Chart -->
+                  <div class="col-md-6">
+                      <div class="card card-outline card-info">
+                          <div class="card-header">
+                              <h3 class="card-title">Gender Distribution</h3>
+                          </div>
+                          <div class="card-body">
+                              <!-- Chart -->
+                              <canvas id="genderChart" width="400" height="200"></canvas>
+                          </div>
+                      </div>
+                  </div>
+
+
+                    <!-- Pass/Fail Students Bar Chart -->
+                    <div class="col-md-6">
+                        <div class="card card-outline card-info">
+                            <div class="card-header">
+                                <h3 class="card-title">Pass/Fail Students</h3>
+                            </div>
+                            <div class="card-body">
+                                <!-- Chart -->
+                                <canvas id="passFailStudentsChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <a href="{% url "view_student" %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-              </div>
+                <!-- /.row -->
             </div>
-            <!-- Total Feedbacks Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-success">
-                <div class="inner">
-                  <h3>{{feedbacks_count}}</h3>
-                  <p>Total Feedbacks</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-comments"></i>
-                </div>
-                <a href="{% url "feedback_management" %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-            <!-- Total Exams Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-warning">
-                <div class="inner">
-                  <h3>{{exams_count}}</h3>
-                  <p>Total Exams</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-clipboard-list"></i>
-                </div>
-                <a href="{% url "manage_exam" %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-            <!-- Total Questions Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-danger">
-                <div class="inner">
-                  <h3>{{questions_count}}</h3>
-                  <p>Total Questions</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-question"></i>
-                </div>
-                <a href="{% url "manage_questions" %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-          </div>
-          <!-- /.row -->
-
-          <!-- Chart Section -->
-          <div class="row">
-
-            <!-- Students by Course Chart -->
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
-                <div class="card-header">
-                  <h3 class="card-title">Students Exam Status</h3>
-                </div>
-                <div class="card-body">
-                  <canvas id="myChart" width="400" height="200"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- Male/Female Distribution Donut Chart -->
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
-                <div class="card-header">
-                  <h3 class="card-title">Gender</h3>
-                </div>
-                <div class="card-body">
-                  <canvas id="genderChart" width="400" height="200"></canvas>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <!-- /.row -->
-
-        </div>
-      </section>
-      <!-- /.content -->
+        </section>
+        <!-- /.content -->
     </div>
- 
-    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Get male and female counts from the template
+    var maleCount = {{ male_count }};
+    var femaleCount = {{ female_count }};
+
+    // Create data for the gender distribution pie chart
+    var genderData = {
+        labels: ['Male', 'Female'],
+        datasets: [{
+            data: [maleCount, femaleCount],
+            backgroundColor: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 99, 132, 0.5)'],
+            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+            borderWidth: 1
+        }]
+    };
+
+    // Create options for the gender distribution pie chart
+    var genderOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+        },
+    };
+
+    // Create and display the gender distribution pie chart
+    var ctx = document.getElementById('genderChart').getContext('2d');
+    var genderChart = new Chart(ctx, {
+        type: 'pie',
+        data: genderData,
+        options: genderOptions
+    });
+
+            // Initialize the pass/fail students count chart
+            var passFailStudentsData = [
+                {% for data in exam_scores_data %}
+                    {
+                        examName: "{{ data.exam__name }}",
+                        passedStudents: {{ data.passed_students_count }},
+                        failedStudents: {{ data.failed_students_count }}
+                    },
+                {% endfor %}
+            ];
+
+            var ctx2 = document.getElementById('passFailStudentsChart').getContext('2d');
+            var passFailStudentsChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: passFailStudentsData.map(data => data.examName),
+                    datasets: [{
+                        label: 'Passed Students',
+                        data: passFailStudentsData.map(data => data.passedStudents),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Failed Students',
+                        data: passFailStudentsData.map(data => data.failedStudents),
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 
     {% include 'department_template/footer.html' %}
-  </div>
-  
-  <!-- ./wrapper -->
+</div>
+<!-- ./wrapper -->
 {% endblock %}

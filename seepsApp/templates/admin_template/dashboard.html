@@ -82,36 +82,48 @@
             <div class="col-md-6 col-lg-3">
               <div class="small-box bg-info">
                 <div class="inner">
-                  <h3>{{total_students}}</h3>
+                  <h3>{{ total_students }}</h3>
                   <p>Total Students</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-users"></i>
                 </div>
+                {% comment %} <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div> {% endcomment %}
               </div>
             </div>
             <!-- Total Feedbacks Card -->
             <div class="col-md-6 col-lg-3">
               <div class="small-box bg-success">
                 <div class="inner">
-                  <h3>25</h3>
+                  <h3>{{feedbacks}}</h3> <!-- Placeholder for total feedbacks -->
                   <p>Total Feedbacks</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-comments"></i>
                 </div>
+                {% comment %} <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div> {% endcomment %}
               </div>
             </div>
             <!-- Total Exams Card -->
             <div class="col-md-6 col-lg-3">
               <div class="small-box bg-warning">
                 <div class="inner">
-                  <h3>{{exams}}</h3>
+                  <h3>{{ exams }}</h3>
                   <p>Total Exams</p>
                 </div>
                 <div class="icon">
                   <i class="fas fa-clipboard-list"></i>
                 </div>
+                {% comment %} <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div> {% endcomment %}
               </div>
             </div>
             <!-- Total Departments Card -->
@@ -124,21 +136,46 @@
                     <div class="icon">
                         <i class="fas fa-building"></i> <!-- Assuming you want to use a building icon for departments -->
                     </div>
+                    {% comment %} <div class="card-tools">
+                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                    </div> {% endcomment %}
                 </div>
             </div>
 
           </div>
           <!-- /.row -->
 
-          <!-- Calendar Section -->
+          <!-- Chart Section -->
           <div class="row">
-            <div class="col-md-12">
-              <div class="card">
+            <div class="col-md-6">
+              <div class="card card-outline card-info">
                 <div class="card-header">
-                  <h3 class="card-title">Calendar</h3>
+                  <h3 class="card-title">Department Distribution by College</h3>
+                  {% comment %} <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                  </div> {% endcomment %}
                 </div>
                 <div class="card-body">
-                  <div id="calendar"></div>
+                  <!-- Chart -->
+                  <canvas id="departmentCollegeChart" style="height: 300px;"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- Calendar Section -->
+            <div class="col-md-6">
+              <div class="card card-outline card-info">
+                <div class="card-header">
+                  <h3 class="card-title">Calendar</h3>
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- AdminLTE Calendar -->
+                  <div id="adminlte-calendar"></div>
                 </div>
               </div>
             </div>
@@ -150,9 +187,76 @@
       <!-- /.content -->
     </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet" />
+  <!-- AdminLTE Theme JavaScript files -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css" rel="stylesheet" />
+
+  <script>
+    // Real data for the chart
+    const collegeNames = {{ college_names|safe }};
+    const departmentCounts = {{ department_counts|safe }};
+
+    // Different colors for colleges
+    const backgroundColors = [
+      'rgba(255, 99, 132, 0.5)',
+      'rgba(54, 162, 235, 0.5)',
+      'rgba(255, 206, 86, 0.5)',
+      'rgba(75, 192, 192, 0.5)',
+      'rgba(153, 102, 255, 0.5)',
+      'rgba(255, 159, 64, 0.5)'
+    ];
+
+    // Chart configuration
+    const departmentData = {
+      labels: collegeNames,
+      datasets: [{
+        label: 'Number of Departments',
+        backgroundColor: backgroundColors,
+        borderColor: backgroundColors.map(color => color.replace('0.5', '1')),
+        borderWidth: 1,
+        data: departmentCounts,
+      }],
+    };
+
+    const departmentChartConfig = {
+      type: 'bar',
+      data: departmentData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Department Distribution by College',
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    };
+
+    // Render the chart
+    const departmentCollegeChart = document.getElementById('departmentCollegeChart').getContext('2d');
+    new Chart(departmentCollegeChart, departmentChartConfig);
+
+    // Initialize AdminLTE Calendar
+    document.addEventListener('DOMContentLoaded', function() {
+        $('#adminlte-calendar').datetimepicker({
+            format: 'L',
+            inline: true,
+        });
+    });
+  </script>
     {% include 'admin_template/footer.html' %}
   </div>
 
   <!-- ./wrapper -->
 {% endblock %}
-

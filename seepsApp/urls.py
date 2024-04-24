@@ -49,6 +49,8 @@ urlpatterns = [
                 path('preview/', preview_questions_view, name='preview_questions'),
                     path('edit_question/<int:question_id>/', edit_question, name='edit_question'),
                         path('exam-scores/', exam_scores_table, name='exam_scores_table'),
+                            path('delete-report/<str:exam_name>/', delete_report, name='delete_report'),
+
 
 
 

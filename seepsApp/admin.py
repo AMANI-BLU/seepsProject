@@ -40,7 +40,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ['user', 'feedback_text', 'created_at']
 
 # Register your models and admin classes
-admin.site.register(Exam, ExamAdmin)
+admin.site.register(Exam)
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)
 admin.site.register(Result)
@@ -48,3 +48,4 @@ admin.site.register(Feedback, FeedbackAdmin)
 admin.site.register(Course)
 admin.site.register(Tutorial)
 admin.site.register(User)
+admin.site.register(ExamSubmission)

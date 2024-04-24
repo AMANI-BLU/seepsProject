@@ -49,8 +49,8 @@ def login_view(request):
 
 
 
+from django.db.models import Count
 
-########################### Admin Views ###############################
 #Admin Home
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
@@ -59,18 +59,35 @@ def home(request):
     total_departments = User.objects.filter(is_department=True).count()
     total_students = User.objects.filter(is_student=True).count()
     exams = Exam.objects.all().count()
+    feedbacks = Feedback.objects.all().count()
+
+    # Fetch department distribution by college
+    department_distribution = User.objects.filter(is_department=True).values('college').annotate(department_count=Count('college'))
+
+    # Prepare data for the chart
+    college_names = []
+    department_counts = []
+    for data in department_distribution:
+        college_names.append(data['college'])
+        department_counts.append(data['department_count'])
+
     context = {
         'total_departments': total_departments,
-        'total_students':total_students,
-        'exams':exams,
+        'total_students': total_students,
+        'exams': exams,
+        'college_names': college_names,
+        'department_counts': department_counts,
+        'feedbacks':feedbacks
     }
     return render(request, 'admin_template/dashboard.html', context)
+
 
  
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def feedback(request):
-     return render(request, 'admin_template/feedback.html')
+     student_feedback = Feedback.objects.all()
+     return render(request, 'admin_template/feedback.html',{'student_feedback':student_feedback})
 
 # def admin_register(request):
 #     msg = None
@@ -183,35 +200,25 @@ def update_department(request, username):
 
 
 
-
-################ Department Views #####################
-# Department Home Page
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def department_home(request):
     department_name = request.user.username
     department_username = request.user.username
+
+    # Fetching data for department dashboard
     students = User.objects.filter(is_student=True, department_name=department_name)
-    # Count the number of feedbacks
     feedbacks_count = Feedback.objects.filter(user__department_name=department_username).count()
-
-    # Count the number of questions
     questions_count = Question.objects.filter(exam__department_name=department_username).select_related('exam').count()
-
-    # Count the total number of students
     total_students = User.objects.filter(is_student=True, department_name=department_username).count()
-
-    # Count the number of exams
     exams_count = Exam.objects.filter(department_name=department_name).count()
-    male_count = 0
-    female_count = 0
-    for student in students:
-        if student.sex == 'male':  # Corrected: accessing sex directly from student object
-            male_count += 1
-        elif student.sex == 'female':  # Corrected: accessing sex directly from student object
-            female_count += 1   
+    male_count = sum(1 for student in students if student.sex == 'male')
+    female_count = sum(1 for student in students if student.sex == 'female')
 
-    # Pass the counts to the template
+    # Fetching data for exam scores table
+    aggregate_data = fetch_exam_scores_data(department_name)
+
+    # Pass the counts and exam scores data to the template
     context = {
         'total_students': total_students,
         'questions_count': questions_count,
@@ -219,11 +226,59 @@ def department_home(request):
         'feedbacks_count': feedbacks_count,
         'male_count': male_count,
         'female_count': female_count,
+        'exam_scores_data': aggregate_data,
+        'passed_students_count': sum(data['passed_students_count'] for data in aggregate_data),
+        'failed_students_count': sum(data['failed_students_count'] for data in aggregate_data),
     }
 
     return render(request, 'department_template/dashboard.html', context)
 
+
+
+def fetch_exam_scores_data(department_name):
+    # Subquery to count the number of questions for each exam
+    num_questions_subquery = Subquery(
+        Exam.objects.filter(id=OuterRef('exam')).annotate(
+            num_questions=Count('question')
+        ).values('num_questions')
+    )
+    
+    # Aggregate exam scores for each exam in the department
+    aggregate_data = Result.objects.filter(exam__department_name=department_name).values(
+        'exam__name'
+    ).annotate(
+        num_students=Count('student', distinct=True),  # Count the number of distinct students for each exam
+        average_score=Avg('score'),
+        highest_score=Max('score'), 
+        lowest_score=Min('score'),
+        num_questions=num_questions_subquery,
+    )
+
+    # Process the aggregated data
+    for data in aggregate_data:
+        # Initialize counters for passed and failed students
+        passed_students_count = 0
+        failed_students_count = 0
+        
+        # Calculate the pass/fail threshold
+        pass_fail_threshold = data['num_questions'] // 2
+        
+        # Check each student's score against the pass/fail threshold
+        for result in Result.objects.filter(exam__name=data['exam__name']):
+            if result.score >= pass_fail_threshold:
+                passed_students_count += 1
+            else:
+                failed_students_count += 1
+        
+        # Add the counts to the data dictionary
+        data['passed_students_count'] = passed_students_count
+        data['failed_students_count'] = failed_students_count
+
+    return aggregate_data
+
 # views.py
+
+
 
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -1195,7 +1250,10 @@ def edit_question(request, question_id):
 
     return render(request, 'department_template/edit_question.html', {'form': form, 'formset': formset, 'question': question})
 
+
 from django.db.models import Avg, Max, Min, Count, Subquery, OuterRef
+from django.shortcuts import render
+from .models import Exam, Result
 
 def exam_scores_table(request):
     # Get the department of the current user
@@ -1212,7 +1270,7 @@ def exam_scores_table(request):
     aggregate_data = Result.objects.filter(exam__department_name=user_department).values(
         'exam__name'
     ).annotate(
-        num_students=Count('exam__examsubmission'),  # Count the number of students for each exam
+        num_students=Count('student', distinct=True),  # Count the number of distinct students for each exam
         average_score=Avg('score'),
         highest_score=Max('score'), 
         lowest_score=Min('score'),
@@ -1220,13 +1278,14 @@ def exam_scores_table(request):
     )
 
     # Process the aggregated data
+    total_students = 0
     for data in aggregate_data:
         # Initialize counters for passed and failed students
         passed_students_count = 0
         failed_students_count = 0
         
         # Calculate the pass/fail threshold
-        pass_fail_threshold = data['num_questions'] / 2
+        pass_fail_threshold = data['num_questions'] // 2
         
         # Check each student's score against the pass/fail threshold
         for result in Result.objects.filter(exam__name=data['exam__name']):
@@ -1238,5 +1297,19 @@ def exam_scores_table(request):
         # Add the counts to the data dictionary
         data['passed_students_count'] = passed_students_count
         data['failed_students_count'] = failed_students_count
+        
+        # Update total students count
+        total_students += passed_students_count + failed_students_count
 
-    return render(request, 'department_template/report.html', {'exam_scores_data': aggregate_data})
+    return render(request, 'department_template/report.html', {'exam_scores_data': aggregate_data, 'total_students': total_students})
+
+
+
+def delete_report(request, exam_name):
+    # Get the exam object based on the exam name
+    exam = get_object_or_404(Exam, name=exam_name)
+    
+    # Delete all results associated with the exam
+    Result.objects.filter(exam=exam).delete()
+    
+    return redirect('exam_scores_table')  # Redirect back to the exam scores table page

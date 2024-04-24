@@ -11,19 +11,81 @@
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-           
-          </div>
-        </div>
-      </div>
+       <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                    <h1 class="text-muted">Feedbacks</h1>
+
+                  </div>
+          {% if messages %}
+              {% for message in messages %}
+                  {% if message.tags == 'success' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'success',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'error' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'error',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'warning' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'warning',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'info' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'info',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% endif %}
+              {% endfor %}
+          {% endif %}
+
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">Feedbacks</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
       <!-- /.content-header -->
 
       <!-- Main content -->
        <!-- Main content -->
-      <section class="content mt-5">
+      <section class="content">
         <div class="container-fluid">
          
           <!-- Manage Students Section -->
@@ -37,25 +99,26 @@
               <table id="studentsTable" class="table table-bordered table-striped">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                   <th>No.</th>
+                    <th>Name</th>
                     <th>Email</th>
-                    <th>Department</th>
                     <th>Message</th>
-                    <th>Action</th>
+                    <th>Sent At</th>
+                                    
                   </tr>
                 </thead>
                 <tbody>
                   <!-- Sample Data -->
-                  <tr>
-                    <td>1</td>
-                    <td>abc@gmail.com</td>
-                    <td>Computer Science</td>
-                    <td>This is Message..</td>
-              
-                    <td>
-                      <button class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete</button>
-                    </td>
+                 {% for feedback in student_feedback %}
+                      <tr>
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{ feedback.user.first_name }}</td>
+                          <td>{{ feedback.user.email }}</td>
+                          <td>{{ feedback.feedback_text }}</td>
+                          <td>{{ feedback.created_at }}</td>
+                         
                   </tr>
+                  {%endfor%}
                   <!-- Add more rows for additional students -->
                 </tbody>
               </table>
@@ -108,6 +171,27 @@
       </div>
       <!-- /.modal-dialog -->
     </div>
+   <script>
+            $(document).ready(function () {
+                $('#studentsTable').DataTable({
+               
+            // Add Bootstrap classes to the table
+            "language": {
+                "search": "_INPUT_", // Search input style
+                "searchPlaceholder": "Search...", // Placeholder for search input
+                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                "paginate": {
+                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                    "next": '<i class="fas fa-angle-right"></i>' // Next button
+                }
+            }
+                });
+
+                  // Add an event listener to update the page length when the user changes the selection
+          
+            });
+        </script>
 
     {% include 'admin_template/footer.html' %}
   </div>
