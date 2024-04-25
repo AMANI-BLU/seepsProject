@@ -1,0 +1,107 @@
+<!-- instructor_template/manage_courses.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Instructor | View Courses{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'teacher_template/navbar.html' %}
+        {% include 'teacher_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h3 class="text-muted">Course List</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                    <!-- Manage Courses Section -->
+                    <div class="card card-outline card-info">
+                         <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Course List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Courses Table -->
+                            <table id="coursesTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Title</th>
+                                        <th>Description</th>
+                                        <th>Resource</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in courses %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ course.title }}</td>
+                                            <td>{{ course.description }}</td>
+                                            <td>{{ course.resource }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <!-- Footer Section -->
+{% include 'teacher_template/footer.html' %}
+
+    </div>
+    <!-- ./wrapper -->
+     <script>
+    $(document).ready(function () {
+        $('#coursesTable').DataTable({
+              
+            responsive: true, // Make the table responsive
+        
+            "language": {
+                "search": "_INPUT_", // Search input style
+                "searchPlaceholder": "Search...", // Placeholder for search input
+                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                "paginate": {
+                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                    "next": '<i class="fas fa-angle-right"></i>' // Next button
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

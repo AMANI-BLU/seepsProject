@@ -1,0 +1,83 @@
+{% load static %}
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="#" class="brand-link">
+        <span class="brand-text font-weight-light">Dashboard</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                {% if user.profile_picture %}
+                <img class="img-circle elevation-2" src="{{ user.profile_picture.url }}" alt="User profile picture" style="width: 35px; height: 35px;">
+                {% else %}
+                <!-- If profile picture is not available, display a placeholder image -->
+                <img class="img-circle elevation-2" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture">
+                {% endif %}
+            </div>
+            <div class="info">
+                <a href="#" class="d-block">{{user.first_name}}</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a href="{% url "instructor_home" %}" class="nav-link">
+                        <i class="nav-icon fas fa-chart-pie"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <!-- View Student -->
+                <li class="nav-item">
+                    <a href="{% url "view_students" %}" class="nav-link">
+                        <i class="nav-icon fas fa-user-graduate"></i>
+                        <p>View Student</p>
+                    </a>
+                </li>
+                <!-- View Exam -->
+                <li class="nav-item">
+                    <a href="{% url "view_exams" %}" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>View Exam</p>
+                    </a>
+                </li>
+                <!-- Question Bank -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-question-circle"></i>
+                        <p>Question Bank</p>
+                    </a>
+                </li>
+                <!-- View Course -->
+                <li class="nav-item">
+                    <a href="{% url "view_courses_inst" %}" class="nav-link">
+                        <i class="nav-icon fas fa-book-open"></i>
+                        <p>View Course</p>
+                    </a>
+                </li>
+                <!-- Manage Tutorial -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                        <p>Manage Tutorial</p>
+                    </a>
+                </li>
+                <!-- Study Resources -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-file-alt"></i>
+                        <p>Study Resources</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

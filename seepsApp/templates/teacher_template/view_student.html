@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher | View Students{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'teacher_template/navbar.html' %}
+        {% include 'teacher_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                           <h3 class="text-muted">Student</h3>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'instructor_home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">View Students</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <!-- Display success and error messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Manage Students Section -->
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Student List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Students Table -->
+                            <table id="studentsTable" class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Gender</th>
+                                        <th>Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Student Rows -->
+                                    {% for student in students %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ student.first_name }}</td>
+                                            <td>{{ student.email }}</td>
+                                            <td>{{ student.sex }}</td>
+                                            <td>{{ student.phone }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+
+       <!-- JavaScript Section -->
+<script>
+    $(document).ready(function () {
+        $('#studentsTable').DataTable({
+               dom: 'Bfrtip',
+            responsive: true, // Make the table responsive
+            // Add Bootstrap classes to the table
+            "buttons": [
+            {
+                extend: 'copy',
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude last column from copying
+                }
+            },
+            {
+                extend: 'csv',
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude last column from CSV export
+                }
+            },
+            {
+                extend: 'excel',
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude last column from Excel export
+                }
+            },
+            {
+                extend: 'pdf',
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude last column from PDF export
+                }
+            },
+            {
+                extend: 'print',
+                exportOptions: {
+                    columns: ':not(:last-child)' // Exclude last column from printing
+                }
+            }
+        ],
+            "language": {
+                "search": "_INPUT_", // Search input style
+                "searchPlaceholder": "Search...", // Placeholder for search input
+                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                "paginate": {
+                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                    "next": '<i class="fas fa-angle-right"></i>' // Next button
+                }
+            }
+        });
+    });
+</script>
+
+<!-- Footer Section -->
+{% include 'teacher_template/footer.html' %}
+
+
+    </div>
+    <!-- ./wrapper -->
+{% endblock %}

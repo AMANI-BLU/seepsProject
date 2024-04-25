@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Department | Add Instructor{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'department_template/navbar.html' %}
+  {% include 'department_template/aside.html' %}
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Instructor Creation Form</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url "manage_instructors" %}">Manage Instructor</a></li>
+              <li class="breadcrumb-item active">Add Instructor</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="login-box w-100">
+          <div class="card card-outline card-info">
+            <div class="card-body">
+              {% if success_msg %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                  Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    text: '{{ success_msg }}',
+                    showConfirmButton: false,
+                    timer: 6000,
+                  });
+                </script>
+              {% endif %}
+              <form action="{% url 'add_instructor' %}" method="post" id="instructorRegistrationForm" novalidate>
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    {{ form.non_field_errors.as_text }}
+                </div>
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}" class="text-muted">Full Name</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        {{ form.first_name }}
+                    </div>
+                    {% if form.first_name.errors %}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.first_name.errors.as_text }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="text-muted">Email</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        </div>
+                        {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.email.errors.as_text }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.sex.id_for_label }}" class="text-muted">Sex</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                        </div>
+                        {{ form.sex }}
+                    </div>
+                    {% if form.sex.errors %}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.sex.errors.as_text }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.phone.id_for_label }}" class="text-muted">Phone</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                        </div>
+                        {{ form.phone }}
+                    </div>
+                    {% if form.phone.errors %}
+                    <div class="text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        {{ form.phone.errors.as_text }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="row">                          
+                    <div class="col-12">
+                        <button type="submit" id="uploadButton" class="btn btn-info">
+                            <i id="uploadIcon" class="fas fa-user-plus mr-2"></i>   
+                            <span id="uploadText">Register</span>
+                        </button>
+                    </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+  <!-- Script to handle button click event and show loading effect -->
+  <script>
+      $(document).ready(function() {
+          $('#uploadButton').on('click', function() {
+              $(this).addClass('disabled').prop('disabled', true);
+              $('#uploadIcon').removeClass('fa-user-plus').addClass('fa-spinner fa-spin');
+              $('#uploadText').html('please wait...');
+              $('#instructorRegistrationForm').submit();
+          });
+      });
+  </script>
+  
+  {% include 'department_template/footer.html' %}
+</div>
+{% endblock %}
