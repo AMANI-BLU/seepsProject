@@ -1601,5 +1601,115 @@ def inst_delete_question(request, question_id):
     return redirect('inst_manage_questions')  # Correct URL pattern name here
 
 
+
+def inst_manage_resources(request):
+    # Get the department username of the logged-in user
+    department_username = request.user.department_name
+    
+    # Fetch all resources associated with the department username
+    resources = Resource.objects.filter(department_name=department_username)
+    
+    for resource in resources:
+        resource.filename = basename(resource.file.name)
+    
+    # Pass the resources to the template context
+    return render(request, 'teacher_template/manage_resources.html', {'resources': resources})
+
+
+
+
+def inst_add_resource(request):
+    if request.method == 'POST':
+        form = ResourceForm(request.POST, request.FILES)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.department_name = request.user.department_name  # Assuming department_name is associated with the user
+            resource.save()
+            messages.success(request, 'Resource added successfully!')
+            return redirect('inst_manage_resources')
+    else:
+        form = ResourceForm()
+    return render(request, 'teacher_template/add_resource.html', {'form': form})
+
+
+
+def inst_add_tutorial(request):
+    if request.method == 'POST':
+        form = TutorialForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tutorial Added successfully!')
+            return redirect('inst_add_tutorial')  # Redirect to the same page after adding a tutorial
+    else:
+        department_name = request.user.department_name  # Get department name from user
+        courses = Course.objects.filter(department_name=department_name)  # Filter courses by department
+        # Pass the department to the form
+        form = TutorialForm(department=department_name)
+        
+    return render(request, 'teacher_template/add_tutorial.html', {
+        'form': form,
+    })
+ 
+
+def inst_manage_tutorials(request):
+    department_name = request.user.department_name
+    courses = Course.objects.filter(department_name=department_name)
+    tutorials = Tutorial.objects.filter(course__in=courses)
+    return render(request, 'teacher_template/manage_tutorials.html', {'tutorials': tutorials, 'courses': courses})
+
+
+
+def inst_delete_tutorial(request, tutorial_id):
+    tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
+    if request.method == 'POST':
+        tutorial.delete()
+        messages.success(request, 'Tutorial deleted successfully!')
+    return redirect('inst_manage_tutorials')
+
+
+def inst_update_tutorial(request, tutorial_id):
+    tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
+    if request.method == 'POST':
+        form = TutorialForm(request.POST, instance=tutorial)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Tutorial updated successfully!')
+            return redirect('inst_manage_tutorials')
+    else:
+        form = TutorialForm(instance=tutorial)
+        department_name = request.user.department_name
+        courses = Course.objects.filter(department_name=department_name)
+    return render(request, 'teacher_template/update_tutorial.html', {'form': form, 'courses': courses})
+
+
+
+def inst_delete_resource(request, resource_id):
+    if request.method == 'POST':
+        try:
+            resource = Resource.objects.get(pk=resource_id)
+            resource.delete()
+            messages.success(request, 'Resource deleted successfully.')
+        except Resource.DoesNotExist:
+            messages.error(request, 'Resource does not exist.')
+    return redirect('inst_manage_resources')
+
+
+def inst_update_resource(request, resource_id):
+    resource = get_object_or_404(Resource, pk=resource_id)
+    if request.method == 'POST':
+        # Update resource fields based on form input
+        resource.description = request.POST.get('description')
+        
+        # Handle file upload
+        if 'file' in request.FILES:
+            resource.file = request.FILES['file']
+        
+        # Add more fields as needed
+        resource.save()
+        messages.success(request, 'Resource updated successfully!')
+        return redirect('inst_manage_resources')  # Redirect to the manage_resources page after successful update
+    else:
+        return redirect('inst_manage_resources')   # Redirect to the manage_resources page if the request method is not POSTect('manage_resources')   # Redirect to the manage_resources page if the request method is not POST
+
 ####################### /Instructor Views ########################
 

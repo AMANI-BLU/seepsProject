@@ -119,7 +119,15 @@ urlpatterns = [
    path('inst_preview/', inst_preview_questions_view, name='inst_preview_questions'),
    path('inst_edit_question/<int:question_id>/', inst_edit_question, name='inst_edit_question'),
    path('inst_delete_question/<int:question_id>/delete/', inst_delete_question, name='inst_delete_question'),
-
+   path('inst-manage-resources/', inst_manage_resources, name='inst_manage_resources'),
+   path('inst-add-resource/', inst_add_resource, name='inst_add_resource'),
+   path('inst_manage/tutorials/add/', inst_add_tutorial, name='inst_add_tutorial'),
+   path('inst_manage/tutorials/', inst_manage_tutorials, name='inst_manage_tutorials'),
+   path('inst_delete-tutorial/<int:tutorial_id>/', inst_delete_tutorial, name='inst_delete_tutorial'),
+   path('inst_update-tutorial/<int:tutorial_id>/', inst_update_tutorial, name='inst_update_tutorial'),
+   path('inst_delete-resource/<int:resource_id>/', inst_delete_resource, name='inst_delete_resource'),
+   path('inst_update_resource/<int:resource_id>/', inst_update_resource, name='inst_update_resource'),
+        
 
    
    
