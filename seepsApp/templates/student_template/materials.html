@@ -6,62 +6,66 @@
     <div class="container mt-5">
         <div style="margin-top:70px;"></div>
         <h2 class="mb-4 text-muted">Study Materials</h2>
-        <div class="row">
-            {% for resource in resources %}
-                <div class="col-md-3 mb-4">
-                    <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="card-title">{{ resource.filename }}</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="text-center">
-                                {% if resource.file.name|lower|slice:'-4:' == '.pdf' %}
-                                    <i class="far fa-file-pdf fa-5x text-danger"></i>
-                                {% elif resource.file.name|lower|slice:'-5:' == '.doc' or resource.file.name|lower|slice:'-5:' == '.docx' %}
-                                    <i class="far fa-file-word fa-5x text-info"></i>
-                                {% elif resource.file.name|lower|slice:'-5:' == '.ppt' or resource.file.name|lower|slice:'-5:' == '.pptx' %}
-                                    <i class="far fa-file-powerpoint fa-5x text-warning"></i>
-                                {% elif resource.file.name|lower|slice:'-5:' == '.xlsx' or resource.file.name|lower|slice:'-4:' == '.xls' %}
-                                    <i class="far fa-file-excel fa-5x text-success"></i>
-                                {% elif resource.file.name|lower|slice:'-4:' == '.sql' %}
-                                    <i class="fas fa-database fa-5x text-primary"></i>
-                                {% elif resource.file.name|lower|slice:'-4:' == '.exe' %}
-                                    <i class="fas fa-cogs fa-5x text-dark"></i>
-                                {% elif resource.file.name|lower|slice:'-4:' == '.rar' %}
-                                    <i class="far fa-file-archive fa-5x text-secondary"></i>
-                                {% elif resource.file.name|lower|slice:'-4:' == '.zip' %}
-                                    <i class="far fa-file-archive fa-5x text-secondary"></i>
-                                {% else %}
-                                    <i class="far fa-file fa-5x text-secondary"></i>
-                                {% endif %}
+        {% if resources %}
+            <div class="row">
+                {% for resource in resources %}
+                    <div class="col-md-3 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title">{{ resource.filename }}</h5>
                             </div>
-                            <p class="card-text mt-3">{{ resource.description }}</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                           <a href="{{ resource.file.url }}" id="downloadLink" class="btn btn-info btn-block" download>
-                                <i class="fas fa-download"></i> Download
-                            </a>
-
-
+                            <div class="card-body">
+                                <div class="text-center">
+                                    {% if resource.file.name|lower|slice:'-4:' == '.pdf' %}
+                                        <i class="far fa-file-pdf fa-5x text-danger"></i>
+                                    {% elif resource.file.name|lower|slice:'-5:' == '.doc' or resource.file.name|lower|slice:'-5:' == '.docx' %}
+                                        <i class="far fa-file-word fa-5x text-info"></i>
+                                    {% elif resource.file.name|lower|slice:'-5:' == '.ppt' or resource.file.name|lower|slice:'-5:' == '.pptx' %}
+                                        <i class="far fa-file-powerpoint fa-5x text-warning"></i>
+                                    {% elif resource.file.name|lower|slice:'-5:' == '.xlsx' or resource.file.name|lower|slice:'-4:' == '.xls' %}
+                                        <i class="far fa-file-excel fa-5x text-success"></i>
+                                    {% elif resource.file.name|lower|slice:'-4:' == '.sql' %}
+                                        <i class="fas fa-database fa-5x text-primary"></i>
+                                    {% elif resource.file.name|lower|slice:'-4:' == '.exe' %}
+                                        <i class="fas fa-cogs fa-5x text-dark"></i>
+                                    {% elif resource.file.name|lower|slice:'-4:' == '.rar' %}
+                                        <i class="far fa-file-archive fa-5x text-secondary"></i>
+                                    {% elif resource.file.name|lower|slice:'-4:' == '.zip' %}
+                                        <i class="far fa-file-archive fa-5x text-secondary"></i>
+                                    {% else %}
+                                        <i class="far fa-file fa-5x text-secondary"></i>
+                                    {% endif %}
+                                </div>
+                                <p class="card-text mt-3">{{ resource.description }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <a href="{{ resource.file.url }}" id="downloadLink" class="btn btn-info btn-block" download>
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No study materials available.
+            </div>
+        {% endif %}
     </div>
-<script>
-    $(document).ready(function() {
-        // Add loading overlay to download link when clicked
-        $('#downloadLink').on('click', function() {
-            // Show loading overlay
-            $('body').LoadingOverlay('show', {
-                image: "",
-                fontawesome: "fas fa-spinner fa-spin",
-                zIndex: 9999 // Adjust the z-index if necessary
+
+    <script>
+        $(document).ready(function() {
+            // Add loading overlay to download link when clicked
+            $('#downloadLink').on('click', function() {
+                // Show loading overlay
+                $('body').LoadingOverlay('show', {
+                    image: "",
+                    fontawesome: "fas fa-spinner fa-spin",
+                    zIndex: 9999 // Adjust the z-index if necessary
+                });
             });
         });
-    });
-</script>
-
+    </script>
 
 {% endblock %}

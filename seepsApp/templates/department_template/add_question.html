@@ -33,7 +33,7 @@
                 <!-- Your message display code -->
               {% endif %}
               
-              <form action="{% url 'add_question' %}" method="post">
+              <form action="{% url 'add_question' %}" method="post" novalidate>
                 {% csrf_token %}
                 
                 <!-- Main question fields -->
