@@ -1,0 +1,44 @@
+<!-- edit_question.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Department | Edit Question{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'teacher_template/navbar.html' %}
+  {% include 'teacher_template/aside.html' %}
+  
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Edit Question</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="card card-outline card-info">
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <!-- Choice formset -->
+              {{ formset.management_form }}
+              {% for choice_form in formset %}
+                  {{ choice_form.as_p }}
+              {% endfor %}
+              <button type="submit" class="btn btn-info btn-block mt-2">Update Question</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  {% include 'teacher_template/footer.html' %}
+</div>
+{% endblock %}

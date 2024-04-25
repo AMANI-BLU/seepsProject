@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructor | Manage Questions{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'teacher_template/navbar.html' %}
+        {% include 'teacher_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                        <script>
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                text: "{{ message }}",
+                                showConfirmButton: false,
+                                timer: 6000,
+                            });
+                        </script>
+                    {% elif message.tags == 'error' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                        <script>
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                text: "{{ message }}",
+                                showConfirmButton: false,
+                                timer: 6000,
+                            });
+                        </script>
+                    {% elif message.tags == 'warning' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                        <script>
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'warning',
+                                text: "{{ message }}",
+                                showConfirmButton: false,
+                                timer: 6000,
+                            });
+                        </script>
+                    {% elif message.tags == 'info' %}
+                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                        <script>
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'info',
+                                text: "{{ message }}",
+                                showConfirmButton: false,
+                                timer: 6000,
+                            });
+                        </script>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-plus"></i> Add New
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'inst_add_question' %}">Add Question</a> 
+                                    <a class="dropdown-item" href="{% url 'inst_upload_pdf_view' %}">Import Question</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'instructor_home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">Manage Questions</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- Manage Questions Section -->
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Question List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Questions Table -->
+                            <table id="questionsTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Question Content</th>
+                                        <th>Exam</th>
+                                        <th class="exclude-export">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sample Data -->
+                                    {% for question in questions %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>{{ question.content|safe }}</td>
+                                        <td>{{ question.exam.name }} ({{question.exam.difficulty}})</td>
+                                        <td>
+                                            <!-- Edit Button -->
+                                             <!-- Edit Button -->
+                                        <a href="{% url 'inst_edit_question' question.id %}" class="btn btn-info">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                            <!-- Delete Button -->
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
+                                                <i class="fas fa-trash-alt"></i> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- Delete Question Modal -->
+                                    <div class="modal fade" id="deleteQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteQuestionModalLabel{{ question.id }}" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteQuestionModalLabel{{ question.id }}">Delete Question</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete the question this question?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form action="{% url 'inst_delete_question' question.id %}" method="post">
+                                                        {% csrf_token %}
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Delete Question Modal -->
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+
+        <script>
+            $(document).ready(function() {
+                // Initialize Summernote
+                $('.summernote').summernote({
+                    height: 200, // Set the height of the editor
+                    // Add other Summernote options here if needed
+                });
+            });
+        </script>
+
+        <!-- Datatables and other scripts -->
+        <script>
+            $(document).ready(function () {
+                var questionsTable = $('#questionsTable').DataTable({
+                     // Set the default number of rows per page
+                    
+                    responsive: true, // Make the table responsive
+                    // Add Bootstrap classes to the table
+                    "language": {
+                        "search": "_INPUT_", // Search input style
+                        "searchPlaceholder": "Search...", // Placeholder for search input
+                        "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
+                        "paginate": {
+                            "previous": '<i class="fas fa-angle-left"></i>', // Previous button
+                            "next": '<i class="fas fa-angle-right"></i>' // Next button
+                        }
+                    }
+                });
+
+                
+            });
+        </script>
+
+        {% include 'teacher_template/footer.html' %}
+    </div>
+    <!-- ./wrapper -->
+{% endblock %}

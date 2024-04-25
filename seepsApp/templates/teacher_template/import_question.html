@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Import Questions{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="wrapper">
+    {% include 'teacher_template/navbar.html' %}
+    {% include 'teacher_template/aside.html' %}
+
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    showSweetAlert('success', "{{ message }}");
+                </script>
+            {% elif message.tags == 'error' %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    showSweetAlert('error', "{{ message }}");
+                </script>
+            {% elif message.tags == 'warning' %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    showSweetAlert('warning', "{{ message }}");
+                </script>
+            {% elif message.tags == 'info' %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    showSweetAlert('info', "{{ message }}");
+                </script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <h1>Import Questions</h1>
+                </div>
+            </div>
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div id="alertContainer"></div> <!-- Alert container -->
+
+        <div class="card card-outline card-info">
+            <div class="card-header">
+                <h3 class="card-title">Upload Questions PDF</h3>
+            </div>
+            <div class="card-body">
+                <form id="uploadForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.pdf_file.label_tag }}
+                        {{ form.pdf_file }}
+                        <small class="form-text text-muted">{{ form.pdf_file.help_text }}</small>
+                    </div>
+                    <div class="form-group">
+                        {{ form.exam.label_tag }}
+                        {{ form.exam }}
+                    </div>
+                    <!-- Placeholder image -->
+                    <button type="button" id="uploadButton" class="btn btn-info">
+                        <i id="uploadIcon" class="fas fa-upload"></i> Upload
+                    </button>
+                </form>
+            </div>
+        </div>
+
+   
+    </div>
+</section>
+
+<!-- /.content -->
+
+        <!-- /.content -->
+    </div>
+
+    {% include 'teacher_template/footer.html' %}
+</div>
+<!-- ./wrapper -->
+
+<!-- Script to handle button click event and show loading effect -->
+<script>
+    $(document).ready(function() {
+        $('#uploadButton').on('click', function() {
+            $(this).addClass('disabled').prop('disabled', true);
+            $('#uploadIcon').removeClass('fa-upload').addClass('fa-spinner fa-spin');
+            $('#uploadForm').submit();
+        });
+    });
+
+    // Function to show SweetAlert2 messages
+    function showSweetAlert(icon, message) {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: icon,
+            text: message,
+            showConfirmButton: false,
+            timer: 6000,
+        });
+    }
+</script>
+{% endblock %}
