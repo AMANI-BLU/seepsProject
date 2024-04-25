@@ -1,8 +1,11 @@
 {% extends "loginBase.html" %}
 {% block content %}
-
+{% load static %}
 <div class="login-box">
-  <div class="card card-outline card-info">
+ <div class="login-logo">
+    <a href="#"><b>LOGIN</b>HERE</a>
+  </div>
+  <div class="card card-outline mb-5 card-info">
     <div class="card-body">
       <p class="login-box-msg muted">
         {% if msg %}
@@ -34,22 +37,20 @@
           </div>
         </div>
 
-        
-
         <div class="row">
           <div class="col-12">
             <button type="submit" class="btn btn-info btn-block">Login</button>
           </div>
         </div>
       </form>
-      {% comment %} <div class="input-group mb-3">
-          <div class="icheck-primary">
-            <input type="checkbox" id="remember">
-            <label for="remember" class="text-muted">Remember Me</label>
-          </div>
-        </div> {% endcomment %}
+      <div class="input-group mt-3">
+            {% comment %} <div class="icheck-primary">
+              <input type="checkbox" id="remember">
+              <label for="remember" class="text-muted">Remember Me</label>
+            </div>
+          </div>  {% endcomment %}
       <!-- Forgot Password Link -->
-      <p class="mt-2">
+      <p class="mt-1">
         <a href="{% url 'password_reset' %}">Forgot Password?</a>
       </p>
       

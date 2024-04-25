@@ -1437,5 +1437,169 @@ def view_courses_inst(request):
 
     return render(request, 'teacher_template/view_course.html', {'courses': courses})
 
+
+
+
+@login_required(login_url='login_view')
+def inst_add_question(request):
+    success_msg = None
+    error_msg = None
+
+    department_username = request.user.department_name
+
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, department_username=department_username)
+        formset = ChoiceFormSet(request.POST, instance=form.instance)
+        if form.is_valid() and formset.is_valid():
+            question = form.save()
+            formset.instance = question
+            formset.save()
+            messages.success(request, 'Questions added successfully!')
+        else:
+            # error_msg = 'Form is not valid'
+            print("Form errors outside if:", form.errors, formset.errors)
+    else:
+        form = QuestionForm(department_username=department_username)
+        # Determine the number of extra forms based on the number of additional choice fields submitted
+        num_extra = len(request.POST.getlist('form-0-text')) - 1 if request.POST.get('form-0-text') else 2
+        formset = ChoiceFormSet(instance=Question(), extra=num_extra)
+
+    return render(request, 'teacher_template/add_question.html', {
+        'form': form,
+        'formset': formset,
+        'success_msg': success_msg,
+        'error_msg': error_msg
+    })
+    
+
+
+
+def inst_manage_questions(request):
+    department_username = request.user.department_name
+    questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
+    return render(request, 'teacher_template/manage_questions.html', {'questions': questions})
+
+
+
+
+# from file
+
+
+def inst_upload_pdf_view(request):
+    questions_with_choices = None
+
+    # Fetch queryset of exams relevant to the user's department
+    department_name = request.user.department_name  # Assuming you have a user object with department_name
+    exam_queryset = Exam.objects.filter(department_name=department_name)
+
+    if request.method == 'POST':
+        form = UploadPdfForm(request.POST, request.FILES, department_queryset=exam_queryset)
+        if form.is_valid():
+            # Get the selected exam
+            selected_exam = Exam.objects.get(pk=form.cleaned_data['exam'])
+            
+            # Extract questions with choices from the uploaded PDF file
+            pdf_file = request.FILES['pdf_file']
+            questions_with_choices = extract_questions_with_choices_from_pdf(pdf_file)
+
+            # Save the questions and choices in session for preview
+            request.session['questions_with_choices'] = questions_with_choices
+            request.session['selected_exam'] = selected_exam.id
+            
+            # Redirect to the preview page
+            return redirect('inst_preview_questions')  # Create a URL pattern named 'preview_questions' for the preview page
+    else:
+        # Initialize the form with the exam queryset
+        form = UploadPdfForm(department_queryset=exam_queryset)
+    
+    return render(request, 'teacher_template/import_question.html', {'form': form})
+
+def inst_preview_questions_view(request):
+    questions_with_choices = request.session.get('questions_with_choices')
+    selected_exam_id = request.session.get('selected_exam')
+    selected_exam = None
+    
+    # Check if selected_exam_id exists and get the Exam object
+    if selected_exam_id:
+        try:
+            selected_exam = Exam.objects.get(pk=selected_exam_id)
+        except Exam.DoesNotExist:
+            # Handle the case where the Exam object does not exist
+            # You might want to redirect or render an error page
+            pass
+    
+    # Check if necessary session data is missing
+    if not questions_with_choices or not selected_exam:
+        # Check if questions_with_choices is empty or None
+        if not questions_with_choices:
+            message = "Please upload a file with correct format."
+        else:
+            message = "Please select an exam."
+        
+        # Add the message to the messages framework
+        messages.warning(request, message)
+        
+        # Redirect to the upload page if session data is missing
+        return redirect('inst_upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
+    
+    if request.method == 'POST':
+        # Get the selected choices from POST data
+        selected_choices = {}
+        for key, value in request.POST.items():
+            if key.startswith('selected_choice_'):
+                question_number = key.split('_')[2]  # Extract the question number from the key
+                selected_choices[question_number] = value  # Store the selected choice for this question
+
+        # If the user confirms, save questions and choices to the database
+        for qwc in questions_with_choices:
+            question = Question.objects.create(exam=selected_exam, content=qwc['question'])
+            for choice_text in qwc['choices']:
+                # Check if this choice is selected
+                is_correct = choice_text in selected_choices.values()
+                Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
+        
+        # Clear session data
+        del request.session['questions_with_choices']
+        del request.session['selected_exam']
+        
+        # Add success message
+        messages.success(request, 'Questions added successfully!')
+        
+        # Redirect to a success page or any other desired page
+        return redirect('inst_manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
+    
+    return render(request, 'teacher_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
+
+
+
+def inst_edit_question(request, question_id):
+    question = get_object_or_404(Question, id=question_id)
+    
+    # Pass department username to the form
+    form = EditQuestionForm(instance=question, department_username=request.user.department_name)
+    formset = EditChoiceFormSet(instance=question)
+
+    if request.method == 'POST':
+        form = EditQuestionForm(request.POST, instance=question, department_username=request.user.department_name)
+        formset = EditChoiceFormSet(request.POST, instance=question)
+        if form.is_valid() and formset.is_valid():
+            form.save()
+            formset.save()
+            messages.success(request, 'Questions Updated successfully!')
+            return redirect('inst_manage_questions')
+
+    return render(request, 'teacher_template/edit_question.html', {'form': form, 'formset': formset, 'question': question})
+
+
+def inst_delete_question(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    if request.method == 'POST':
+        question.delete()
+        messages.success(request, 'Question deleted successfully!')
+        return redirect('inst_manage_questions')  # Correct URL pattern name here
+    
+    return redirect('inst_manage_questions')  # Correct URL pattern name here
+
+
 ####################### /Instructor Views ########################
 

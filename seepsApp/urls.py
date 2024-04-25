@@ -113,6 +113,12 @@ urlpatterns = [
    path('view_students/', view_students, name='view_students'),
    path('exams/', view_exams, name='view_exams'),
    path('view_courses_inst/', view_courses_inst, name='view_courses_inst'),
+   path('inst_add_question/', inst_add_question, name='inst_add_question'),
+   path('inst_manage_questions/', inst_manage_questions, name='inst_manage_questions'),
+   path('inst_import_question/', inst_upload_pdf_view, name='inst_upload_pdf_view'),
+   path('inst_preview/', inst_preview_questions_view, name='inst_preview_questions'),
+   path('inst_edit_question/<int:question_id>/', inst_edit_question, name='inst_edit_question'),
+   path('inst_delete_question/<int:question_id>/delete/', inst_delete_question, name='inst_delete_question'),
 
 
    
