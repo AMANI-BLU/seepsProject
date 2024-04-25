@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Department | Add Tutorial{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'teacher_template/navbar.html' %}
+  {% include 'teacher_template/aside.html' %}
+
+  <div class="content-wrapper">
+       {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Tutorial Creation Form</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="">Manage Tutorials</a></li>
+              <li class="breadcrumb-item active">Add Tutorial</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        <div class="login-box w-100">
+          <div class="card card-outline card-info">
+            <div class="card-body">
+              {% if success_msg %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                  Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    text: '{{ success_msg }}',
+                    showConfirmButton: false,
+                    timer: 6000,
+                  });
+                </script>
+              {% endif %}
+
+              <form action="{% url 'inst_add_tutorial' %}" method="post" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                  <div class="text-danger">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    {{ form.non_field_errors.as_text }}
+                  </div>
+                {% endif %}
+
+                <div class="form-group">
+                  <label for="{{ form.course.id_for_label }}" class="text-muted">Course</label>
+                  {{ form.course }}
+                  {% if form.course.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.course.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="{{ form.title.id_for_label }}" class="text-muted">Title</label>
+                  {{ form.title }}
+                  {% if form.title.errors %}
+                    <div class="text-danger">
+                      <i class="bi bi-exclamation-triangle"></i>
+                      {{ form.title.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+
+                <div class="form-group">
+                    <label for="{{ form.tutorial_url.id_for_label }}" class="text-muted">Tutorial URL</label>
+                    {{ form.tutorial_url }}
+                    {% if form.tutorial_url.errors %}
+                        <div class="text-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            {{ form.tutorial_url.errors.as_text }}
+                        </div>
+                    {% endif %}
+                </div>
+
+               
+                <div class="row">
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-info btn-block">
+                      Add Tutorial
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    $(function () {
+      // Summernote
+      $('#summernote').summernote()
+
+      // CodeMirror
+      CodeMirror.fromTextArea(document.getElementById("codeMirrorDemo"), {
+        mode: "htmlmixed",
+        theme: "monokai"
+      });
+    })
+  </script>
+  {% include 'teacher_template/footer.html' %}
+</div>
+{% endblock %}

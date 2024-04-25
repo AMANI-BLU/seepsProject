@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Instructor | Add Resource{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+  {% include 'teacher_template/navbar.html' %}
+  {% include 'teacher_template/aside.html' %}
+
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1 class="text-secondary">Resource Upload Form</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="{% url 'inst_manage_resources' %}">Manage Resources</a></li>
+              <li class="breadcrumb-item active">Add Resource</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+        {% if messages %}
+          {% for message in messages %}
+            {% if message.tags == 'success' %}
+              <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+              <script>
+                Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'success',
+                  text: "{{ message }}",
+                  showConfirmButton: false,
+                  timer: 6000,
+                });
+              </script>
+            {% elif message.tags == 'error' %}
+              <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+              <script>
+                Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'error',
+                  text: "{{ message }}",
+                  showConfirmButton: false,
+                  timer: 6000,
+                });
+              </script>
+            {% elif message.tags == 'warning' %}
+              <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+              <script>
+                Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'warning',
+                  text: "{{ message }}",
+                  showConfirmButton: false,
+                  timer: 6000,
+                });
+              </script>
+            {% elif message.tags == 'info' %}
+              <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+              <script>
+                Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  icon: 'info',
+                  text: "{{ message }}",
+                  showConfirmButton: false,
+                  timer: 6000,
+                });
+              </script>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        <div class="login-box w-100">
+          <div class="card card-outline card-info">
+            <div class="card-body">
+            <form action="{% url 'inst_add_resource' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                  <div class="text-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {{ form.non_field_errors.as_text }}
+                  </div>
+                {% endif %}
+
+            
+
+                <div class="form-group">
+                  <label for="{{ form.description.id_for_label }}" class="text-muted">Description</label>
+                  <textarea name="description" class="form-control" id="{{ form.description.id_for_label }}" rows="3" placeholder="Enter description"></textarea>
+                  {% if form.description.errors %}
+                    <div class="text-danger">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      {{ form.description.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <div class="form-group">
+                  <label for="file" class="text-muted">File</label>
+                  <input type="file" name="file" class="form-control-file" id="file">
+                  {% if form.file.errors %}
+                    <div class="text-danger">
+                      <i class="fas fa-exclamation-triangle"></i>
+                      {{ form.file.errors.as_text }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-info btn-block">
+                  <i class="fas fa-upload"></i> Upload Resource
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  {% include 'teacher_template/footer.html' %}
+</div>
+{% endblock %}

@@ -1,0 +1,200 @@
+<!-- department_template/manage_tutorials.html -->
+{% extends 'base.html' %}
+
+{% block title %}Instructor | Manage Tutorials{% endblock %}
+
+{% block content %}
+    <!-- Main content -->
+    <div class="wrapper">
+        {% include 'teacher_template/navbar.html' %}
+        {% include 'teacher_template/aside.html' %}
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+
+             {% if messages %}
+                        {% for message in messages %}
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            <script>
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    text: "{{ message }}",
+                                    showConfirmButton: false,
+                                    timer: 6000,
+                                });
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <div class="btn-group">
+                                <a href="{% url 'inst_add_tutorial' %}" class="btn btn-info">
+                                    <i class="fas fa-plus"></i> Add New
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="{% url 'instructor_home' %}">Home</a></li>
+                                <li class="breadcrumb-item active">Manage Tutorials</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- Manage Tutorials Section -->
+                    <div class="card card-outline card-info">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3 class="card-title">Tutorial List</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Tutorials Table -->
+                        <table id="tutorialsTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Course</th>
+                                <th>Title</th>
+                               
+                                <th class="exclude-export">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tutorial in tutorials %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ tutorial.course.title }}</td>
+                                <td>{{ tutorial.title }}</td>
+                              
+                                <td class="d-flex align-items-center">
+                                    <!-- Update Button - Open Modal -->
+                                    <button type="button" class="btn btn-info me-3" data-toggle="modal" data-target="#updateTutorialModal{{ tutorial.id }}">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>&nbsp;&nbsp;
+                                    <!-- Delete Button - Open Modal -->
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteTutorialModal{{ tutorial.id }}">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <!-- Update Tutorial Modal -->
+                           <!-- Update Tutorial Modal -->
+<div class="modal fade" id="updateTutorialModal{{ tutorial.id }}" tabindex="-1" role="dialog" aria-labelledby="updateTutorialModalLabel{{ tutorial.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateTutorialModalLabel{{ tutorial.id }}">Update Tutorial</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <!-- Update Form -->
+                    <form action="{% url 'inst_update_tutorial' tutorial.id %}" method="post">
+                        {% csrf_token %}
+                        <!-- Course Selection -->
+                        <div class="form-group">
+                            <label for="course">Course</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                </div>
+                                <select class="form-control" id="course" name="course">
+                                    {% for course in courses %}
+                                        <option value="{{ course.id }}" {% if course.id == tutorial.course.id %}selected{% endif %}>{{ course.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Tutorial Title -->
+                        <div class="form-group">
+                            <label for="title">Tutorial Title</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="title" name="title" value="{{ tutorial.title }}">
+                            </div>
+                        </div>
+                        <!-- Tutorial URL -->
+                        <div class="form-group">
+                            <label for="tutorial_url">Tutorial URL</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="tutorial_url" name="tutorial_url" value="{{ tutorial.tutorial_url }}">
+                            </div>
+                        </div>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Save Changes</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+                            <!-- Delete Tutorial Modal -->
+                            <div class="modal fade" id="deleteTutorialModal{{ tutorial.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteTutorialModalLabel{{ tutorial.id }}" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteTutorialModalLabel{{ tutorial.id }}">Delete Tutorial</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to delete the tutorial "{{ tutorial.title }}"?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form action="{% url 'inst_delete_tutorial' tutorial.id %}" method="post">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+
+  
+        <script>
+            $(document).ready(function () {
+                $('#tutorialsTable').DataTable({
+                
+                });
+
+            });
+        </script>
+
+        {% include 'teacher_template/footer.html' %}
+    </div>
+    <!-- ./wrapper -->
+{% endblock %}
