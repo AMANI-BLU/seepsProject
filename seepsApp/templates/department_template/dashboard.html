@@ -87,7 +87,7 @@
                                 <p>Total Students</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-user-graduate"></i>
                             </div>
                             <a href="{% url "view_student" %}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
@@ -97,13 +97,13 @@
                     <div class="col-md-6 col-lg-3">
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>{{feedbacks_count}}</h3>
-                                <p>Total Feedbacks</p>
+                                <h3>{{instructors}}</h3>
+                                <p>Total Instructors</p>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-comments"></i>
+                                <i class="fas fa-users"></i>
                             </div>
-                            <a href="{% url "feedback_management" %}" class="small-box-footer">More info <i
+                            <a href="{% url "manage_instructors" %}" class="small-box-footer">More info <i
                                     class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>

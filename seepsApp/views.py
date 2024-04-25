@@ -17,6 +17,9 @@ def is_department(user):
     return user.is_authenticated and user.is_department
 def is_student(user):
     return user.is_authenticated and user.is_student
+def is_instructor(user):
+    return user.is_authenticated and user.is_instructor
+
 def is_admin(user):
     return user.is_authenticated and user.is_staff and user.is_superuser
 
@@ -41,6 +44,8 @@ def login_view(request):
                     return redirect('department_home')  # Render a template informing the user to verify their account
                 elif user.is_student:
                     return redirect('student_home')
+                elif user.is_instructor:
+                    return redirect('instructor_home')
             else:
                 msg = 'Invalid email or password. Please try again.'
 
@@ -205,7 +210,7 @@ def update_department(request, username):
 def department_home(request):
     department_name = request.user.username
     department_username = request.user.username
-
+    instructors = User.objects.filter(department_name=department_name, is_instructor=True).count()
     # Fetching data for department dashboard
     students = User.objects.filter(is_student=True, department_name=department_name)
     feedbacks_count = Feedback.objects.filter(user__department_name=department_username).count()
@@ -220,6 +225,7 @@ def department_home(request):
 
     # Pass the counts and exam scores data to the template
     context = {
+        'instructors':instructors,
         'total_students': total_students,
         'questions_count': questions_count,
         'exams_count': exams_count,
@@ -1313,3 +1319,123 @@ def delete_report(request, exam_name):
     Result.objects.filter(exam=exam).delete()
     
     return redirect('exam_scores_table')  # Redirect back to the exam scores table page
+
+
+
+
+
+def manage_instructors(request):
+    # Retrieve the department name from the logged-in user
+    department_name = request.user.username
+    
+    # Filter instructors based on the department name
+    instructors = User.objects.filter(department_name=department_name, is_instructor=True)
+    
+    return render(request, 'department_template/view_instructor.html', {'instructors': instructors})
+
+
+# Add Instructor View
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def add_instructor(request):
+    if request.method == 'POST':
+        form = InstructorRegistrationForm(request.POST, department_name=request.user.username)
+        if form.is_valid():
+            # Generate the password
+            password = form.generate_password()
+
+            try:
+                user = form.save(commit=False)
+                user.is_instructor = True
+                user.set_password(password)  # Hash the password
+                user.save()
+                success_msg = 'Instructor registered successfully!'
+
+                # Send email
+                subject = 'Instructor Account Verification'
+                html_message = render_to_string('email/instructor_account_email.html', {
+                    'user': user,
+                    'password': password,  # Pass the generated password to the email template
+                    # 'login_url': 'http://127.0.0.1:8000/login/',  # Provide the login URL
+                })
+                plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+            except Exception as e:
+                error_msg = f'An error occurred: {str(e)}'
+        else:
+            error_msg = 'Form is not valid'
+    else:
+        form = InstructorRegistrationForm(department_name=request.user.username)
+    
+    return render(request, 'department_template/add_instructor.html', {'form': form})
+
+
+    
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_instructor(request, username):
+    if request.method == 'POST':
+        try:
+            # Retrieve the user (instructor) by username
+            instructor = User.objects.get(username=username)
+            # Delete the instructor
+            instructor.delete()
+            messages.success(request, 'Instructor deleted successfully!')
+        except User.DoesNotExist:
+            messages.error(request, 'Instructor not found!')
+
+    # Redirect to a relevant page after deletion (e.g., manage_instructors)
+    return redirect('manage_instructors')
+
+
+
+####################### Instructor Views ########################
+
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
+def instructor_home(request):
+    return render(request, 'teacher_template/dashboard.html')
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
+def view_students(request):
+    # Get the department of the logged-in teacher
+    teacher_department = request.user.department_name  # Assuming department is a ForeignKey field on the teacher model
+
+    # Filter students based on the department of the teacher
+    students = User.objects.filter(is_student=True, department_name=teacher_department)
+
+    return render(request, 'teacher_template/view_student.html', {'students': students})
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
+def view_exams(request):
+    # Get the department of the logged-in teacher
+    teacher_department = request.user.department_name  # Assuming department is a ForeignKey field on the teacher model
+
+    # Filter exams based on the department of the teacher
+    exams = Exam.objects.filter(department_name=teacher_department).annotate(num_questions=Count('question'))
+   
+
+    return render(request, 'teacher_template/view_exam.html', {'exams': exams})
+
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
+def view_courses_inst(request):
+    # Get the department of the logged-in instructor
+    instructor_department = request.user.department_name  # Assuming department is a ForeignKey field on the instructor model
+
+    # Filter courses based on the department of the instructor
+    courses = Course.objects.filter(department_name=instructor_department)
+
+    return render(request, 'teacher_template/view_course.html', {'courses': courses})
+
+####################### /Instructor Views ########################
+

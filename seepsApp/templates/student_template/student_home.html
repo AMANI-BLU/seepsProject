@@ -80,15 +80,11 @@
     </div>
     
     {% else %}
-            <div class="card ">
-                <div class="card-body text-center">
-                    <h5 class="card-title text-muted">There are currently no courses available.</h5>
-                    <p class="card-text text-muted">
-                        Check back later
-                    </p>
-                    <!-- You can add more styling or buttons as needed -->
-                </div>
-            </div>
+          <div class="text-center mt-5">
+                            <p class="text-muted">No courses are currently available, Please Check back later!</p>
+                                <img class="card-img-right example-card-img-responsive" src="{% static 'dist/img/no.jpg' %}" alt="Image" style="max-width: 240px;">
+
+                        </div> 
     {% endif %}
 {% endblock %}
 

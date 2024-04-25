@@ -51,18 +51,19 @@
     </div>
   </div>
 </div>
-
 <script>
   // Function to handle form submission
-  {% comment %} function handleSubmit() {
-    // Clear progress data from localStorage
-    localStorage.removeItem('examProgress');
-    localStorage.removeItem('timerValue'); // Remove timer value from localStorage
-  } {% endcomment %}
+  function handleSubmit() {
+    // Clear progress data from localStorage for the current user
+    const username = "{{ user.username }}";
+    localStorage.removeItem('examProgress_' + username);
+    localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
+  }
 
   var timerElement = document.getElementById('timer');
   var progressBar = document.getElementById('timerProgressBar');
-  var timerValue = localStorage.getItem('timerValue') ? parseInt(localStorage.getItem('timerValue')) : {{ exam.timer }} * 60;
+  var username = "{{ user.username }}";
+  var timerValue = localStorage.getItem('timerValue_' + username) ? parseInt(localStorage.getItem('timerValue_' + username)) : {{ exam.timer }} * 60;
 
   function updateTimer() {
     var minutes = Math.floor(timerValue / 60);
@@ -82,11 +83,11 @@
 
     if (timerValue === 0) {
       document.getElementById('examForm').submit();
-      localStorage.removeItem('examProgress');
-      localStorage.removeItem('timerValue');
+      localStorage.removeItem('examProgress_' + username);
+      localStorage.removeItem('timerValue_' + username);
     } else {
       timerValue--;
-      localStorage.setItem('timerValue', timerValue); // Store timer value in localStorage
+      localStorage.setItem('timerValue_' + username, timerValue); // Store timer value in localStorage
       setTimeout(updateTimer, 1000);
     }
 
@@ -110,12 +111,12 @@
     const progressData = {
       selectedAnswers: selectedAnswers
     };
-    localStorage.setItem('examProgress', JSON.stringify(progressData));
+    localStorage.setItem('examProgress_' + username, JSON.stringify(progressData));
   }
 
   // Load progress
   function loadProgress() {
-    const savedProgress = localStorage.getItem('examProgress');
+    const savedProgress = localStorage.getItem('examProgress_' + username);
     if (savedProgress) {
       const progressData = JSON.parse(savedProgress);
       for (const questionId in progressData.selectedAnswers) {

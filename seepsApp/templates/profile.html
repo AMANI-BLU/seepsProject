@@ -15,6 +15,9 @@
   {% elif user.is_staff and user.is_superuser %}
     {% include 'admin_template/aside.html' %}
     {% include 'admin_template/navbar.html' %}
+  {% elif user.is_instructor %}
+    {% include 'teacher_template/aside.html' %} 
+    {% include 'teacher_template/navbar.html' %} 
   {% elif user.is_student %}
     {% include 'student_template/navbar.html' %}
   {% endif %}
@@ -127,6 +130,8 @@
                     {{ user.department_name }}
                   {% elif user.is_student%}
                     {{ user.first_name }}
+                    {% elif user.is_instructor%}
+                    {{ user.first_name }}
                   {% elif user.is_staff and user.is_superuser %}
                     {{ user.username }}
                   {% endif %}
@@ -172,6 +177,8 @@
                                   <input type="text" class="form-control" id="inputName" name="username" value="{{ user.username }}" required>
                               {% elif user.is_student %}
                                   <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>
+                                {% elif user.is_instructor %}
+                                  <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>    
                               {% else %}
                                   <input type="text" class="form-control" id="inputName" name="department_name" value="{{ user.department_name }}" required>
                               {% endif %}
@@ -194,7 +201,7 @@
                     
                     <input type="file" id="profilePictureInput" name="profile_picture" style="display: none;" accept="image/*">
 
-                    {% if user.is_student %}
+                    {% if user.is_student or user.is_instructor%}
                     <div class="form-group row">
                         <label for="inputSex" class="col-sm-2 col-form-label text-muted">Sex</label>
                         <div class="col-sm-10">
@@ -211,7 +218,7 @@
                         </div>
                     </div>
                     {% endif %}
-                    {% if user.is_student or user.is_department %}
+                    {% if user.is_student or user.is_department or user.is_instructor%}
                         <div class="form-group row">
                             <label for="inputPhone" class="col-sm-2 col-form-label text-muted">Phone</label>
                             <div class="col-sm-10">

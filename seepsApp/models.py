@@ -8,13 +8,13 @@ class User(AbstractUser):
     is_admin = models.BooleanField('Is admin', default=False)
     is_department = models.BooleanField('Is department', default=False)
     is_student = models.BooleanField('Is student', default=False)
+    is_instructor = models.BooleanField('Is instructor', default=False)
     college = models.CharField(max_length=255, blank=True, null=True)
     department_name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True) 
     sex = models.CharField(max_length=10, choices=(('Male', 'Male'), ('Female', 'Female')),blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
- 
-   
+
   # Generate a UUID as a verification token
     
 # models.py

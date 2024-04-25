@@ -50,6 +50,14 @@ urlpatterns = [
                     path('edit_question/<int:question_id>/', edit_question, name='edit_question'),
                         path('exam-scores/', exam_scores_table, name='exam_scores_table'),
                             path('delete-report/<str:exam_name>/', delete_report, name='delete_report'),
+                            
+                            
+                                path('manage_instructors/', manage_instructors, name='manage_instructors'),
+                                path('add_instructor/', add_instructor, name='add_instructor'),
+                                path('delete_instructor/<str:username>/', delete_instructor, name='delete_instructor'),
+
+
+
 
 
 
@@ -82,6 +90,18 @@ urlpatterns = [
     path('tutorial/<int:course_id>/', tutorial_page, name='tutorial_page'),
     path('materials/', materials, name='materials'),
 
+
+   #teacher urls
+   path('teacher_home/', instructor_home, name='instructor_home'),
+   path('view_students/', view_students, name='view_students'),
+   path('exams/', view_exams, name='view_exams'),
+   path('view_courses_inst/', view_courses_inst, name='view_courses_inst'),
+
+
+   
+   
+   
+   
     #NoPage
     path('nopage/', NoPage, name='NoPage'),
 ]

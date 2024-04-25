@@ -486,6 +486,8 @@ class StudentRegistrationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+    
+    
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
@@ -574,3 +576,111 @@ class EditQuestionForm(forms.ModelForm):
         })
 EditChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, extra=0, can_delete=False)
 
+
+
+# Instructor Registration Form
+class InstructorRegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your full name"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your email"
+        })
+    )
+    sex_choices = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+    sex = forms.ChoiceField(
+        choices=sex_choices,
+        widget=forms.Select(attrs={
+            "class": "form-control"
+        })
+    )
+    phone = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your phone number"
+        })
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your password"
+        }),
+        required=False  # Set to False to avoid validation errors
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirm your password"
+        }),
+        required=False  # Set to False to avoid validation errors
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.department_name = kwargs.pop('department_name', None)
+        super(InstructorRegistrationForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'email', 'sex', 'phone', 'password1', 'password2')
+
+    def generate_username(self):
+        first_name = self.cleaned_data.get('first_name')
+        email = self.cleaned_data.get('email')
+        username = f"{first_name}_{email}".replace('@', '_').replace('.', '_')
+        return username
+
+        
+    def generate_password(self):
+        length = 12
+        characters = string.ascii_letters + string.digits
+        # Choose at most 2 special characters
+        special_characters = string.punctuation
+        if length > 2:
+            special_characters = ''.join(random.sample(special_characters, min(2, len(special_characters))))
+        password = ''.join(random.choice(characters) for _ in range(length - 2))  # Use 10 characters for letters and digits
+        password += special_characters  # Append the chosen special characters
+        password = ''.join(random.sample(password, len(password)))  # Shuffle the password
+        return password
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Email already exists")
+        return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        # Define the regular expression pattern
+        pattern = r'^(\+2519\d{8}|09\d{8}|07\d{8}|\+2517\d{8})$'
+        # Check if the phone matches the pattern
+        if not re.match(pattern, phone):
+            raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
+        return phone
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get('password1')
+        password2 = cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords do not match")
+        return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_instructor = True
+        user.username = self.generate_username()
+        user.department_name = self.department_name
+        password = self.generate_password()  # Generate a random password
+        user.set_password(password)  # Set the password
+        if commit:
+            user.save()
+        return user
+    

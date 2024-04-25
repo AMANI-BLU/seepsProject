@@ -1,5 +1,5 @@
 {% extends 'student_template/base.html' %}
-
+{% load static %}
 {% block title %}Student | View Exams{% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
     <div class="row mt-4">
         {% for exam, submitted_by_current_user in exams_with_submission %}
         <div class="col-md-6 mb-4">
-            <div class="card h-100 shadow">
+            <div class="card flex-row">
                 <div class="card-body">
                     <h5 class="card-title">{{ exam.name }}</h5>
                     <p class="card-text">{{ exam.description }}</p>
@@ -33,11 +33,12 @@
                         <button class="btn btn-info" disabled>Exam Already Taken</button>
                     {% else %}
                         <a href="{% url 'enter_exam_code' exam.id %}" class="btn btn-info">Take Exam</a>
-                    {% endif %}
+                    {% endif %}                    
+                    <br><br><small class="text-muted"><i class="fas fa-clock"></i> Time to complete: {{ exam.timer }} minutes</small>
+
                 </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <small class="text-muted"><i class="fas fa-clock"></i> Time to complete: {{ exam.timer }} minutes</small>
-                </div>
+                <!-- Image container aligned to the right -->
+                <img class="card-img-right example-card-img-responsive" src="{% static 'dist/img/exams.jpg' %}" alt="Image" style="max-width: 240px;">
             </div>
         </div>
         {% endfor %}
@@ -45,7 +46,9 @@
 
     {% if not exams_with_submission %}
     <div class="text-center mt-5">
-        <p class="text-muted">No exams are currently available. Check back later.</p>
+        <p class="text-muted">No exams are currently available, Please Check back later!</p>
+            <img class="card-img-right example-card-img-responsive" src="{% static 'dist/img/no.jpg' %}" alt="Image" style="max-width: 240px;">
+
     </div>
     {% endif %}
 </div>

@@ -140,12 +140,10 @@
                 </div>
             </div>
              {% else %}
-                        <!-- Display message when no tutorials are available -->
-                        <div class="card ">
-                            <div class="card-body text-center">
-                                <h5 class="card-title text-muted">There are currently no tutorials available for this course.</h5>
-                                <p class="card-text text-muted">Check back later</p>
-                            </div>
+                        <div class="text-center mt-5">
+                            <p class="text-muted">No tutorials are currently available, Please Check back later!</p>
+                                <img class="card-img-right example-card-img-responsive" src="{% static 'dist/img/no.jpg' %}" alt="Image" style="max-width: 240px;">
+
                         </div>
            {% endif %}
             <hr>    
@@ -265,18 +263,6 @@ function changeVideo(link) {
 <script src="{% static "plugins/datatables-buttons/js/buttons.print.min.js"%}"></script>
 <script src="{% static "plugins/datatables-buttons/js/buttons.colVis.min.js"%}"></script>
 </body>
-<footer class="footer mt-4 py-3 bg-dark">
-  <div class="container">
-    <span class="text-muted">Useful Links</span>
-    <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Home</a></li>
-      <li class="list-inline-item"><a href="#">Exam</a></li>
-      <li class="list-inline-item"><a href="#">Study Material</a></li>
-      <li class="list-inline-item"><a href="#">Feedback</a></li>
-    </ul>
-    <p class="text-center mb-0">&copy; 2024 Hu Isy Students</p>
-  </div>
-</footer>
 
 
 </html>
