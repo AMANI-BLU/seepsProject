@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Department | Dashboard{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    {% if messages %}
+                    {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'error' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'warning' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% elif message.tags == 'info' %}
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'info',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+
+                   <!-- Department Notifications - Second Card -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-bullhorn"></i> Notifications (Second Half)
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                {% for notification in notifications|slice:"{{ notifications|length//2 }}:" %}
+                                <div class="alert alert-info alert-dismissible">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- /.row -->
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+
+    <!-- AdminLTE JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+
+    {% include 'department_template/footer.html' %}
+</div>
+<!-- ./wrapper -->
+{% endblock %}
