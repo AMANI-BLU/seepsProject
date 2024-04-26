@@ -1,42 +1,36 @@
 {% load static %}
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <!-- Left navbar links -->
-      <ul class="navbar-nav">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
+            <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
         </li>
-         <li class="nav-item">
-           <div id="google_translate_element"></div>
+        <li class="nav-item">
+            <div id="google_translate_element"></div>
         </li>
-      </ul>
+    </ul>
 
-      <!-- Right navbar links -->
-      <ul class="navbar-nav ml-auto">
-        
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
 
-
-  <!-- Notification Dropdown -->
-    <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="fas fa-bell"></i>
-            <span class="badge badge-warning navbar-badge">3</span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-            <span class="dropdown-item dropdown-header">Notifications</span>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item">
-                <i class="fas fa-envelope mr-2"></i> New message
-                <span class="float-right text-muted text-sm">2 min</span>
+        <!-- Notification Dropdown -->
+        <li class="nav-item dropdown">
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="fas fa-bell"></i>
+                <span id="notification-badge" class="badge badge-warning navbar-badge"></span>
             </a>
-            <div class="dropdown-divider"></div>
-            <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-        </div>
-    </li>
-    <!-- End 
+            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <span class="dropdown-item dropdown-header">Notifications</span>
+                <div class="dropdown-divider"></div>
+                <div class="notification-list">
+                    <!-- Notification items will be dynamically added here -->
+                </div>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+            </div>
+        </li>
+        <!-- End Notification Dropdown -->
 
-
-         <!-- Dark/Light Mode Toggle Button -->
-      
         <!-- Dark/Light Mode Toggle Button -->
         <li class="nav-item">
             <a class="nav-link" href="#" id="darkModeToggle">
@@ -47,66 +41,54 @@
                 {% endif %}
             </a>
         </li>
-        
+
         <li class="nav-item">
-          <a class="nav-link" href="#" onclick="toggleFullScreen()">
-            <i class="fas fa-expand"></i>
-          </a>
+            <a class="nav-link" href="#" onclick="toggleFullScreen()">
+                <i class="fas fa-expand"></i>
+            </a>
         </li>
+
         <!-- User Dropdown -->
         <li class="nav-item dropdown">
-          <a class="nav-link" data-toggle="dropdown" href="#">
-            <i class="fas fa-user"></i>
-          </a>
-          <div class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
-            <a href="{% url "profile" %}" class="dropdown-item">
-              <i class="fas fa-user-circle"></i>&nbsp;&nbsp;&nbsp;Profile
+            <a class="nav-link" data-toggle="dropdown" href="#">
+                <i class="fas fa-user"></i>
             </a>
-            <a href="{% url "change_password" %}" class="dropdown-item">
-              <i class="fas fa-key"></i>&nbsp;&nbsp;&nbsp;Change Password
-            </a>
-            <div class="dropdown-divider"></div>
-           
-            {% comment %} <form action="{% url 'logout' %}" method="post"> {% endcomment %}
-                {% csrf_token %}
-             <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
-              <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
-             </a>
-
-               
-            {% comment %} </form> {% endcomment %}
-          </div>
+            <div class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
+                <a href="{% url "profile" %}" class="dropdown-item">
+                    <i class="fas fa-user-circle"></i>&nbsp;&nbsp;&nbsp;Profile
+                </a>
+                <a href="{% url "change_password" %}" class="dropdown-item">
+                    <i class="fas fa-key"></i>&nbsp;&nbsp;&nbsp;Change Password
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
+                    <i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
+                </a>
+            </div>
         </li>
         <!-- End User Dropdown -->
-       
-      </ul>
-    </nav>
+    </ul>
+</nav>
 
 <div class="modal fade" id="modal-primary">
-        <div class="modal-dialog">
-          <div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
             <div class="modal-header">
-                 <h5>Confirm to Logout</h5> 
-            </div> 
+                <h5>Confirm to Logout</h5>
+            </div>
             <div class="modal-body">
-              <h6>Are you sure want to logout?</h6>
+                <h6>Are you sure want to logout?</h6>
             </div>
             <div class="modal-footer pl-5">
-                  <a href="{% url 'logout' %}" class="btn btn-info">
-                     Yes
-                  </a>
-                  <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                <a href="{% url 'logout' %}" class="btn btn-info">Yes</a>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
             </div>
-          </div>
-          <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
-      </div>
-      <!-- /.modal -->
-
-   
-
-
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <!-- Dark/Light Mode Toggle Script -->
 <script>
@@ -135,25 +117,80 @@
     }
 </script>
 
-
-     <!-- Full screen -->
-    <script>
-      function toggleFullScreen() {
+<!-- Full screen -->
+<script>
+    function toggleFullScreen() {
         if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen();
+            document.documentElement.requestFullscreen();
         } else {
-          if (document.exitFullscreen) {
-            document.exitFullscreen();
-          }
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
         }
-      }
-    </script>
-    
+    }
+</script>
 
 <script type="text/javascript">
-function googleTranslateElementInit() {
-  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
-}
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+    }
 </script>
 
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<!-- JavaScript for updating notification count and messages -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Function to update notification count and messages
+        function updateNotificationCountAndMessages() {
+            $.ajax({
+                url: '/count_department/notifications/', // Endpoint URL to fetch notification count and messages
+                type: 'GET',
+                success: function (response) {
+                    $('#notification-badge').text(response.count); // Update notification count badge
+                    displayLatestNotifications(response.notifications); // Display latest notifications
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching notification count and messages:', error);
+                }
+            });
+        }
+
+        // Function to display latest notifications in dropdown menu
+        function displayLatestNotifications(notifications) {
+            var dropdownMenu = $('.notification-list');
+
+            // Remove old notifications
+            dropdownMenu.find('.dropdown-item').remove();
+
+            // Add new notifications
+            for (var i = 0; i < Math.min(notifications.length, 2); i++) {
+                var notification = notifications[i];
+                var listItem = $('<a>').addClass('dropdown-item').attr('href', '#');
+                listItem.append($('<i>').addClass('fas fa-envelope mr-2'));
+                // Check for modified or inserted text in the notification message
+                if (notification.message.includes('deleted by')) {
+                    notification.message = ' Modification made!';
+                } else if (notification.message.includes('added by')) {
+                    notification.message = ' Insertion made!';
+                }
+                 else if (notification.message.includes('updated by')) {
+                    notification.message = ' Modification made!';
+                }
+                listItem.append(notification.message);
+                // Display actual timestamp
+                listItem.append($('<span>').addClass('float-right text-muted text-sm').text(notification.timestamp));
+                dropdownMenu.append(listItem);
+            }
+        }
+
+        // Initial call to update notification count and messages
+        updateNotificationCountAndMessages();
+
+        // Periodically update notification count and messages (e.g., every 5 seconds)
+        setInterval(updateNotificationCountAndMessages, 5000); // Update every 5 seconds
+    });
+</script>
+

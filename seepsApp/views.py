@@ -1711,3 +1711,33 @@ def inst_update_resource(request, resource_id):
 
 ####################### /Instructor Views ########################
 
+
+
+#################### notification ###################
+
+
+from .models import Notification
+
+from django.http import JsonResponse
+
+def count_department_notifications(request):
+    # Fetch notifications for the department
+    department_notifications = Notification.objects.filter(department=request.user.username)
+    
+    # Fetch the notification count for the department
+    department_notifications_count = department_notifications.count()
+    
+    # Serialize the notifications
+    serialized_notifications = [{'message': notification.message} for notification in department_notifications]
+
+    return JsonResponse({'notifications': serialized_notifications, 'count': department_notifications_count})
+
+
+
+
+def department_notifications(request):
+    # Fetch notifications for the department
+    department_notifications = Notification.objects.filter(department=request.user.username)
+    return render(request, 'department_template/notifications.html', {'notifications': department_notifications})
+
+#################### notification ###################

@@ -130,3 +130,14 @@ class Resource(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Notification(models.Model):
+    message = models.CharField(max_length=255)
+    department = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    read = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.message

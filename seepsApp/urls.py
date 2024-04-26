@@ -129,8 +129,10 @@ urlpatterns = [
    path('inst_update_resource/<int:resource_id>/', inst_update_resource, name='inst_update_resource'),
         
 
-   
-   
+   #notifications
+   path('department/notifications/', department_notifications, name='department_notifications'),
+   path('count_department/notifications/', count_department_notifications, name='count_department_notifications'),
+
    
    
     #NoPage
