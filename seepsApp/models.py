@@ -15,10 +15,6 @@ class User(AbstractUser):
     sex = models.CharField(max_length=10, choices=(('Male', 'Male'), ('Female', 'Female')),blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
 
-  # Generate a UUID as a verification token
-    
-# models.py
-from django.db import models
 
 class Exam(models.Model):
     DIFFICULTY_CHOICES = [
@@ -57,8 +53,7 @@ class Attempt(models.Model):
     def __str__(self):
         return f"Attempt by {self.student.username} on {self.exam.name}"
     
-# models.py
-# models.py
+
 class Question(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     content = models.TextField()
@@ -78,7 +73,7 @@ class Choice(models.Model):
         return f"Choice for {self.question}"
 
 
-# models.py
+
 class Result(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
@@ -126,12 +121,12 @@ class Feedback(models.Model):
         return f'Feedback from {self.user.username} at {self.created_at}'
 
 
-from django.db import models
 
 class Resource(models.Model):
     file = models.FileField(upload_to='resources/')
     description = models.TextField()
     department_name = models.CharField(max_length=255, blank=True, null=True)
+    added_by = models.CharField(max_length=255, blank=True, null=True)  
 
     def __str__(self):
         return self.name

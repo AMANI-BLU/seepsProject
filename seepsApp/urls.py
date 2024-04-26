@@ -111,7 +111,7 @@ urlpatterns = [
    #teacher urls
    path('teacher_home/', instructor_home, name='instructor_home'),
    path('view_students/', view_students, name='view_students'),
-   path('exams/', view_exams, name='view_exams'),
+   path('inst_exams/', inst_view_exams, name='inst_view_exams'),
    path('view_courses_inst/', view_courses_inst, name='view_courses_inst'),
    path('inst_add_question/', inst_add_question, name='inst_add_question'),
    path('inst_manage_questions/', inst_manage_questions, name='inst_manage_questions'),

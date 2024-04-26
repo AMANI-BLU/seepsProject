@@ -382,10 +382,6 @@ class DepartmentRegistrationForm(UserCreationForm):
         return ''.join(random.choice(characters) for i in range(length))
 
 
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import User
-
 
 class StudentRegistrationForm(UserCreationForm):
     first_name = forms.CharField(

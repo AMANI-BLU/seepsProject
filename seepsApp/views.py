@@ -854,8 +854,6 @@ def student_home(request):
     
     return render(request, 'student_template/student_home.html', {'first_name': first_name, 'courses': courses})
 
-from django.db.models import Count
-from .models import Attempt
 @login_required(login_url='login_view')
 @user_passes_test(lambda user: user.is_student, login_url='NoPage')
 def view_exams(request):
@@ -1414,7 +1412,7 @@ def view_students(request):
 
 @login_required(login_url='login_view')
 @user_passes_test(is_instructor, login_url='NoPage')
-def view_exams(request):
+def inst_view_exams(request):
     # Get the department of the logged-in teacher
     teacher_department = request.user.department_name  # Assuming department is a ForeignKey field on the teacher model
 
@@ -1605,9 +1603,10 @@ def inst_delete_question(request, question_id):
 def inst_manage_resources(request):
     # Get the department username of the logged-in user
     department_username = request.user.department_name
+    added_by_username = request.user.username
     
-    # Fetch all resources associated with the department username
-    resources = Resource.objects.filter(department_name=department_username)
+    # Fetch all resources associated with the department username and added by the logged-in user
+    resources = Resource.objects.filter(department_name=department_username, added_by=added_by_username)
     
     for resource in resources:
         resource.filename = basename(resource.file.name)
@@ -1617,20 +1616,19 @@ def inst_manage_resources(request):
 
 
 
-
 def inst_add_resource(request):
     if request.method == 'POST':
         form = ResourceForm(request.POST, request.FILES)
         if form.is_valid():
             resource = form.save(commit=False)
             resource.department_name = request.user.department_name  # Assuming department_name is associated with the user
+            resource.added_by = request.user.username  # Set the added_by field to the username of the logged-in user
             resource.save()
             messages.success(request, 'Resource added successfully!')
             return redirect('inst_manage_resources')
     else:
         form = ResourceForm()
     return render(request, 'teacher_template/add_resource.html', {'form': form})
-
 
 
 def inst_add_tutorial(request):
