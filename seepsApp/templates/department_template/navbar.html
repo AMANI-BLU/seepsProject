@@ -167,7 +167,7 @@
                     $('.notification-list').empty(); // Clear existing notifications
                     for (var i = 0; i < response.notifications.length && i < 2; i++) {
                         var notification = response.notifications[i];
-                        var listItem = $('<a>').addClass('dropdown-item').attr('href', '#');
+                        var listItem = $('<a>').addClass('dropdown-item').attr('href', '{% url 'department_notifications' %}');
                         listItem.append($('<i>').addClass('fas fa-envelope mr-2'));
                         listItem.append(notification.message);
                         listItem.append($('<span>').addClass('float-right text-muted text-sm').text(calculateTimeDifference(notification.timestamp)));

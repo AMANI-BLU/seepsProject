@@ -13,7 +13,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-
+from django.utils.html import mark_safe
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 
@@ -1428,22 +1428,27 @@ def inst_add_question(request):
     success_msg = None
     error_msg = None
 
-    department_username = request.user.department_name
 
     if request.method == 'POST':
-        form = QuestionForm(request.POST, department_username=department_username)
+        form = QuestionForm(request.POST, department_username=request.user.department_name)
         formset = ChoiceFormSet(request.POST, instance=form.instance)
         if form.is_valid() and formset.is_valid():
-            question = form.save()
+            question = form.save(commit=False)
+            question.added_by = request.user.username  # Store the username
+            question.save()
             formset.instance = question
             formset.save()
+            
+            # Create notification for the department
+            department_name = request.user.department_name
+            content = mark_safe(question.content) 
+            message = f"Instructor {request.user.first_name} added a new question: {content}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Questions added successfully!')
         else:
-            # error_msg = 'Form is not valid'
             print("Form errors outside if:", form.errors, formset.errors)
     else:
-        form = QuestionForm(department_username=department_username)
-        # Determine the number of extra forms based on the number of additional choice fields submitted
+        form = QuestionForm(department_username=request.user.department_name)
         num_extra = len(request.POST.getlist('form-0-text')) - 1 if request.POST.get('form-0-text') else 2
         formset = ChoiceFormSet(instance=Question(), extra=num_extra)
 
@@ -1460,7 +1465,8 @@ def inst_add_question(request):
 @user_passes_test(is_instructor, login_url='NoPage')
 def inst_manage_questions(request):
     department_username = request.user.department_name
-    questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
+    added_by_username = request.user.username
+    questions = Question.objects.filter(exam__department_name=department_username,added_by=added_by_username).select_related('exam').all()
     return render(request, 'teacher_template/manage_questions.html', {'questions': questions})
 
 
@@ -1499,6 +1505,8 @@ def inst_upload_pdf_view(request):
     
     return render(request, 'teacher_template/import_question.html', {'form': form})
 
+
+from django.utils.html import mark_safe
 
 @login_required(login_url='login_view')
 @user_passes_test(is_instructor, login_url='NoPage')
@@ -1540,11 +1548,18 @@ def inst_preview_questions_view(request):
 
         # If the user confirms, save questions and choices to the database
         for qwc in questions_with_choices:
-            question = Question.objects.create(exam=selected_exam, content=qwc['question'])
+            question = Question.objects.create(exam=selected_exam, content=qwc['question'], added_by=request.user.username)
             for choice_text in qwc['choices']:
                 # Check if this choice is selected
                 is_correct = choice_text in selected_choices.values()
                 Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
+                
+            # Create notification for the department for each added question
+            department_name = request.user.department_name
+            exam_name = selected_exam.name
+            content = mark_safe(question.content) 
+            message = f"Instructor {request.user.first_name} added a new question to the exam {exam_name}: {content}"
+            Notification.objects.create(message=message, department=department_name)
         
         # Clear session data
         del request.session['questions_with_choices']
@@ -1574,6 +1589,10 @@ def inst_edit_question(request, question_id):
         if form.is_valid() and formset.is_valid():
             form.save()
             formset.save()
+            
+            department_name = request.user.department_name
+            message = f"Instructor {request.user.first_name} editted question: {question.content}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Questions Updated successfully!')
             return redirect('inst_manage_questions')
 
@@ -1585,6 +1604,10 @@ def inst_delete_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if request.method == 'POST':
         question.delete()
+         
+        department_name = request.user.department_name
+        message = f"Instructor {request.user.first_name} deleted question: {question.content}"
+        Notification.objects.create(message=message, department=department_name)
         messages.success(request, 'Question deleted successfully!')
         return redirect('inst_manage_questions')  # Correct URL pattern name here
     
@@ -1641,7 +1664,7 @@ def inst_add_tutorial(request):
 
             # Create notification for the department
             department_name = request.user.department_name
-            message = f"Instructor {request.user.first_name} added a new tutorial: {tutorial.title}"
+            message = f"Instructor {request.user.first_name} added a new tutorial with title: {tutorial.title}"
             Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Tutorial Added successfully!')
             return redirect('inst_add_tutorial')  # Redirect to the same page after adding a tutorial
@@ -1672,6 +1695,10 @@ def inst_delete_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
     if request.method == 'POST':
         tutorial.delete()
+        # Create notification for the department
+        department_name = request.user.department_name
+        message = f"Instructor {request.user.first_name} deleted tutorial with title: {tutorial.title}"
+        Notification.objects.create(message=message, department=department_name)
         messages.success(request, 'Tutorial deleted successfully!')
     return redirect('inst_manage_tutorials')
 
@@ -1683,6 +1710,9 @@ def inst_update_tutorial(request, tutorial_id):
         form = TutorialForm(request.POST, instance=tutorial)
         if form.is_valid():
             form.save()
+            department_name = request.user.department_name
+            message = f"Instructor {request.user.first_name} updated tutorial with title: {tutorial.title}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Tutorial updated successfully!')
             return redirect('inst_manage_tutorials')
     else:
@@ -1699,6 +1729,9 @@ def inst_delete_resource(request, resource_id):
         try:
             resource = Resource.objects.get(pk=resource_id)
             resource.delete()
+            department_name = request.user.department_name
+            message = f"Instructor {request.user.first_name} deleted resource with description: {resource.description}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Resource deleted successfully.')
         except Resource.DoesNotExist:
             messages.error(request, 'Resource does not exist.')
@@ -1718,12 +1751,18 @@ def inst_update_resource(request, resource_id):
         
         # Add more fields as needed
         resource.save()
+        
+        department_name = request.user.department_name
+        message = f"Instructor {request.user.first_name} updated resource with description: {resource.description}"
+        Notification.objects.create(message=message, department=department_name)
         messages.success(request, 'Resource updated successfully!')
         return redirect('inst_manage_resources')  # Redirect to the manage_resources page after successful update
     else:
         return redirect('inst_manage_resources')   # Redirect to the manage_resources page if the request method is not POSTect('manage_resources')   # Redirect to the manage_resources page if the request method is not POST
 
 ####################### /Instructor Views ########################
+
+
 
 
 

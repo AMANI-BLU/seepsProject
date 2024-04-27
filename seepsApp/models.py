@@ -58,6 +58,7 @@ class Question(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
     content = models.TextField()
     answer_description = models.TextField(blank=True, null=True)
+    added_by = models.CharField(max_length=255, blank=True, null=True)
 
   
     def __str__(self):
