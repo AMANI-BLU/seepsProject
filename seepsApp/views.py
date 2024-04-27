@@ -7,8 +7,15 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from .models import User
 import string
 import os
+from django.db.models import Count
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
 
-
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,11 +57,11 @@ def login_view(request):
                 msg = 'Invalid email or password. Please try again.'
 
     return render(request, 'login.html', {'form': form, 'msg': msg})
-#/Login View/ 
+
+######################### /Login View ############################## 
 
 
 
-from django.db.models import Count
 
 #Admin Home
 @login_required(login_url='login_view')
@@ -94,29 +101,8 @@ def feedback(request):
      student_feedback = Feedback.objects.all()
      return render(request, 'admin_template/feedback.html',{'student_feedback':student_feedback})
 
-# def admin_register(request):
-#     msg = None
-#     if request.method == 'POST':
-#         form = AdminRegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save(commit=False)
-#             user.is_admin = True  # Set is_admin to True
-#             user.save()
-#             msg = 'Admin user created'
-#             return redirect('login_view')
-#         else:
-#             msg = 'Form is not valid'
-#     else:
-#         form = AdminRegistrationForm()
-#     return render(request, 'register_admin.html', {'form': form, 'msg': msg})
-# Admin Add Department Form
-# File: views.py
 
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
-from django.conf import settings
-from django.contrib.auth.hashers import make_password
+
 
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
@@ -286,8 +272,6 @@ def fetch_exam_scores_data(department_name):
 
 
 
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
@@ -1439,6 +1423,7 @@ def view_courses_inst(request):
 
 
 @login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_add_question(request):
     success_msg = None
     error_msg = None
@@ -1471,7 +1456,8 @@ def inst_add_question(request):
     
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_manage_questions(request):
     department_username = request.user.department_name
     questions = Question.objects.filter(exam__department_name=department_username).select_related('exam').all()
@@ -1482,7 +1468,8 @@ def inst_manage_questions(request):
 
 # from file
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_upload_pdf_view(request):
     questions_with_choices = None
 
@@ -1512,6 +1499,9 @@ def inst_upload_pdf_view(request):
     
     return render(request, 'teacher_template/import_question.html', {'form': form})
 
+
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_preview_questions_view(request):
     questions_with_choices = request.session.get('questions_with_choices')
     selected_exam_id = request.session.get('selected_exam')
@@ -1569,7 +1559,8 @@ def inst_preview_questions_view(request):
     return render(request, 'teacher_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_edit_question(request, question_id):
     question = get_object_or_404(Question, id=question_id)
     
@@ -1588,7 +1579,8 @@ def inst_edit_question(request, question_id):
 
     return render(request, 'teacher_template/edit_question.html', {'form': form, 'formset': formset, 'question': question})
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_delete_question(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     if request.method == 'POST':
@@ -1599,7 +1591,8 @@ def inst_delete_question(request, question_id):
     return redirect('inst_manage_questions')  # Correct URL pattern name here
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_manage_resources(request):
     # Get the department username of the logged-in user
     department_username = request.user.department_name
@@ -1615,7 +1608,8 @@ def inst_manage_resources(request):
     return render(request, 'teacher_template/manage_resources.html', {'resources': resources})
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_add_resource(request):
     if request.method == 'POST':
         form = ResourceForm(request.POST, request.FILES)
@@ -1635,8 +1629,8 @@ def inst_add_resource(request):
         form = ResourceForm()
     return render(request, 'teacher_template/add_resource.html', {'form': form})
 
-from .models import Tutorial, Notification
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_add_tutorial(request):
     if request.method == 'POST':
         form = TutorialForm(request.POST)
@@ -1662,7 +1656,8 @@ def inst_add_tutorial(request):
     })
 
  
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_manage_tutorials(request):
     department_name = request.user.department_name
     added_by_username = request.user.username
@@ -1671,7 +1666,8 @@ def inst_manage_tutorials(request):
     return render(request, 'teacher_template/manage_tutorials.html', {'tutorials': tutorials, 'courses': courses})
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_delete_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
     if request.method == 'POST':
@@ -1679,7 +1675,8 @@ def inst_delete_tutorial(request, tutorial_id):
         messages.success(request, 'Tutorial deleted successfully!')
     return redirect('inst_manage_tutorials')
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_update_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
     if request.method == 'POST':
@@ -1695,7 +1692,8 @@ def inst_update_tutorial(request, tutorial_id):
     return render(request, 'teacher_template/update_tutorial.html', {'form': form, 'courses': courses})
 
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_delete_resource(request, resource_id):
     if request.method == 'POST':
         try:
@@ -1706,7 +1704,8 @@ def inst_delete_resource(request, resource_id):
             messages.error(request, 'Resource does not exist.')
     return redirect('inst_manage_resources')
 
-
+@login_required(login_url='login_view')
+@user_passes_test(is_instructor, login_url='NoPage')
 def inst_update_resource(request, resource_id):
     resource = get_object_or_404(Resource, pk=resource_id)
     if request.method == 'POST':
@@ -1728,22 +1727,24 @@ def inst_update_resource(request, resource_id):
 
 
 
-#################### notification ###################
+#################### notification Views ###################
 
 
 from django.http import JsonResponse
-import json
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def count_department_notifications(request):
-    # Fetch notifications for the department and count them
+    # Fetch unread notifications for the department and count them
     department_name = request.user.username
-    department_notifications = Notification.objects.filter(department=department_name)
-    department_notifications_count = department_notifications.count()
+    unread_notifications_count = Notification.objects.filter(department=department_name, read=False).count()
 
-    return JsonResponse({'count': department_notifications_count})
-import json
-from django.http import JsonResponse
-from .models import Notification
+    return JsonResponse({'count': unread_notifications_count})
 
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def latest_department_notifications(request):
     department_name = request.user.username
     latest_notifications = Notification.objects.filter(department=department_name).order_by('-timestamp')[:2]
@@ -1759,10 +1760,45 @@ def latest_department_notifications(request):
     return JsonResponse({'notifications': serialized_notifications})
 
 
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
 def department_notifications(request):
-    # Fetch notifications for the department
-    department_notifications = Notification.objects.filter(department=request.user.username)
-    return render(request, 'department_template/notifications.html', {'notifications': department_notifications})
+    # Fetch unread notifications for the department
+    unread_notifications = Notification.objects.filter(department=request.user.username, read=False)
+
+    # Fetch read notifications for the department
+    read_notifications = Notification.objects.filter(department=request.user.username, read=True)
+
+    return render(request, 'department_template/notifications.html', {
+        'unread_notifications': unread_notifications,
+        'read_notifications': read_notifications,
+    })
+
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def update_notification_status(request, notification_id):
+    if request.method == 'POST':
+        notification = get_object_or_404(Notification, id=notification_id)
+        status = request.POST.get('status')
+
+        if status == 'read':
+            # Mark the notification as read
+            notification.read = True
+            notification.save()
+        elif status == 'unread':
+            # Mark the notification as unread
+            notification.read = False
+            notification.save()
+        elif status == 'delete':
+            # Delete the notification
+            notification.delete()
+            messages.success(request,'Notification deleted successfully!')
+            return redirect('department_notifications')
+
+    return redirect('department_notifications')
 
 
 

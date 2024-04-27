@@ -78,7 +78,7 @@
             <div class="container-fluid">
                 <div class="row">
 
-                  <!-- Department Notifications - Second Card -->
+<!-- Department Notifications - Second Card -->
 <div class="col-md-6">
     <div class="card">
         <div class="card-header">
@@ -87,7 +87,7 @@
             </h3>
         </div>
         <div class="card-body">
-            {% for notification in notifications|slice:"{{ notifications|length//2 }}:" %}
+            {% for notification in unread_notifications %}
             <div class="alert alert-info">
                 <button type="button" class="btn btn-link dropdown-toggle text-white pt-0 float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <!-- Three dots icon -->
@@ -95,8 +95,11 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <!-- Dropdown menu items with icons -->
-                    <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-check"></i> Mark as Read</a>
-                    <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-trash-alt"></i> Delete</a>
+                    <form action="{% url 'update_notification_status' notification.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="dropdown-item text-dark" type="submit" name="status" value="read"><i class="fas fa-check"></i> Mark as Read</button>
+                        <button class="dropdown-item text-dark" type="submit" name="status" value="delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </form>
                 </div>
                 <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
             </div>
@@ -105,32 +108,36 @@
     </div>
 </div>
 
-                            <!-- Department Notifications - Third Card -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-bullhorn"></i> Read Notifications
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        {% for notification in read_notifications %}
-                        <div class="alert alert-info alert-dismissible">
-                            <button type="button" class="btn btn-link dropdown-toggle text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <!-- Three dots icon -->
-                                <i class="fas fa-ellipsis-h"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right">
-                                <!-- Dropdown menu items with icons -->
-                                <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-check"></i> Mark as Unread</a>
-                                <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-trash-alt"></i> Delete</a>
-                            </div>
-                            <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
-                        </div>
-                        {% endfor %}
-                    </div>
+<!-- Department Notifications - Third Card -->
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-bullhorn"></i> Read Notifications
+            </h3>
+        </div>
+        <div class="card-body">
+            {% for notification in read_notifications %}
+            <div class="alert alert-secondary">
+                <button type="button" class="btn btn-link dropdown-toggle text-white pt-0 float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <!-- Three dots icon -->
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <!-- Dropdown menu items with icons -->
+                    <form action="{% url 'update_notification_status' notification.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="dropdown-item text-dark" type="submit" name="status" value="unread"><i class="fas fa-bell"></i> Mark as Unread</button>
+                        <button class="dropdown-item text-dark" type="submit" name="status" value="delete"><i class="fas fa-trash-alt"></i> Delete</button>
+                    </form>
                 </div>
+                <h5><i class="icon fas fa-check-circle"></i> {{ notification.message }}</h5>
             </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
 
                 <!-- /.row -->
             </div>
