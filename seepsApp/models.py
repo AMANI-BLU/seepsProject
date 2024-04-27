@@ -103,6 +103,7 @@ class Tutorial(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     tutorial_url = models.CharField(max_length=100)  # New field for tutorial URL
+    added_by = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -129,13 +130,13 @@ class Resource(models.Model):
     added_by = models.CharField(max_length=255, blank=True, null=True)  
 
     def __str__(self):
-        return self.name
+        return self.description
 
 
 class Notification(models.Model):
     message = models.CharField(max_length=255)
     department = models.CharField(max_length=100)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     read = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 

@@ -13,23 +13,23 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
 
-        <!-- Notification Dropdown -->
-        <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-                <i class="fas fa-bell"></i>
-                <span id="notification-badge" class="badge badge-warning navbar-badge"></span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                <span class="dropdown-item dropdown-header">Notifications</span>
-                <div class="dropdown-divider"></div>
-                <div class="notification-list">
-                    <!-- Notification items will be dynamically added here -->
+                <!-- Notification Dropdown -->
+            <li class="nav-item dropdown">
+                <a class="nav-link" data-toggle="dropdown" href="#">
+                    <i class="fas fa-bell"></i>
+                    <span id="notification-badge" class="badge badge-warning navbar-badge"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                    <span class="dropdown-item dropdown-header">Notifications</span>
+                    <div class="dropdown-divider"></div>
+                    <div class="notification-list">
+                        <!-- Notification items will be dynamically added here -->
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
                 </div>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-            </div>
-        </li>
-        <!-- End Notification Dropdown -->
+            </li>
+            <!-- End Notification Dropdown -->
 
         <!-- Dark/Light Mode Toggle Button -->
         <li class="nav-item">
@@ -140,57 +140,27 @@
 
 <!-- JavaScript for updating notification count and messages -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
 <script>
     $(document).ready(function () {
-        // Function to update notification count and messages
-        function updateNotificationCountAndMessages() {
+        // Function to update notification count
+        function updateNotificationCount() {
             $.ajax({
-                url: '/count_department/notifications/', // Endpoint URL to fetch notification count and messages
+                url: '/count_department/notifications/', // URL to fetch notification count
                 type: 'GET',
                 success: function (response) {
-                    $('#notification-badge').text(response.count); // Update notification count badge
-                    displayLatestNotifications(response.notifications); // Display latest notifications
+                    console.log(response); // Log the response to the console
+                    $('#notification-badge').text(response.count); // Update notification count
                 },
                 error: function (xhr, status, error) {
-                    console.error('Error fetching notification count and messages:', error);
+                    console.error('Error fetching notification count:', error);
                 }
             });
         }
 
-        // Function to display latest notifications in dropdown menu
-        function displayLatestNotifications(notifications) {
-            var dropdownMenu = $('.notification-list');
+        // Initial call to update notification count
+        updateNotificationCount();
 
-            // Remove old notifications
-            dropdownMenu.find('.dropdown-item').remove();
-
-            // Add new notifications
-            for (var i = 0; i < Math.min(notifications.length, 2); i++) {
-                var notification = notifications[i];
-                var listItem = $('<a>').addClass('dropdown-item').attr('href', '#');
-                listItem.append($('<i>').addClass('fas fa-envelope mr-2'));
-                // Check for modified or inserted text in the notification message
-                if (notification.message.includes('deleted by')) {
-                    notification.message = ' Modification made!';
-                } else if (notification.message.includes('added by')) {
-                    notification.message = ' Insertion made!';
-                }
-                 else if (notification.message.includes('updated by')) {
-                    notification.message = ' Modification made!';
-                }
-                listItem.append(notification.message);
-                // Display actual timestamp
-                listItem.append($('<span>').addClass('float-right text-muted text-sm').text(notification.timestamp));
-                dropdownMenu.append(listItem);
-            }
-        }
-
-        // Initial call to update notification count and messages
-        updateNotificationCountAndMessages();
-
-        // Periodically update notification count and messages (e.g., every 5 seconds)
-        setInterval(updateNotificationCountAndMessages, 5000); // Update every 5 seconds
+        // Periodically update notification count (e.g., every 5 seconds)
+        setInterval(updateNotificationCount, 5000); // Update every 5 seconds
     });
 </script>
-

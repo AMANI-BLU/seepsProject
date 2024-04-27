@@ -1624,18 +1624,31 @@ def inst_add_resource(request):
             resource.department_name = request.user.department_name  # Assuming department_name is associated with the user
             resource.added_by = request.user.username  # Set the added_by field to the username of the logged-in user
             resource.save()
+            
+            # Create notification for the department
+            department_name = request.user.department_name
+            message = f"Instructor {request.user.first_name} added a new resource with description: {resource.description}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Resource added successfully!')
             return redirect('inst_manage_resources')
     else:
         form = ResourceForm()
     return render(request, 'teacher_template/add_resource.html', {'form': form})
 
+from .models import Tutorial, Notification
 
 def inst_add_tutorial(request):
     if request.method == 'POST':
         form = TutorialForm(request.POST)
         if form.is_valid():
-            form.save()
+            tutorial = form.save(commit=False)
+            tutorial.added_by = request.user.username
+            tutorial.save()
+
+            # Create notification for the department
+            department_name = request.user.department_name
+            message = f"Instructor {request.user.first_name} added a new tutorial: {tutorial.title}"
+            Notification.objects.create(message=message, department=department_name)
             messages.success(request, 'Tutorial Added successfully!')
             return redirect('inst_add_tutorial')  # Redirect to the same page after adding a tutorial
     else:
@@ -1647,12 +1660,14 @@ def inst_add_tutorial(request):
     return render(request, 'teacher_template/add_tutorial.html', {
         'form': form,
     })
+
  
 
 def inst_manage_tutorials(request):
     department_name = request.user.department_name
+    added_by_username = request.user.username
     courses = Course.objects.filter(department_name=department_name)
-    tutorials = Tutorial.objects.filter(course__in=courses)
+    tutorials = Tutorial.objects.filter(course__in=courses,added_by=added_by_username)
     return render(request, 'teacher_template/manage_tutorials.html', {'tutorials': tutorials, 'courses': courses})
 
 
@@ -1716,28 +1731,19 @@ def inst_update_resource(request, resource_id):
 #################### notification ###################
 
 
-from .models import Notification
-
 from django.http import JsonResponse
 
 def count_department_notifications(request):
-    # Fetch notifications for the department
-    department_notifications = Notification.objects.filter(department=request.user.username)
-    
-    # Fetch the notification count for the department
+    # Fetch notifications for the department and count them
+    department_name = request.user.username
+    department_notifications = Notification.objects.filter(department=department_name)
     department_notifications_count = department_notifications.count()
-    
-    # Serialize the notifications
-    serialized_notifications = [{'message': notification.message} for notification in department_notifications]
 
-    return JsonResponse({'notifications': serialized_notifications, 'count': department_notifications_count})
-
-
-
+    return JsonResponse({'count': department_notifications_count})
 
 def department_notifications(request):
     # Fetch notifications for the department
     department_notifications = Notification.objects.filter(department=request.user.username)
-    return render(request, 'department_template/notifications.html', {'notifications': department_notifications})
+    return render(request, 'department_template/not.html', {'notifications': department_notifications})
 
 #################### notification ###################
