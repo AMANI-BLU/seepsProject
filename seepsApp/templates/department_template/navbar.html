@@ -185,34 +185,35 @@
             window.location.href = "{% url 'department_notifications' %}"; // Redirect to notifications page
         });
 
-        // Function to calculate time difference between current time and notification timestamp
-        function calculateTimeDifference(timestamp) {
-            var currentTime = new Date();
-            var notificationTime = new Date(timestamp);
-            var timeDifferenceInSeconds = Math.floor((currentTime - notificationTime) / 1000);
+     function calculateTimeDifference(timestamp) {
+    var currentTime = new Date();
+    var notificationTime = new Date(timestamp);
+    var timeDifferenceInSeconds = Math.floor((currentTime - notificationTime) / 1000);
+  
+    var intervals = {
+        year: 31536000,
+        month: 2592000,
+        day: 86400,
+        hour: 3600,
+        minute: 60,
+        second: 1
+    };
 
-            var intervals = {
-                year: 31536000,
-                month: 2592000,
-                week: 604800,
-                day: 86400,
-                hour: 3600,
-                minute: 60,
-                second: 1
-            };
+    var timeDifference = '';
+    var count = 0;
 
-            var timeDifference = '';
-
-            for (var key in intervals) {
-                var interval = Math.floor(timeDifferenceInSeconds / intervals[key]);
-                if (interval > 0) {
-                    timeDifference += interval + ' ' + key + (interval === 1 ? ' ago' : 's ago');
-                    break;
-                }
-            }
-
-            return timeDifference;
+    for (var key in intervals) {
+        var interval = Math.floor(timeDifferenceInSeconds / intervals[key]);
+        if (interval > 0 && count < 2) {
+            timeDifference += interval + ' ' + key + (interval === 1 ? '' : 's') + ' ';
+            count++;
+            timeDifferenceInSeconds -= interval * intervals[key];
         }
+    }
+
+    return timeDifference.trim(); // Trim any trailing spaces
+}
+
 
         // Initial call to update notification count and display latest notifications
         updateNotificationCount();
@@ -225,4 +226,3 @@
         }, 5000); // Update every 5 seconds
     });
 </script>
-

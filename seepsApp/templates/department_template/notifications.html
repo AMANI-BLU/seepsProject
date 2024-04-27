@@ -78,26 +78,59 @@
             <div class="container-fluid">
                 <div class="row">
 
-                   <!-- Department Notifications - Second Card -->
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-bullhorn"></i> Notifications (Second Half)
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                {% for notification in notifications|slice:"{{ notifications|length//2 }}:" %}
-                                <div class="alert alert-info alert-dismissible">
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
+                  <!-- Department Notifications - Second Card -->
+<div class="col-md-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-bullhorn"></i> Unread Notifications
+            </h3>
+        </div>
+        <div class="card-body">
+            {% for notification in notifications|slice:"{{ notifications|length//2 }}:" %}
+            <div class="alert alert-info">
+                <button type="button" class="btn btn-link dropdown-toggle text-white pt-0 float-right" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <!-- Three dots icon -->
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <!-- Dropdown menu items with icons -->
+                    <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-check"></i> Mark as Read</a>
+                    <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-trash-alt"></i> Delete</a>
+                </div>
+                <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+                            <!-- Department Notifications - Third Card -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-bullhorn"></i> Read Notifications
+                        </h3>
                     </div>
+                    <div class="card-body">
+                        {% for notification in read_notifications %}
+                        <div class="alert alert-info alert-dismissible">
+                            <button type="button" class="btn btn-link dropdown-toggle text-white" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <!-- Three dots icon -->
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <!-- Dropdown menu items with icons -->
+                                <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-check"></i> Mark as Unread</a>
+                                <a class="dropdown-item text-dark"  style="text-decoration: none;" href="#"><i class="fas fa-trash-alt"></i> Delete</a>
+                            </div>
+                            <h5><i class="icon fas fa-bell"></i> {{ notification.message }}</h5>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
 
                 <!-- /.row -->
             </div>

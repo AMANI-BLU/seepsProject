@@ -1762,6 +1762,8 @@ def latest_department_notifications(request):
 def department_notifications(request):
     # Fetch notifications for the department
     department_notifications = Notification.objects.filter(department=request.user.username)
-    return render(request, 'department_template/not.html', {'notifications': department_notifications})
+    return render(request, 'department_template/notifications.html', {'notifications': department_notifications})
+
+
 
 #################### notification ###################
