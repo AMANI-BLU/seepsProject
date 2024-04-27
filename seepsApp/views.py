@@ -1732,7 +1732,7 @@ def inst_update_resource(request, resource_id):
 
 
 from django.http import JsonResponse
-
+import json
 def count_department_notifications(request):
     # Fetch notifications for the department and count them
     department_name = request.user.username
@@ -1740,6 +1740,24 @@ def count_department_notifications(request):
     department_notifications_count = department_notifications.count()
 
     return JsonResponse({'count': department_notifications_count})
+import json
+from django.http import JsonResponse
+from .models import Notification
+
+def latest_department_notifications(request):
+    department_name = request.user.username
+    latest_notifications = Notification.objects.filter(department=department_name).order_by('-timestamp')[:2]
+    
+    serialized_notifications = []
+    for notification in latest_notifications:
+        truncated_message = notification.message[:30] + '...' if len(notification.message) > 30 else notification.message
+        serialized_notifications.append({
+            'message': truncated_message,
+            'timestamp': notification.timestamp.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp as string
+        })
+    
+    return JsonResponse({'notifications': serialized_notifications})
+
 
 def department_notifications(request):
     # Fetch notifications for the department

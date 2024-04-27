@@ -132,6 +132,7 @@ urlpatterns = [
    #notifications
    path('department/notifications/', department_notifications, name='department_notifications'),
    path('count_department/notifications/', count_department_notifications, name='count_department_notifications'),
+   path('latest_department_notifications/', latest_department_notifications, name='latest_department_notifications'),
 
    
    

@@ -26,7 +26,7 @@
                         <!-- Notification items will be dynamically added here -->
                     </div>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+                    <a href="#" id="see-all-notifications" class="dropdown-item dropdown-footer">See All Notifications</a>
                 </div>
             </li>
             <!-- End Notification Dropdown -->
@@ -140,6 +140,8 @@
 
 <!-- JavaScript for updating notification count and messages -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!-- JavaScript for updating notification count and messages -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
         // Function to update notification count
@@ -148,7 +150,6 @@
                 url: '/count_department/notifications/', // URL to fetch notification count
                 type: 'GET',
                 success: function (response) {
-                    console.log(response); // Log the response to the console
                     $('#notification-badge').text(response.count); // Update notification count
                 },
                 error: function (xhr, status, error) {
@@ -157,10 +158,71 @@
             });
         }
 
-        // Initial call to update notification count
-        updateNotificationCount();
+        // Function to fetch and display latest notifications
+        function displayLatestNotifications() {
+            $.ajax({
+                url: '/latest_department_notifications/', // URL to fetch latest notifications
+                type: 'GET',
+                success: function (response) {
+                    $('.notification-list').empty(); // Clear existing notifications
+                    for (var i = 0; i < response.notifications.length && i < 2; i++) {
+                        var notification = response.notifications[i];
+                        var listItem = $('<a>').addClass('dropdown-item').attr('href', '#');
+                        listItem.append($('<i>').addClass('fas fa-envelope mr-2'));
+                        listItem.append(notification.message);
+                        listItem.append($('<span>').addClass('float-right text-muted text-sm').text(calculateTimeDifference(notification.timestamp)));
+                        $('.notification-list').append(listItem); // Append notification to dropdown menu
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching latest notifications:', error);
+                }
+            });
+        }
 
-        // Periodically update notification count (e.g., every 5 seconds)
-        setInterval(updateNotificationCount, 5000); // Update every 5 seconds
+        // Function to handle "See All Notifications" click event
+        $('#see-all-notifications').click(function () {
+            window.location.href = "{% url 'department_notifications' %}"; // Redirect to notifications page
+        });
+
+        // Function to calculate time difference between current time and notification timestamp
+        function calculateTimeDifference(timestamp) {
+            var currentTime = new Date();
+            var notificationTime = new Date(timestamp);
+            var timeDifferenceInSeconds = Math.floor((currentTime - notificationTime) / 1000);
+
+            var intervals = {
+                year: 31536000,
+                month: 2592000,
+                week: 604800,
+                day: 86400,
+                hour: 3600,
+                minute: 60,
+                second: 1
+            };
+
+            var timeDifference = '';
+
+            for (var key in intervals) {
+                var interval = Math.floor(timeDifferenceInSeconds / intervals[key]);
+                if (interval > 0) {
+                    timeDifference += interval + ' ' + key + (interval === 1 ? ' ago' : 's ago');
+                    break;
+                }
+            }
+
+            return timeDifference;
+        }
+
+        // Initial call to update notification count and display latest notifications
+        updateNotificationCount();
+        displayLatestNotifications();
+
+        // Periodically update notification count and display latest notifications (e.g., every 5 seconds)
+        setInterval(function () {
+            updateNotificationCount();
+            displayLatestNotifications();
+        }, 5000); // Update every 5 seconds
     });
 </script>
+
