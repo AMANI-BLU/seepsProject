@@ -143,3 +143,10 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.message
+    
+
+
+class ExamAttempt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    attempt_count = models.IntegerField(default=0)

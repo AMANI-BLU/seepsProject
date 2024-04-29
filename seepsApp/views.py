@@ -370,7 +370,6 @@ def add_student(request):
     })
     
     
-    
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):
@@ -886,9 +885,17 @@ def exam_detail(request, exam_id):
     # Clear the session variable for the entered exam code
     del request.session[f'exam_code_{exam_id}']
 
-    # Use prefetch_related to fetch choices along with questions in a single query
-    questions = list(Question.objects.filter(exam=exam).prefetch_related('choice_set'))
-    shuffle(questions)  # Shuffle the questions
+    # Check if questions have been shuffled previously
+    shuffled_questions = request.session.get(f'shuffled_questions_{exam_id}')
+    if not shuffled_questions:
+        # Use prefetch_related to fetch choices along with questions in a single query
+        questions = list(Question.objects.filter(exam=exam).prefetch_related('choice_set'))
+        shuffle(questions)  # Shuffle the questions
+        request.session[f'shuffled_questions_{exam_id}'] = [question.id for question in questions]  # Store shuffled order in session
+    else:
+        # Retrieve questions in the shuffled order from session
+        shuffled_question_ids = shuffled_questions
+        questions = [Question.objects.get(id=question_id) for question_id in shuffled_question_ids]
 
     context = {
         'exam': exam,
@@ -987,20 +994,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Exam
 
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib import messages
-from .models import Exam  # Import your Exam model
 
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib import messages
-from .models import Exam  # Import your Exam model
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect
-from django.contrib import messages
 
 @login_required(login_url='login_view')
 def enter_exam_code(request, exam_id):
     exam = get_object_or_404(Exam, id=exam_id)
+    user = request.user
 
     # Retrieve the number of questions for the exam
     num_questions = exam.question_set.count()
@@ -1008,14 +1007,11 @@ def enter_exam_code(request, exam_id):
     # Get the maximum attempts allowed for the exam
     max_attempts = exam.attempts_allowed
 
-    # Get the session key for the exam code
-    session_key = f'exam_code_{exam_id}'
-
-    # Initialize attempt count to 0
-    attempt_count = request.session.get(f'attempt_count_{exam_id}', 0)
+    # Get or create the ExamAttempt object for the current user and exam
+    exam_attempt, created = ExamAttempt.objects.get_or_create(user=user, exam=exam)
 
     # Calculate attempts remaining
-    attempts_remaining = max_attempts - attempt_count
+    attempts_remaining = max_attempts - exam_attempt.attempt_count
 
     if request.method == 'POST':
         entered_exam_code = request.POST.get('exam_code', '').strip()
@@ -1023,13 +1019,12 @@ def enter_exam_code(request, exam_id):
         if entered_exam_code:
             if entered_exam_code == exam.exam_code:
                 # Check if the attempt count is less than the maximum allowed attempts
-                if attempt_count < max_attempts:
+                if exam_attempt.attempt_count < max_attempts:
                     # Increment the attempt count
-                    attempt_count += 1
-                    # Store the updated attempt count in the session
-                    request.session[f'attempt_count_{exam_id}'] = attempt_count
+                    exam_attempt.attempt_count += 1
+                    exam_attempt.save()
                     # Store the entered exam code in the session
-                    request.session[session_key] = entered_exam_code
+                    request.session[f'exam_code_{exam_id}'] = entered_exam_code
                     # Redirect to the exam detail page if the entered code is correct and attempts are within limit
                     return redirect('exam_detail', exam_id=exam_id)
                 else:
@@ -1040,7 +1035,6 @@ def enter_exam_code(request, exam_id):
             messages.error(request, 'Please enter a valid exam code.')
 
     return render(request, 'student_template/enter_exam_code.html', {'exam': exam, 'num_questions': num_questions, 'attempts_remaining': attempts_remaining})
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import FeedbackForm
