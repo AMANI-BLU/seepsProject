@@ -139,7 +139,7 @@
                                                                 </button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <form id="updateDepartmentForm{{ forloop.counter }}" action="{% url 'update_department' department.username %}" method="post">
+                                                                <form id="updateDepartmentForm{{ forloop.counter }}" action="{% url 'update_department' department.username %}" method="post" novalidate>
                                                                     {% csrf_token %}
                                                                     <div class="form-group">
                                                                         <label for="updateDepartmentName">Department Name</label>

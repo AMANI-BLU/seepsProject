@@ -70,7 +70,7 @@ def home(request):
     # Calculate the total number of departments
     total_departments = User.objects.filter(is_department=True).count()
     total_students = User.objects.filter(is_student=True).count()
-    exams = Exam.objects.all().count()
+    total_teachers = User.objects.filter(is_instructor=True).count()
     feedbacks = Feedback.objects.all().count()
 
     # Fetch department distribution by college
@@ -86,7 +86,7 @@ def home(request):
     context = {
         'total_departments': total_departments,
         'total_students': total_students,
-        'exams': exams,
+        'total_teachers': total_teachers,
         'college_names': college_names,
         'department_counts': department_counts,
         'feedbacks':feedbacks
@@ -1354,7 +1354,23 @@ def add_instructor(request):
     return render(request, 'department_template/add_instructor.html', {'form': form})
 
 
-    
+def update_instructor(request, username):
+    if request.method == 'POST':
+        instructor = get_object_or_404(User, username=username, is_instructor=True, department_name=request.user.username)
+        
+        # Update fields based on form input
+        instructor.first_name = request.POST.get('first_name')
+        instructor.email = request.POST.get('email')
+        instructor.sex = request.POST.get('sex')
+        instructor.phone = request.POST.get('phone')
+        # Add more fields as needed
+        
+        instructor.save()
+        
+        messages.success(request, 'Instructor updated successfully!')
+        return redirect('manage_instructors')  # Redirect to the view_student page after successful update
+    else:
+        return redirect('manage_instructors')   
 
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')

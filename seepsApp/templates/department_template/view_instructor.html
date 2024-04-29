@@ -109,7 +109,7 @@
                                                             </div>
                                                             <div class="modal-body">
                                                             <!-- Update Form -->
-                                                                      <form action="" method="post" class="needs-validation" novalidate>
+                                                                      <form action="{% url 'update_instructor' username=instructor.username %}" method="post" class="needs-validation" novalidate>
                                                                                         {% csrf_token %}
 
                                                                                         <div class="form-group">
@@ -155,7 +155,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         
-                                                                                        <div class="form-group">
+                                                                                        <div class="form-group" style="display:none;">
                                                                                             <label for="college"  class="text-muted">College</label>
                                                                                             <div class="input-group">
                                                                                                 <div class="input-group-prepend">
@@ -166,7 +166,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         
-                                                                                        <div class="form-group">
+                                                                                        <div class="form-group" style="display:none;">
                                                                                             <label for="department_name"  class="text-muted">Department</label>
                                                                                             <div class="input-group">
                                                                                                 <div class="input-group-prepend">

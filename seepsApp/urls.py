@@ -43,22 +43,23 @@ urlpatterns = [
     path('manage-resources/', manage_resources, name='manage_resources'),
     path('add-resource/', add_resource, name='add_resource'),
     path('delete-resource/<int:resource_id>/', delete_resource, name='delete_resource'),
-        path('update_resource/<int:resource_id>/', update_resource, name='update_resource'),
+    path('update_resource/<int:resource_id>/', update_resource, name='update_resource'),
         
-            path('import_question/', upload_pdf_view, name='upload_pdf_view'),
-                path('preview/', preview_questions_view, name='preview_questions'),
-                    path('edit_question/<int:question_id>/', edit_question, name='edit_question'),
-                        path('exam-scores/', exam_scores_table, name='exam_scores_table'),
-                            path('delete-report/<str:exam_name>/', delete_report, name='delete_report'),
+    path('import_question/', upload_pdf_view, name='upload_pdf_view'),
+    path('preview/', preview_questions_view, name='preview_questions'),
+    path('edit_question/<int:question_id>/', edit_question, name='edit_question'),
+    path('exam-scores/', exam_scores_table, name='exam_scores_table'),
+    path('delete-report/<str:exam_name>/', delete_report, name='delete_report'),
                             
                             
-                                path('manage_instructors/', manage_instructors, name='manage_instructors'),
-                                path('add_instructor/', add_instructor, name='add_instructor'),
-                                path('delete_instructor/<str:username>/', delete_instructor, name='delete_instructor'),
+    path('manage_instructors/', manage_instructors, name='manage_instructors'),
+    path('add_instructor/', add_instructor, name='add_instructor'),
+    path('delete_instructor/<str:username>/', delete_instructor, name='delete_instructor'),
+    path('update_instructor/<str:username>/', update_instructor, name='update_instructor'),
 
 
 
- path('password_reset/', auth_views.PasswordResetView.as_view(
+    path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset.html',
         email_template_name='password_reset_email.html',
         success_url='/password_reset/done/'
