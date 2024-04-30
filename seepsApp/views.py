@@ -1852,3 +1852,117 @@ def update_notification_status(request, notification_id):
 
 
 #################### notification ###################
+
+
+######################## Options #######################
+
+def book_search(request):
+    if request.method == 'GET' and 'query' in request.GET:
+        query = request.GET.get('query')
+        api_url = f"https://www.googleapis.com/books/v1/volumes?q={query}"
+        response = requests.get(api_url)
+        data = response.json()
+        # Extract relevant information from the API response
+        books = []
+        for item in data.get('items', []):
+            volume_info = item.get('volumeInfo', {})
+            book = {
+                'title': volume_info.get('title', 'No title available'),
+                'authors': ', '.join(volume_info.get('authors', ['Unknown'])),
+                'description': volume_info.get('description', 'No description available'),
+                'thumbnail': volume_info.get('imageLinks', {}).get('thumbnail', ''),
+                'link': volume_info.get('infoLink', '')  # Link to Google Books page
+            }
+            books.append(book)
+        # Pass the extracted data to the template
+        return render(request, 'student_template/book_search_results.html', {'query': query, 'books': books})
+    else:
+        return render(request, 'student_template/book_search_form.html')
+
+
+import requests
+
+from youtubesearchpython import VideosSearch
+
+def youtube(request):
+    if request.method == "POST":
+        form = DashboardForm(request.POST)
+        if form.is_valid():
+            text = form.cleaned_data.get('text')
+            
+            # Perform YouTube search
+            video = VideosSearch(text, limit=100)
+            result_list = []
+            for i in video.result()['result']:
+                result_dict = {
+                    'input': text,
+                    'title': i['title'],
+                    'duration': i['duration'],
+                    'thumbnail': i['thumbnails'][0]['url'],
+                    'channel': i['channel']['name'],
+                    'link': f"https://www.youtube.com/watch?v={i['id']}",
+                    'views': i['viewCount']['short'],
+                    'published': i['publishedTime'],
+                    'description': i['descriptionSnippet']
+                }
+                result_list.append(result_dict)
+            context = {
+                'form': form,
+                'results': result_list
+            }
+            return render(request, 'student_template/YouTube.html', context)
+    else:
+        form = DashboardForm()
+    context = {'form': form}
+    return render(request, 'student_template/YouTube.html', context)
+
+
+import wikipedia
+
+def wiki(request):
+    if request.method == "POST":
+        form = DashboardForm(request.POST)
+        if form.is_valid():
+            text = form.cleaned_data['text']
+            try:
+                search = wikipedia.page(text)
+                context = {
+                    'form': form,
+                    'title': search.title,
+                    'link': search.url,
+                    'details': search.summary
+                }
+                return render(request, 'student_template/wiki.html', context)
+            except wikipedia.exceptions.PageError:
+                context = {
+                    'form': form,
+                    'error': f"Could not find a Wikipedia page for '{text}'."
+                }
+        else:
+            # Handle form validation errors
+            context = {
+                'form': form
+            }
+    else:
+        form = DashboardForm()
+        context = {
+            'form': form
+        }
+
+    return render(request, 'student_template/wiki.html', context)
+
+
+
+from PyDictionary import PyDictionary
+
+def dictionary_search(request):
+    meaning = None
+    synonyms = None
+    antonyms = None
+    if 'word' in request.GET:
+        word = request.GET.get('word')
+        dictionary = PyDictionary()
+        meaning = dictionary.meaning(word)
+        synonyms = dictionary.synonym(word)
+        antonyms = dictionary.antonym(word)
+    return render(request, 'student_template/dictionary.html', {'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})

@@ -138,7 +138,16 @@ urlpatterns = [
 
    
 
-   
+   #Books Search
+    path('book/search/', book_search, name='book_search'),
+    path('youtube/', youtube, name='youtube'),
+    path('wiki/', wiki, name='wiki'),
+    path('dictionary-search/', dictionary_search, name='dictionary_search'),
+
+
+
+
+
    
     #NoPage
     path('nopage/', NoPage, name='NoPage'),

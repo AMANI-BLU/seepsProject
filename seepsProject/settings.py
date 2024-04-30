@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'seepsApp',
     'import_export', 
+   
 ]
 
 MIDDLEWARE = [
@@ -156,13 +157,4 @@ EMAIL_HOST_PASSWORD = 'xdtlcdveysvumamf'  # SMTP password
 DEFAULT_FROM_EMAIL = 'amansolgod@gmail.com'
 
 
-# settings.py
 
-# Other settings...
-
-# Twilio settings
-TWILIO_ACCOUNT_SID = 'ACb2ec51adfbd0a4a94108accd54e0859d'
-TWILIO_AUTH_TOKEN = '07aa8e548aed63ac3dac385fb466415b'
-TWILIO_PHONE_NUMBER = '+14052943485'
-
-# Other settings...

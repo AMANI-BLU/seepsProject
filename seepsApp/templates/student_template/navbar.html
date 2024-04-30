@@ -21,17 +21,38 @@
             font-family: 'Poppins', sans-serif;
         }
 
-
-        .h{
-            padding-left:50px;
+        .h {
+            padding-left: 50px;
         }
 
         .navbar-nav .nav-link {
              margin-left: 80px;
         }
 
-      
-       
+        /* Custom styles for dropdown */
+        .dropdown-menu {
+            border: none;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-menu a.dropdown-item {
+            color: #333;
+            padding-right: 30px; /* Added padding for space between text and icon */
+        }
+
+        .dropdown-menu a.dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+
+        .dropdown-menu a.dropdown-item .fa {
+            margin-right: 10px;
+        }
+
+        .dropdown-divider {
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -70,30 +91,37 @@
                 <div class="collapse navbar-collapse justify-content-end">
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {% comment %} <img src="{% static 'path/to/user_image.png' %}" alt="User" class="nav-icon">&nbsp;&nbsp;{{ request.user.first_name }} {% endcomment %}
-                        {% if user.profile_picture %}
-                          <img src="{{user.profile_picture.url}}" alt="User" class="nav-icon" style="width: 22px; height: 22px;  border-radius: 50%;">&nbsp;&nbsp;{{ request.user.first_name }}
-                         {% else %}
-                      <!-- If profile picture is not available, display a placeholder image -->
-                      <img class="img-circle elevation-2" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture" style="width: 22px; height: 20px;">&nbsp;&nbsp;{{ request.user.first_name }}
-                  {% endif %}
-                        </a>
-
-                           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <!-- Add user-related dropdown items here -->
-                                <a class="dropdown-item text-info" href="{% url 'profile' %}">
-                                    <i class="nav-icon fas fa-user"></i>&nbsp;&nbsp;&nbsp;Profile
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if user.profile_picture %}
+                                    <img src="{{user.profile_picture.url}}" alt="User" class="nav-icon" style="width: 22px; height: 22px;  border-radius: 50%;">&nbsp;&nbsp;{{ request.user.first_name }}
+                                {% else %}
+                                    <img class="img-circle elevation-2" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture" style="width: 22px; height: 20px;">&nbsp;&nbsp;{{ request.user.first_name }}
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <!-- User-related dropdown items -->
+                                <a class="dropdown-item text-muted" href="{% url 'profile' %}">
+                                    <i class="fas fa-user"></i>&nbsp; Profile
                                 </a>
-                                <a class="dropdown-item text-info" href="{% url "change_password" %}">
-                                    <i class="nav-icon fas fa-lock"></i>&nbsp;&nbsp;&nbsp;Change Password
+                                <a class="dropdown-item text-muted" href="{% url 'book_search' %}">
+                                    <i class="fas fa-book"></i>&nbsp; Books
+                                </a>
+                                <a class="dropdown-item text-muted" href="{% url 'wiki' %}">
+                                    <i class="fab fa-wikipedia-w"></i>&nbsp; Wikipedia
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <!-- Options dropdown items -->
+                                <a class="dropdown-item text-muted" href="{% url 'youtube' %}">
+                                    <i class="fab fa-youtube"></i>&nbsp; Youtube
+                                </a>
+                                <a class="dropdown-item text-muted" href="{% url 'dictionary_search' %}">
+                                    <i class="fas fa-book-open"></i>&nbsp; Dictionary
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
-                                    <i class="nav-icon fas fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;Logout
+                                    <i class="fas fa-sign-out-alt"></i>&nbsp; Logout
                                 </a>
                             </div>
-
                         </li>
                     </ul>
                 </div>
@@ -101,33 +129,30 @@
         </nav>
         <!-- /.navbar -->
 
-
-
         <div class="modal fade" id="modal-primary">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-                 <h5>Confirm to Logout</h5> 
-            </div> 
-            <div class="modal-body">
-              <h6>Are you sure want to logout?</h6>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                         <h5>Confirm to Logout</h5> 
+                    </div> 
+                    <div class="modal-body">
+                      <h6>Are you sure want to logout?</h6>
+                    </div>
+                    <div class="modal-footer pl-5">
+                          <a href="{% url 'logout' %}" class="btn btn-info">
+                             Yes
+                          </a>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
             </div>
-            <div class="modal-footer pl-5">
-                  <a href="{% url 'logout' %}" class="btn btn-info">
-                     Yes
-                  </a>
-                  <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
-            </div>
-          </div>
-          <!-- /.modal-content -->
+            <!-- /.modal-dialog -->
         </div>
-        <!-- /.modal-dialog -->
-      </div>
-      <!-- /.modal -->
+        <!-- /.modal -->
 
         <!-- Bootstrap JS and dependencies -->
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-2sZv1KImJ3aANEE2xqZb9sG8aFZbhJYYg3Z2mqxmePPlXEeg3bBC1jefFGK1Pqf" crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5+2aBEp0K/9l/XyD6Jiaq1mxPr1wJ6JuMbG2h2P1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     </div>
 </body>
