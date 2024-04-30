@@ -1,0 +1,50 @@
+{% extends 'student_template/base.html' %} 
+{% load static %} 
+
+{% block content %}
+<section class="container py-5">
+    <div class="text-center">
+        <i class="fab fa-youtube fa-3x text-danger mb-3"></i>
+        <h2 class="mb-4">Search Videos in YouTube</h2>
+        <p>Search for videos and select any video to open in YouTube.</p>
+        <form action="" method="post" class="form-inline justify-content-center">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                {{ form }}
+                <div class="input-group-append">
+                    <button class="btn btn-danger" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row mt-5">
+        {% for result in results %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <a href="{{ result.link }}" target="_blank">
+                    <img class="card-img-top" src="{{ result.thumbnail }}" alt="Video Thumbnail">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{ result.title }}</h5>
+                    <p class="card-text">
+                        {% for segment in result.description %}
+                            {% if segment.bold %}
+                                <strong>{{ segment.text }}</strong>
+                            {% else %}
+                                {{ segment.text }}
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                    <p class="card-text"><small class="text-muted">{{ result.channel }}</small></p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">{{ result.duration }}</small>
+                    <small class="text-muted float-right">{{ result.published }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

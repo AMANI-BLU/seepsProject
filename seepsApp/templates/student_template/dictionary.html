@@ -1,0 +1,97 @@
+{% extends 'student_template/base.html' %}
+
+{% block content %}
+    <div class="container-fluid py-4" style="margin-top: 75px;">
+        <h3 class="text-muted mb-4"><i class="fas fa-book-open" style="color: #007bff;"></i> Dictionary</h3>
+        <hr class="my-4"/>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <form id="dictionary-form" method="GET" action="{% url 'dictionary_search' %}">
+                    <div class="input-group">
+                        <input type="text" name="word" id="word-input" class="form-control" placeholder="Enter a word">
+                        <div class="input-group-append">
+                            <button type="button" id="voice-search" class="btn btn-primary"><i class="fas fa-microphone" style="color: #fff;"></i></button>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search" style="color: #fff;"></i> Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% if meaning %}
+            <div class="mt-4">
+                <h5 class="mb-3"><i class="fas fa-info-circle" style="color: #28a745;"></i> Result for word <b>{{ word }}</b></h5>
+                {% for part_of_speech, definitions in meaning.items %}
+                    <div class="mb-4">
+                        <h6 class="text-muted">{{ part_of_speech }}</h6>
+                        <ul class="list-group">
+                            {% for definition in definitions %}
+                                <li class="list-group-item">{{ definition }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+                <button type="button" id="read-meaning" class="btn btn-primary"><i class="fas fa-volume-up" style="color: #fff;"></i> Read Meaning</button>
+                <button type="button" id="stop-reading" class="btn btn-danger ml-2"><i class="fas fa-stop" style="color: #fff;"></i> Stop Reading</button>
+            </div>
+            {% if synonyms %}
+                <div class="mt-4">
+                    <h5><i class="fas fa-book" style="color: #ffc107;"></i> Synonyms:</h5>
+                    <p>{{ synonyms|join:", " }}</p>
+                </div>
+            {% endif %}
+            {% if antonyms %}
+                <div class="mt-4">
+                    <h5><i class="fas fa-exchange-alt" style="color: #dc3545;"></i> Antonyms:</h5>
+                    <p>{{ antonyms|join:", " }}</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <script>
+        const voiceSearchButton = document.getElementById('voice-search');
+        const wordInput = document.getElementById('word-input');
+        const readMeaningButton = document.getElementById('read-meaning');
+        const stopReadingButton = document.getElementById('stop-reading');
+
+        let speech = null;
+
+        voiceSearchButton.addEventListener('click', () => {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.start();
+            
+            recognition.onresult = (event) => {
+                const speechToText = event.results[0][0].transcript.trim(); // Remove leading and trailing whitespace
+                const cleanedText = speechToText.replace(/\.$/, ''); // Remove trailing dot
+                wordInput.value = cleanedText;
+                document.getElementById('dictionary-form').submit();
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+            };
+        });
+
+        readMeaningButton.addEventListener('click', () => {
+            const meaningElements = document.querySelectorAll('.list-group-item');
+            let meaningText = '';
+            meaningElements.forEach((element) => {
+                meaningText += element.textContent + '. '; // Concatenate meaning text with a dot separator
+            });
+            
+            speech = new SpeechSynthesisUtterance(meaningText);
+            speech.lang = 'en-US';
+            speech.volume = 1; // Set volume (0 to 1)
+            speech.rate = 1; // Set rate (0.1 to 10)
+            speech.pitch = 1; // Set pitch (0 to 2)
+            window.speechSynthesis.speak(speech);
+        });
+
+        stopReadingButton.addEventListener('click', () => {
+            if (speech !== null) {
+                window.speechSynthesis.cancel();
+            }
+        });
+    </script>
+{% endblock %}
