@@ -143,6 +143,10 @@ urlpatterns = [
     path('youtube/', youtube, name='youtube'),
     path('wiki/', wiki, name='wiki'),
     path('dictionary-search/', dictionary_search, name='dictionary_search'),
+    path('navigation-options/', navigation_options_view, name='navigation_options'),
+    path('study-dashboard/', study_dashboard, name='study_dashboard'),
+
+
 
 
 

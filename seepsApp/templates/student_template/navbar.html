@@ -59,7 +59,7 @@
 <body class="hold-transition layout-top-nav">
     <div class="wrapper">
         <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand-md navbar-light shadow fixed-top">
+        <nav class="main-header navbar navbar-expand-md navbar-dark fixed-top">
             <div class="container-fluid">
                 <a href="#" class="navbar-brand">
                     <h6 class="text-muted">Exit Exam <span class="text-info">Prep. System</span></h6>
@@ -87,44 +87,37 @@
                     </ul>
                 </div>
 
-                <!-- User dropdown menu -->
-                <div class="collapse navbar-collapse justify-content-end">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {% if user.profile_picture %}
-                                    <img src="{{user.profile_picture.url}}" alt="User" class="nav-icon" style="width: 22px; height: 22px;  border-radius: 50%;">&nbsp;&nbsp;{{ request.user.first_name }}
-                                {% else %}
-                                    <img class="img-circle elevation-2" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture" style="width: 22px; height: 20px;">&nbsp;&nbsp;{{ request.user.first_name }}
-                                {% endif %}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <!-- User-related dropdown items -->
-                                <a class="dropdown-item text-muted" href="{% url 'profile' %}">
-                                    <i class="fas fa-user"></i>&nbsp; Profile
-                                </a>
-                                <a class="dropdown-item text-muted" href="{% url 'book_search' %}">
-                                    <i class="fas fa-book"></i>&nbsp; Books
-                                </a>
-                                <a class="dropdown-item text-muted" href="{% url 'wiki' %}">
-                                    <i class="fab fa-wikipedia-w"></i>&nbsp; Wikipedia
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <!-- Options dropdown items -->
-                                <a class="dropdown-item text-muted" href="{% url 'youtube' %}">
-                                    <i class="fab fa-youtube"></i>&nbsp; Youtube
-                                </a>
-                                <a class="dropdown-item text-muted" href="{% url 'dictionary_search' %}">
-                                    <i class="fas fa-book-open"></i>&nbsp; Dictionary
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
-                                    <i class="fas fa-sign-out-alt"></i>&nbsp; Logout
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+         <div class="collapse navbar-collapse justify-content-end">
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% if user.profile_picture %}
+                    <img src="{{user.profile_picture.url}}" alt="User" class="nav-icon" style="width: 22px; height: 22px;  border-radius: 50%;">&nbsp;&nbsp;{{ request.user.first_name }}
+                {% else %}
+                    <img class="img-circle elevation-2" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture" style="width: 22px; height: 20px;">&nbsp;&nbsp;{{ request.user.first_name }}
+                {% endif %}
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <!-- User-related dropdown items -->
+                <a class="dropdown-item text-muted" href="{% url 'profile' %}">
+                    <i class="fas fa-user-circle"></i>&nbsp; Profile
+                </a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item text-muted" href="{% url 'study_dashboard' %}">
+                    <i class="fas fa-calendar-alt"></i>&nbsp; My Plan
+                </a>
+                <a class="dropdown-item text-muted" href="{% url 'navigation_options' %}">
+                    <i class="fas fa-ellipsis-h"></i>&nbsp; More Options
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item text-danger" data-toggle="modal" data-target="#modal-primary">
+                    <i class="fas fa-sign-out-alt"></i>&nbsp; Logout
+                </a>
+            </div>
+        </li>
+    </ul>
+</div>
+
             </div>
         </nav>
         <!-- /.navbar -->

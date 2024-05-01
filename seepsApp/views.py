@@ -1856,6 +1856,9 @@ def update_notification_status(request, notification_id):
 
 ######################## Options #######################
 
+from django.shortcuts import render
+import requests
+
 def book_search(request):
     if request.method == 'GET' and 'query' in request.GET:
         query = request.GET.get('query')
@@ -1875,9 +1878,9 @@ def book_search(request):
             }
             books.append(book)
         # Pass the extracted data to the template
-        return render(request, 'student_template/book_search_results.html', {'query': query, 'books': books})
+        return render(request, 'student_template/book_search.html', {'query': query, 'books': books})
     else:
-        return render(request, 'student_template/book_search_form.html')
+        return render(request, 'student_template/book_search.html')
 
 
 import requests
@@ -1966,3 +1969,23 @@ def dictionary_search(request):
         synonyms = dictionary.synonym(word)
         antonyms = dictionary.antonym(word)
     return render(request, 'student_template/dictionary.html', {'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})
+
+
+
+def navigation_options_view(request):
+    return render(request, 'student_template/navigation_options.html')
+
+
+def study_dashboard(request):
+    # Add functionality to retrieve data for study schedule, progress tracking, and exam performance
+    # This could include retrieving study schedule data, progress tracking data, and exam performance data
+    study_schedule_data = {...}  # Retrieve study schedule data
+    progress_tracking_data = {...}  # Retrieve progress tracking data
+    exam_performance_data = {...}  # Retrieve exam performance data
+
+    context = {
+        'study_schedule_data': study_schedule_data,
+        'progress_tracking_data': progress_tracking_data,
+        'exam_performance_data': exam_performance_data,
+    }
+    return render(request, 'student_template/study_dashboard.html', context)
