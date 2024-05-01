@@ -1,0 +1,52 @@
+{% extends 'student_template/base.html' %}
+
+{% block content %}
+{% load static %}
+    <div class="pb-4" style="margin-top: 75px;">
+        <hr class="my-4"/>
+        <!-- Navigation options -->
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fab fa-youtube fa-3x mb-3 text-danger"></i>
+                        <h5>YouTube</h5>
+                        <p>Search educational videos on YouTube.</p>
+                        <a href="{% url 'youtube' %}" class="btn btn-outline-danger">Explore</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fab fa-wikipedia-w fa-3x mb-3 text-info"></i>
+                        <h5>Wikipedia</h5>
+                        <p>Access information on Wikipedia.</p>
+                        <a href="{% url 'wiki' %}" class="btn btn-outline-info">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x mb-3 text-success"></i>
+                        <h5>Books</h5>
+                        <p>Access books for your study.</p>
+                        <a href="{% url 'book_search' %}" class="btn btn-outline-success">Explore</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book-open fa-3x mb-3 text-primary"></i>
+                        <h5>Student Dictionary</h5>
+                        <p>Look up words in the dictionary.</p>
+                        <a href="{% url 'dictionary_search' %}" class="btn btn-outline-primary">Search Now</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Add more cards for other options -->
+        </div>
+    </div>
+{% endblock %}

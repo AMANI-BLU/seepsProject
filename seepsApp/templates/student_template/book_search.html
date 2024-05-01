@@ -1,0 +1,41 @@
+{% extends 'student_template/base.html' %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="text-center">
+        <h2 class="mb-4">Search Books</h2>
+        <form action="{% url 'book_search' %}" method="GET" class="form-inline justify-content-center">
+            <div class="input-group mb-3">
+                <input type="text" name="query" class="form-control" placeholder="Search for books">
+                <div class="input-group-append">
+                    <button class="btn btn-success" type="submit">Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% if query %}
+    <div class="text-center">
+        <h3 class="mb-4">Search Results for "{{ query }}"</h3>
+    </div>
+
+    <div class="row">
+        {% for book in books %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{{ book.thumbnail }}" class="card-img-top" alt="{{ book.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">Authors: {{ book.authors }}</p>
+                    <p class="card-text">{{ book.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ book.link }}" class="btn btn-primary btn-sm" target="_blank">Read More</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
