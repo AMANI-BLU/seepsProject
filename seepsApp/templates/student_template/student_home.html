@@ -73,12 +73,13 @@
                 <div class="card-body">
                     <h5>{{ course.title }}</h5>
                     <p>{{ course.description }}</p>
-                <a href="{% url 'tutorial_page' course.id %}" class="btn btn-outline-info btn-sm">View Tutorial</a>                </div>
+                    <a href="{% url 'tutorial_page' course.id %}" class="btn btn-outline-info btn-sm">View Tutorial</a>
+                </div>
             </div>
         </div>
         {% endfor %}
     </div>
-    
+
     {% else %}
           <div class="text-center mt-5">
                             <p class="text-muted">No courses are currently available, Please Check back later!</p>
@@ -86,6 +87,9 @@
 
                         </div> 
     {% endif %}
+
+    <!-- Floating Action Button -->
+    <a href="{% url 'chat_room' %}" class="btn btn-lg btn-primary btn-fab" style="position: fixed; bottom: 20px; right: 30px; border-radius: 50%;">
+        <i class="fa fa-comment"></i>
+    </a>
 {% endblock %}
-
-

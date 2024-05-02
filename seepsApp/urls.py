@@ -145,7 +145,8 @@ urlpatterns = [
     path('dictionary-search/', dictionary_search, name='dictionary_search'),
     path('navigation-options/', navigation_options_view, name='navigation_options'),
     path('study-dashboard/', study_dashboard, name='study_dashboard'),
-
+    path('chat/', chat_room, name='chat_room'),
+    path('send-message/', send_message, name='send_message'),
 
 
 

@@ -1989,3 +1989,26 @@ def study_dashboard(request):
         'exam_performance_data': exam_performance_data,
     }
     return render(request, 'student_template/study_dashboard.html', context)
+
+
+
+
+@login_required
+def chat_room(request):
+    # Retrieve the department of the logged-in user
+    department_name = request.user.department_name
+
+    # Retrieve all messages sent by students belonging to the department
+    department_students = User.objects.filter(is_student=True, department_name=department_name)
+    messages = Message.objects.filter(sender__in=department_students).order_by('timestamp')
+
+    return render(request, 'student_template/chat.html', {'messages': messages})
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        sender = request.user
+        message = Message.objects.create(content=content, sender=sender)
+        return redirect('chat_room')
+    return redirect('chat_room')
