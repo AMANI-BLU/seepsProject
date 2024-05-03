@@ -21,7 +21,9 @@
 
 
 </div>
-
+ <a href="{% url 'chat_room' %}" class="btn btn-lg btn-primary btn-fab" style="position: fixed; bottom: 20px; right: 30px; border-radius: 50%;">
+        <i class="fa fa-comment"></i>
+ </a>
 <div class="row mt-6">
     <!-- Your existing content goes here -->
 </div>
@@ -76,6 +78,8 @@
                 });
             </script>
         {% endif %}
+          <!-- Floating Action Button -->
+   
     {% endfor %}
 {% endif %}
 

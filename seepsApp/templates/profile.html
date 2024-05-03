@@ -12,21 +12,20 @@
   {% if user.is_department %}
     {% include 'department_template/navbar.html' %}
      {% include 'department_template/aside.html' %}
-  {% elif user.is_staff and user.is_superuser %}
-    {% include 'admin_template/aside.html' %}
-    {% include 'admin_template/navbar.html' %}
   {% elif user.is_instructor %}
     {% include 'teacher_template/aside.html' %} 
     {% include 'teacher_template/navbar.html' %} 
   {% elif user.is_student %}
     {% include 'student_template/navbar.html' %}
+ {% elif user.is_staff and user.is_superuser %}
+    {% include 'admin_template/aside.html' %}
+    {% include 'admin_template/navbar.html' %}
   {% endif %}
 
   {% if messages %}
     {% for message in messages %}
       {% if message.tags == 'success' %}
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
         <script>
           Swal.fire({
             toast: true,
@@ -165,95 +164,80 @@
                 <div class="tab-content">
                   <div class="active tab-pane" id="settings">
                     <!-- Profile Update Form -->
-                  <!-- Inside the form -->
-                  <form class="form-horizontal" method="post" id="uploadForm" enctype="multipart/form-data" action="{% url 'profile' %}">
+                    <form class="form-horizontal" method="post" enctype="multipart/form-data" action="{% url 'profile' %}">
                       {% csrf_token %}
                       <div class="form-group row">
-                          <label for="inputName" class="col-sm-2 col-form-label text-muted">Name</label>
-                          <div class="col-sm-10">
-                              <div class="input-group">
-                                  <div class="input-group-prepend">
-                                      <span class="input-group-text"><i class="fas fa-user"></i></span>
-                                  </div>
-                                  {% if user.is_superuser %}
-                                      <input type="text" class="form-control" id="inputName" name="username" value="{{ user.username }}" required>
-                                  {% elif user.is_student %}
-                                      <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>
-                                  {% elif user.is_instructor %}
-                                      <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>    
-                                  {% else %}
-                                      <input type="text" class="form-control" id="inputName" name="department_name" value="{{ user.department_name }}" required>
-                                  {% endif %}
-                              </div>
-                              <!-- Display form errors below the field -->
-                              {% for error in form.username.errors %}
-                                  <span class="text-danger">{{ error }}</span>
-                              {% endfor %}
-                          </div>
-                      </div>
+                        <label for="inputName" class="col-sm-2 col-form-label text-muted">Name</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                </div>
+                              {% if user.is_superuser %}
+                                  <input type="text" class="form-control" id="inputName" name="username" value="{{ user.username }}" required>
+                              {% elif user.is_student %}
+                                  <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>
+                                {% elif user.is_instructor %}
+                                  <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>    
+                              {% elif user.is_department %}
+                                  <input type="text" class="form-control" id="inputName" name="department_name" value="{{ user.department_name }}" required>
+                              {% endif %}
 
-                      <div class="form-group row">
-                          <label for="inputEmail" class="col-sm-2 col-form-label text-muted">Email</label>
-                          <div class="col-sm-10">
-                              <div class="input-group">
-                                  <div class="input-group-prepend">
-                                      <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                  </div>
-                                  <input type="email" class="form-control" id="inputEmail" name="email" value="{{ user.email }}" required>
-                              </div>
-                              <!-- Display form errors below the field -->
-                              {% for error in form.email.errors %}
-                                  <span class="text-danger">{{ error }}</span>
-                              {% endfor %}
-                          </div>
-                      </div>
+                            </div>
+                        </div>
+                    </div>
 
-                      {% if user.is_student or user.is_instructor %}
-                          <div class="form-group row">
-                              <label for="inputSex" class="col-sm-2 col-form-label text-muted">Sex</label>
-                              <div class="col-sm-10">
-                                  <div class="input-group">
-                                      <div class="input-group-prepend">
-                                          <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
-                                      </div>
-                                      <select class="form-control" id="inputSex" name="sex">
-                                          <option value="Male" {% if user.sex == "Male" %}selected{% endif %}>Male</option>
-                                          <option value="Female" {% if user.sex == "Female" %}selected{% endif %}>Female</option>
-                                      </select>
-                                  </div>
-                                  <!-- Display form errors below the field -->
-                                  {% for error in form.sex.errors %}
-                                      <span class="text-danger">{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          </div>
-                      {% endif %}
+                    <div class="form-group row">
+                        <label for="inputEmail" class="col-sm-2 col-form-label text-muted">Email</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                </div>
+                                <input type="email" class="form-control" id="inputEmail" name="email" value="{{ user.email }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="profilePictureInput" name="profile_picture" style="display: none;" accept="image/*">
 
-                      {% if user.is_student or user.is_department or user.is_instructor %}
-                          <div class="form-group row">
-                              <label for="inputPhone" class="col-sm-2 col-form-label text-muted">Phone</label>
-                              <div class="col-sm-10">
-                                  <div class="input-group">
-                                      <div class="input-group-prepend">
-                                          <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                      </div>
-                                      <input type="text" class="form-control" id="inputPhone" name="phone" value="{{user.phone}}">
-                                  </div>
-                                  <!-- Display form errors below the field -->
-                                  {% for error in form.phone.errors %}
-                                      <span class="text-danger">{{ error }}</span>
-                                  {% endfor %}
-                              </div>
-                          </div>
-                      {% endif %}
+                    {% if user.is_student or user.is_instructor%}
+                    <div class="form-group row">
+                        <label for="inputSex" class="col-sm-2 col-form-label text-muted">Sex</label>
+                        <div class="col-sm-10">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                </div>
+                                <select class="form-control" id="inputSex" name="sex">
+                                    <option value="Male" {% if user.sex == "Male" %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if user.sex == "Female" %}selected{% endif %}>Female</option>
+                                    
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if user.is_student or user.is_department or user.is_instructor%}
+                        <div class="form-group row">
+                            <label for="inputPhone" class="col-sm-2 col-form-label text-muted">Phone</label>
+                            <div class="col-sm-10">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inputPhone" name="phone" value="{{user.phone}}">
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Update</button>
+                        </div>
+                    </div>
 
-                      <div class="form-group row">
-                          <div class="offset-sm-2 col-sm-10">
-                              <button type="submit" id="uploadButton" class="btn btn-info"><i class="fas fa-save" id="uploadIcon"></i>  <span id="uploadText">Update</span></button>
-                          </div>
-                      </div>
-                  </form>
-
+                    </form>
                     <!-- End Profile Update Form -->
                   </div>
                   <!-- /.tab-pane -->
@@ -270,16 +254,7 @@
     </section>
     <!-- /.content -->
   </div>
-<script>
-    $(document).ready(function() {
-        $('#uploadButton').on('click', function() {
-            $(this).addClass('disabled').prop('disabled', true);
-            $('#uploadIcon').removeClass('fas fa-save').addClass('fa-spinner fa-spin');
-            $('#uploadText').html('please wait...');
-            $('#uploadForm').submit();
-        });
-    });
-</script>
+
      <script>
         // Function to trigger the file input when the button is clicked
         document.getElementById('changeProfileBtn').addEventListener('click', function() {

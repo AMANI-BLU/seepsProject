@@ -77,184 +77,177 @@
       <!-- Main content -->
       <section class="content">
         <div class="container-fluid">
-            <div class="row">
-            <!-- Total Students Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-info">
-                <div class="inner">
-                  <h3>{{ total_students }}</h3>
-                  <p>Total Students</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-users"></i>
-                </div>
-                {% comment %} <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div> {% endcomment %}
-              </div>
-            </div>
-            <!-- Total Feedbacks Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-success">
-                <div class="inner">
-                  <h3>{{feedbacks}}</h3> <!-- Placeholder for total feedbacks -->
-                  <p>Total Feedbacks</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-comments"></i>
-                </div>
-                {% comment %} <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div> {% endcomment %}
-              </div>
-            </div>
-            <!-- Total Exams Card -->
-            <div class="col-md-6 col-lg-3">
-              <div class="small-box bg-warning">
-                <div class="inner">
-                  <h3>{{ exams }}</h3>
-                  <p>Total Exams</p>
-                </div>
-                <div class="icon">
-                  <i class="fas fa-clipboard-list"></i>
-                </div>
-                {% comment %} <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div> {% endcomment %}
-              </div>
-            </div>
-            <!-- Total Departments Card -->
-            <div class="col-md-6 col-lg-3">
-                <div class="small-box bg-danger">
-                    <div class="inner">
-                        <h3>{{ total_departments }}</h3>
-                        <p>Total Departments</p>
-                    </div>
-                    <div class="icon">
-                        <i class="fas fa-building"></i> <!-- Assuming you want to use a building icon for departments -->
-                    </div>
-                    {% comment %} <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                    </div> {% endcomment %}
-                </div>
-            </div>
-
-          </div>
-          <!-- /.row -->
-
-          <!-- Chart Section -->
           <div class="row">
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
-                <div class="card-header">
-                  <h3 class="card-title">Department Distribution by College</h3>
-                  {% comment %} <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                  </div> {% endcomment %}
-                </div>
-                <div class="card-body">
-                  <!-- Chart -->
-                  <canvas id="departmentCollegeChart" style="height: 300px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <!-- Calendar Section -->
-            <div class="col-md-6">
-              <div class="card card-outline card-info">
-                <div class="card-header">
-                  <h3 class="card-title">Calendar</h3>
-                  <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+              <!-- Total Students Card -->
+              <div class="col-md-6 col-lg-3">
+                  <div class="small-box bg-info">
+                      <div class="inner">
+                          <h3>{{ total_students }}</h3>
+                          <p>Total Students</p>
+                      </div>
+                      <div class="icon">
+                          <i class="fas fa-user-graduate"></i>
+                      </div>
                   </div>
-                </div>
-                <div class="card-body">
-                  <!-- AdminLTE Calendar -->
-                  <div id="adminlte-calendar"></div>
-                </div>
               </div>
-            </div>
+              <!-- Total Courses Card -->
+              <div class="col-md-6 col-lg-3">
+                  <div class="small-box bg-success">
+                      <div class="inner">
+                          <h3>{{ courses }}</h3>
+                          <p>Total Courses</p>
+                      </div>
+                      <div class="icon">
+                         <i class="fas fa-book"></i> <!-- Changed the icon class to represent a book, you can replace it with your desired course icon -->
+                      </div>
+                  </div>
+              </div>
+              <!-- Total Exams Card -->
+              <div class="col-md-6 col-lg-3">
+                  <div class="small-box bg-warning">
+                      <div class="inner">
+                          <h3>{{ exams_count }}</h3>
+                          <p>Total Exams</p>
+                      </div>
+                      <div class="icon">
+                          <i class="fas fa-clipboard-list"></i>
+                      </div>
+                  </div>
+              </div>
+              <!-- Total Questions Card -->
+              <div class="col-md-6 col-lg-3">
+                  <div class="small-box bg-danger">
+                      <div class="inner">
+                          <h3>{{ questions_count }}</h3>
+                          <p>Total Questions</p>
+                      </div>
+                      <div class="icon">
+                          <i class="fas fa-question"></i>
+                      </div>
+                  </div>
+              </div>
           </div>
           <!-- /.row -->
+
+
+          <!-- /.row -->
+
+           <!-- Chart Section -->
+                <div class="row">
+                  <!-- Gender Distribution Pie Chart -->
+                  <div class="col-md-6">
+                      <div class="card card-outline card-info">
+                          <div class="card-header">
+                              <h3 class="card-title">Gender Distribution</h3>
+                          </div>
+                          <div class="card-body">
+                              <!-- Chart -->
+                              <canvas id="genderChart" width="400" height="200"></canvas>
+                          </div>
+                      </div>
+                  </div>
+
+
+                    <!-- Pass/Fail Students Bar Chart -->
+                    <div class="col-md-6">
+                        <div class="card card-outline card-info">
+                            <div class="card-header">
+                                <h3 class="card-title">Pass/Fail Students</h3>
+                            </div>
+                            <div class="card-body">
+                                <!-- Chart -->
+                                <canvas id="passFailStudentsChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
 
         </div>
       </section>
       <!-- /.content -->
     </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/5.10.1/main.min.css" rel="stylesheet" />
-  <!-- AdminLTE Theme JavaScript files -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css" rel="stylesheet" />
 
-  <script>
-    // Real data for the chart
-    const collegeNames = {{ college_names|safe }};
-    const departmentCounts = {{ department_counts|safe }};
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Get male and female counts from the template
+    var maleCount = {{ male_count }};
+    var femaleCount = {{ female_count }};
 
-    // Different colors for colleges
-    const backgroundColors = [
-      'rgba(255, 99, 132, 0.5)',
-      'rgba(54, 162, 235, 0.5)',
-      'rgba(255, 206, 86, 0.5)',
-      'rgba(75, 192, 192, 0.5)',
-      'rgba(153, 102, 255, 0.5)',
-      'rgba(255, 159, 64, 0.5)'
-    ];
-
-    // Chart configuration
-    const departmentData = {
-      labels: collegeNames,
-      datasets: [{
-        label: 'Number of Departments',
-        backgroundColor: backgroundColors,
-        borderColor: backgroundColors.map(color => color.replace('0.5', '1')),
-        borderWidth: 1,
-        data: departmentCounts,
-      }],
+    // Create data for the gender distribution pie chart
+    var genderData = {
+        labels: ['Male', 'Female'],
+        datasets: [{
+            data: [maleCount, femaleCount],
+            backgroundColor: ['rgba(54, 162, 235, 0.5)', 'rgba(255, 99, 132, 0.5)'],
+            borderColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)'],
+            borderWidth: 1
+        }]
     };
 
-    const departmentChartConfig = {
-      type: 'bar',
-      data: departmentData,
-      options: {
+    // Create options for the gender distribution pie chart
+    var genderOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false,
-          },
-          title: {
-            display: true,
-            text: 'Department Distribution by College',
-          },
+            legend: {
+                position: 'bottom',
+            },
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
     };
 
-    // Render the chart
-    const departmentCollegeChart = document.getElementById('departmentCollegeChart').getContext('2d');
-    new Chart(departmentCollegeChart, departmentChartConfig);
-
-    // Initialize AdminLTE Calendar
-    document.addEventListener('DOMContentLoaded', function() {
-        $('#adminlte-calendar').datetimepicker({
-            format: 'L',
-            inline: true,
-        });
+    // Create and display the gender distribution pie chart
+    var ctx = document.getElementById('genderChart').getContext('2d');
+    var genderChart = new Chart(ctx, {
+        type: 'pie',
+        data: genderData,
+        options: genderOptions
     });
-  </script>
+
+            // Initialize the pass/fail students count chart
+            var passFailStudentsData = [
+                {% for data in exam_scores_data %}
+                    {
+                        examName: "{{ data.exam__name }}",
+                        passedStudents: {{ data.passed_students_count }},
+                        failedStudents: {{ data.failed_students_count }}
+                    },
+                {% endfor %}
+            ];
+
+            var ctx2 = document.getElementById('passFailStudentsChart').getContext('2d');
+            var passFailStudentsChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: passFailStudentsData.map(data => data.examName),
+                    datasets: [{
+                        label: 'Passed Students',
+                        data: passFailStudentsData.map(data => data.passedStudents),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Failed Students',
+                        data: passFailStudentsData.map(data => data.failedStudents),
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
     {% include 'teacher_template/footer.html' %}
   </div>
 

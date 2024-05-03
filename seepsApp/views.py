@@ -162,6 +162,7 @@ def delete_department(request, email):
     try:
         department = User.objects.get(email=email, is_department=True)
         department.delete()
+        messages.success(request, 'Department deleted successfully!')
     except User.DoesNotExist:
         # Handle the case where the department doesn't exist
         pass
@@ -418,6 +419,37 @@ def delete_student(request, username):
         messages.error(request, 'Student not found or you do not have permission to delete.')
 
     return redirect('view_student')
+
+
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from django.shortcuts import get_object_or_404
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_selected_students(request):
+    if request.method == 'POST':
+        selected_usernames = request.POST.getlist('selected_students[]')
+        deleted_students = 0
+        for username in selected_usernames:
+            try:
+                student = get_object_or_404(User, username=username, is_student=True, department_name=request.user.username)
+                student.delete()
+                deleted_students += 1
+            except User.DoesNotExist:
+                pass  # Handle case where student doesn't exist or user doesn't have permission
+        
+        if deleted_students > 0:
+            messages.success(request, f'{deleted_students} selected students deleted successfully!')
+        else:
+            messages.error(request, 'No selected students found or you do not have permission to delete.')
+
+        return HttpResponseRedirect(reverse('view_student'))
+    else:
+        return HttpResponseRedirect(reverse('view_student'))  # Redirect if not a POST request
+
 
 def update_student(request, username):
     if request.method == 'POST':
@@ -1389,7 +1421,37 @@ def delete_instructor(request, username):
 @login_required(login_url='login_view')
 @user_passes_test(is_instructor, login_url='NoPage')
 def instructor_home(request):
-    return render(request, 'teacher_template/dashboard.html')
+    department_name = request.user.department_name
+    department_username = request.user.department_name
+    instructors = User.objects.filter(department_name=department_name, is_instructor=True).count()
+    # Fetching data for department dashboard
+    students = User.objects.filter(is_student=True, department_name=department_name)
+    feedbacks_count = Feedback.objects.filter(user__department_name=department_username).count()
+    questions_count = Question.objects.filter(exam__department_name=department_username).select_related('exam').count()
+    total_students = User.objects.filter(is_student=True, department_name=department_username).count()
+    exams_count = Exam.objects.filter(department_name=department_name).count()
+    male_count = sum(1 for student in students if student.sex == 'Male')
+    female_count = sum(1 for student in students if student.sex == 'Female')
+    courses = Course.objects.filter(department_name=department_name).count()
+    # Fetching data for exam scores table
+    aggregate_data = fetch_exam_scores_data(department_name)
+
+    # Pass the counts and exam scores data to the template
+    context = {
+        'instructors':instructors,
+        'total_students': total_students,
+        'questions_count': questions_count,
+        'exams_count': exams_count,
+        'feedbacks_count': feedbacks_count,
+        'male_count': male_count,
+        'female_count': female_count,
+        'courses':courses,
+        'exam_scores_data': aggregate_data,
+        'passed_students_count': sum(data['passed_students_count'] for data in aggregate_data),
+        'failed_students_count': sum(data['failed_students_count'] for data in aggregate_data),
+    }
+
+    return render(request, 'teacher_template/dashboard.html',context)
 
 
 @login_required(login_url='login_view')

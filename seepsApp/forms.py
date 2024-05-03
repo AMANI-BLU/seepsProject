@@ -497,7 +497,8 @@ class ProfileUpdateForm(forms.ModelForm):
             del self.fields['department_name']
             self.fields['username'] = forms.CharField(max_length=150, required=True)
         elif self.instance.is_student:
-            self.fields['first_name'] = forms.CharField(max_length=150, required=True)
+            self.fields['department_name'].required = True  # Retain department_name for students
+        elif self.instance.is_instructor:
             self.fields['department_name'].required = False
             del self.fields['department_name']
 
@@ -508,7 +509,6 @@ class ProfileUpdateForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
 
 
 

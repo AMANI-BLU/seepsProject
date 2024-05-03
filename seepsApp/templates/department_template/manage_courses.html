@@ -83,7 +83,7 @@
 
                                         
                                             
-                                            <td class="d-flex align-items-center">
+                                            <td>
                                             <!-- Update Button -->
 <a href="#updateCourseModal{{ course.id }}" class="btn btn-info me-2" data-toggle="modal">
     <i class="fas fa-edit"></i> Edit
@@ -243,7 +243,7 @@
         <script>
             $(document).ready(function () {
                 $('#coursesTable').DataTable({
-               
+                  responsive: true,
             // Add Bootstrap classes to the table
             "language": {
                 "search": "_INPUT_", // Search input style
