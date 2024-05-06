@@ -13,6 +13,8 @@ urlpatterns = [
     path('view_department/', view_department,name ="view_department" ),
     path('delete_department/<str:email>/', delete_department, name='delete_department'),
     path('update/<str:username>/', update_department, name='update_department'),
+    path('delete_departments/', delete_departments, name='delete_departments'),
+    path('generate-credential/', generate_credential, name='generate_credential'),
 
       
     
@@ -56,7 +58,8 @@ urlpatterns = [
     path('add_instructor/', add_instructor, name='add_instructor'),
     path('delete_instructor/<str:username>/', delete_instructor, name='delete_instructor'),
     path('update_instructor/<str:username>/', update_instructor, name='update_instructor'),
-
+    path('delete-students/', delete_students, name='delete_students'),
+    path('generate-credentials-students/', generate_credentials_students, name='generate_credentials_students'),
 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(

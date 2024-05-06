@@ -98,19 +98,23 @@
                                     <h3 class="card-title">Department List</h3>
                                 </div>
                                 
-                            </div>
+                            </div>        
                         </div>
                         <div class="card-body">
-                            <!-- Add New Student Button -->
-                            <!-- Students Table -->
+                             <button id="generateCredentialsBtn" class="btn btn-info mb-2"><i class="fas fa-key"></i> Generate Credentials</button>
+                             <button id="deleteSelectedBtn" class="btn btn-danger mb-2"><i class="fas fa-trash-alt"></i> Delete Selected</button>
                             <table id="departmentsTable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAllCheckbox"> <label for="selectAllCheckbox">All</label>
+                                        </th>
                                         <th>No.</th>
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Phone</th>
                                         <th>College</th>
+                                        <th>Credential Status</th>
                                         <th class="exclude-export">Action</th>
                                     </tr>
                                 </thead>
@@ -118,94 +122,80 @@
                                     <!-- Sample Data -->
                                     {% for department in departments %}
                                     <tr>
+                                        <td><input type="checkbox" class="departmentCheckbox" data-email="{{ department.email }}"></td>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ department.department_name }}</td>
                                         <td>{{ department.email }}</td>
                                         <td>{{ department.phone }}</td>
                                         <td>{{ department.college }}</td>
+                                    <!-- Inside the <tbody> tag, in the loop for each department -->
+                                    <td>
+                                            {% if department.credential_status %}
+                                                                            <span class="badge badge-success">Generated</span>
+                                                                        {% else %}
+                                                                            <span class="badge badge-warning">Pending</span>
+                                                                        {% endif %}
+                                        </td>
+
                                         <td>
-                                             <!-- Update Button -->
+                                            <!-- Update Button -->
                                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#updateModal{{ forloop.counter }}">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                                <!-- Modal for Updating Department -->
-                                                <div class="modal fade" id="updateModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header bg-info text-white"> <!-- Changed modal header class to bg-info for color info -->
-                                                                <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Department</h5> <!-- Added edit icon -->
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <form id="updateDepartmentForm{{ forloop.counter }}" action="{% url 'update_department' department.username %}" method="post" novalidate>
-                                                                    {% csrf_token %}
-                                                                    <div class="form-group">
-                                                                        <label for="updateDepartmentName">Department Name</label>
-                                                                        <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                                                            </div>
-                                                                            <input type="text" class="form-control" id="updateDepartmentName{{ forloop.counter }}" name="department_name" value="{{ department.department_name }}">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="updateDepartmentEmail">Email</label>
-                                                                        <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                                                            </div>
-                                                                            <input type="email" class="form-control" id="updateDepartmentEmail{{ forloop.counter }}" name="email" value="{{ department.email }}">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="updateDepartmentPhone">Phone</label>
-                                                                        <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                                                            </div>
-                                                                            <input type="text" class="form-control" id="updateDepartmentPhone{{ forloop.counter }}" name="phone" value="{{ department.phone }}">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="updateDepartmentCollege">College</label>
-                                                                        <div class="input-group">
-                                                                            <div class="input-group-prepend">
-                                                                                <span class="input-group-text"><i class="fas fa-university"></i></span>
-                                                                            </div>
-                                                                            <input type="text" class="form-control" id="updateDepartmentCollege{{ forloop.counter }}" name="college" value="{{ department.college }}">
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Save changes</button>
-
-                                                                </form>
-
-                                                            </div>
+                                            <!-- Modal for Updating Department -->
+                                            <div class="modal fade" id="updateModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <!-- Modal header -->
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="updateModalLabel">Edit Department</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <!-- Modal body -->
+                                                        <div class="modal-body">
+                                                            <form id="updateDepartmentForm{{ forloop.counter }}" action="{% url 'update_department' department.username %}" method="post" novalidate>
+                                                                {% csrf_token %}
+                                                                <div class="form-group">
+                                                                    <label for="updateDepartmentName">Department Name</label>
+                                                                    <input type="text" class="form-control" id="updateDepartmentName{{ forloop.counter }}" name="department_name" value="{{ department.department_name }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="updateDepartmentEmail">Email</label>
+                                                                    <input type="email" class="form-control" id="updateDepartmentEmail{{ forloop.counter }}" name="email" value="{{ department.email }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="updateDepartmentPhone">Phone</label>
+                                                                    <input type="text" class="form-control" id="updateDepartmentPhone{{ forloop.counter }}" name="phone" value="{{ department.phone }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="updateDepartmentCollege">College</label>
+                                                                    <input type="text" class="form-control" id="updateDepartmentCollege{{ forloop.counter }}" name="college" value="{{ department.college }}">
+                                                                </div>
+                                                                <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Save changes</button>
+                                                            </form>
+                                                        </div>
+                                                        <!-- Modal footer -->
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                            <!-- Button to trigger the modal -->
-                                            <button type="button" class="btn btn-danger" data-toggle="modal"
-                                                data-target="#deleteModal{{ forloop.counter }}">
+                                            </div>
+                                            
+                                            <!-- Button to trigger the deletion modal -->
+                                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ forloop.counter }}">
                                                 <i class="fas fa-trash-alt"></i> Delete
                                             </button>
 
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="deleteModal{{ forloop.counter }}" tabindex="-1"
-                                                role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                            <!-- Modal for deleting department -->
+                                            <div class="modal fade" id="deleteModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog" role="document">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="deleteModalLabel">Delete
-                                                                Department</h5>
-                                                            <button type="button" class="close"
-                                                                data-dismiss="modal" aria-label="Close">
+                                                            <h5 class="modal-title" id="deleteModalLabel">Delete Department</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
                                                             </button>
                                                         </div>
@@ -213,23 +203,20 @@
                                                             <p>Are you sure you want to delete {{ department.department_name }}?</p>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button type="button" class="btn btn-outline-info"
-                                                                data-dismiss="modal">Close</button>
-                                                            <!-- Link to trigger the deletion -->
-                                                            <a href="{% url 'delete_department' email=department.email %}"
-                                                                class="btn btn-outline-danger">Delete</a>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                            <a href="{% url 'delete_department' email=department.email %}" class="btn btn-danger">Delete</a>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-
+                                            <!-- Rest of your action buttons -->
                                         </td>
                                     </tr>
                                     {% endfor %}
-
-                                    <!-- Add more rows for additional students -->
+                                    <!-- Add more rows for additional departments -->
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
                 </div>
@@ -238,52 +225,27 @@
             <!-- /.content -->
         </div>
 
-        <!-- Add Student Modal -->
-        <div class="modal fade" id="addStudentModal">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title"><i class="fas fa-user-plus"></i> Add New Student</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <!-- Add your form for adding a new student here -->
-                        <form id="addStudentForm">
-                            <div class="mb-3">
-                                <label for="studentName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="studentName" name="studentName"
-                                    placeholder="Enter student name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="studentEmail" name="studentEmail"
-                                    placeholder="Enter student email" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentPhone" class="form-label">Phone no.</label>
-                                <input type="tel" class="form-control" id="studentPhone" name="studentPhone"
-                                    placeholder="Enter student phone number" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="studentPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="studentPassword"
-                                    name="studentPassword" placeholder="Enter password" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword"
-                                    name="confirmPassword" placeholder="Confirm password" required>
-                            </div>
-                            <button type="button" class="btn btn-info" onclick="submitForm()"><i
-                                    class="fas fa-plus"></i> Add Student</button>
-                        </form>
+                <!-- AdminLTE Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete the selected departments?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                        </div>
                     </div>
                 </div>
-                <!-- /.modal-content -->
             </div>
-            <!-- /.modal-dialog -->
-        </div>
+
         {% comment %} <script>
             $(document).ready(function () {
                 $('#departmentsTable').DataTable({
@@ -292,10 +254,131 @@
                 });
             });
         </script> {% endcomment %}
+    <script>
+    $(document).ready(function () {
+        // Select all checkbox
+        $('#selectAllCheckbox').click(function () {
+            $('.departmentCheckbox').prop('checked', $(this).prop('checked'));
+        });
+
+        // Delete selected departments
+        $('#deleteSelectedBtn').click(function () {
+            var selectedEmails = [];
+            $('.departmentCheckbox:checked').each(function () {
+                selectedEmails.push($(this).data('email'));
+            });
+            if (selectedEmails.length > 0) {
+                // Show confirmation modal
+                $('#deleteConfirmationModal').modal('show');
+            } else {
+                // Show AdminLTE alert
+                $(document).Swal.fire('create', {
+                    class: 'bg-warning',
+                    title: 'Warning',
+                    body: 'Please select at least one department to delete.',
+                    autohide: true,
+                    delay: 3000
+                });
+            }
+        });
+
+        // Handle delete action on confirmation
+        $('#confirmDeleteBtn').click(function () {
+            var selectedEmails = [];
+            $('.departmentCheckbox:checked').each(function () {
+                selectedEmails.push($(this).data('email'));
+            });
+            $.ajax({
+                url: '{% url 'delete_departments' %}',
+                type: 'POST',
+                data: {
+                    'emails[]': selectedEmails,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                dataType: 'json',
+                success: function (data) {
+                    // Handle success response
+                    if (data.success > 0) {
+                        // Refresh the page or update department list
+                        location.reload();
+                    }
+                },
+                error: function (xhr, errmsg, err) {
+                    // Handle error response
+                    console.log(xhr.status + ": " + xhr.responseText);
+                }
+            });
+            // Hide confirmation modal
+            $('#deleteConfirmationModal').modal('hide');
+        });
+
+        // Generate credentials for selected departments
+        $('#generateCredentialsBtn').click(function () {
+            var selectedEmails = [];
+            $('.departmentCheckbox:checked').each(function () {
+                selectedEmails.push($(this).data('email'));
+            });
+            var filteredEmails = selectedEmails.filter(function (email) {
+                return !$('.departmentCheckbox[data-email="' + email + '"]').closest('tr').find('.badge-success').length;
+            });
+            if (filteredEmails.length > 0) {
+                // Show loading effect on the button
+                $('#generateCredentialsBtn').html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...').prop('disabled', true);
+                
+                // Make an AJAX request to generate credentials for selected departments
+                $.ajax({
+                    url: '{% url 'generate_credential' %}',
+                    type: 'POST',
+                    data: {
+                        'emails[]': filteredEmails,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        // Handle success response
+                        if (data.success > 0) {
+                            // Update the badge for generated credentials
+                            filteredEmails.forEach(function (email) {
+                                $('.departmentCheckbox[data-email="' + email + '"]').closest('tr').find('.badge-warning').removeClass('badge-warning').addClass('badge-success').text('Generated');
+                            });
+                            // Show success message
+                            $(document).Toasts('create', {
+                                class: 'bg-success',
+                                title: 'Success',
+                                body: data.success + ' credentials generated successfully.',
+                                autohide: true,
+                                delay: 3000
+                            });
+                        }
+                        // Reset button state
+                        $('#generateCredentialsBtn').html('Generate Credentials').prop('disabled', false);
+                    },
+                    error: function (xhr, errmsg, err) {
+                        // Handle error response
+                        console.log(xhr.status + ": " + xhr.responseText);
+                        // Reset button state
+                        $('#generateCredentialsBtn').html('Generate Credentials').prop('disabled', false);
+                    }
+                });
+            } else {
+                // Show AdminLTE alert
+                $(document).Toasts('create', {
+                    class: 'bg-warning',
+                    title: 'Warning',
+                    body: 'Please select departments whose credentials are not generated yet.',
+                    autohide: true,
+                    delay: 3000
+                });
+            }
+        });
+    });
+</script>
+
+
          <script>
             $(document).ready(function () {
                 $('#departmentsTable').DataTable({
-               
+                responsive: true,
             // Add Bootstrap classes to the table
             "language": {
                 "search": "_INPUT_", // Search input style
@@ -305,6 +388,7 @@
                 "paginate": {
                     "previous": '<i class="fas fa-angle-left"></i>', // Previous button
                     "next": '<i class="fas fa-angle-right"></i>' // Next button
+                   
                 }
             }
                 });

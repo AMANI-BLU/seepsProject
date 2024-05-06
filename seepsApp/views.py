@@ -103,7 +103,6 @@ def feedback(request):
 
 
 
-
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def add_department(request):
@@ -121,38 +120,69 @@ def add_department(request):
             user.is_department = True  # Set is_department to True
             user.password = make_password(password)  # Hash the password
             user.save()
+            messages.success(request,'Department added successfully!')
 
-            success_msg = 'Department added successfully!'
-            
-            # Send email
-            subject = 'Department Account Verification'
-            html_message = render_to_string('email/department_account_email.html', {
-                'user': user,
-                'password': password,  # Pass the generated password to the email template
-            })
-            plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
-            from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = user.email
-            send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+            # Don't send email here
+
+            # Redirect to department list view
+            return redirect('view_department')
         else:
-            error_msg = 'Form is not valid'
+            pass
     else:
         form = DepartmentRegistrationForm()
 
     return render(request, 'admin_template/add_department.html', {
-        'form': form,
-        'success_msg': success_msg,
-        'error_msg': error_msg
+        'form': form
+       
     })
 
+from django.contrib import messages
 
+@login_required(login_url='login_view')
+@user_passes_test(is_admin, login_url='NoPage')
+def generate_credential(request):
+    if request.method == 'POST':
+        selected_emails = request.POST.getlist('emails[]')
+        success_count = 0
+        for email in selected_emails:
+            try:
+                user = User.objects.get(email=email, is_department=True)
+                # Generate a random password
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                
+                # Set the generated password
+                user.set_password(password)
+                user.credential_status = True  # Set credential_status to True
+                user.save()
+
+                # Render the email template with the dynamic login URL
+                html_message = render_to_string('email/department_account_email.html', {
+                    'user': user,
+                    'password': password,
+                })
+
+                # Send the email
+                subject = 'Department Account Verification'
+                plain_message = strip_tags(html_message)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+                
+                success_count += 1  # Increment success count
+            except User.DoesNotExist:
+                pass
+        
+        # Return a JsonResponse with success count
+        return JsonResponse({'success': success_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 #Admin View Department List
 @login_required(login_url='login_view')
 @user_passes_test(is_admin, login_url='NoPage')
 def view_department(request):
-    # Retrieve all registered departments with necessary fields, including username
-    departments = User.objects.filter(is_department=True).values('username', 'department_name', 'email', 'college', 'phone')
+    # Retrieve all registered departments with necessary fields, including username and credential status
+    departments = User.objects.filter(is_department=True).values('username', 'department_name', 'email', 'college', 'phone', 'credential_status')
     return render(request, 'admin_template/view_department.html', {'departments': departments})
 
 #Admin Delete Department
@@ -327,6 +357,7 @@ def delete_feedback(request):
     messages.success(request, 'Feedback deleted successfully!')
     return redirect('feedback_management')  # Redirect to the feedback page after deletion
 
+
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def add_student(request):
@@ -345,18 +376,6 @@ def add_student(request):
                 user.set_password(password)  # Hash the password
                 user.save()
                 success_msg = 'Student registered successfully!'
-
-                # Send email
-                subject = 'Student Account Verification'
-                html_message = render_to_string('email/student_account_email.html', {
-                    'user': user,
-                    'password': password,  # Pass the generated password to the email template
-                    # 'login_url': 'http://127.0.0.1:8000/login/',  # Provide the login URL
-                })
-                plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
-                from_email = settings.DEFAULT_FROM_EMAIL
-                to_email = user.email
-                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
             except Exception as e:
                 error_msg = f'An error occurred: {str(e)}'
         else:
@@ -369,40 +388,85 @@ def add_student(request):
         'success_msg': success_msg,
         'error_msg': error_msg
     })
-    
-    
+
 @login_required(login_url='login_view')
 @user_passes_test(is_department, login_url='NoPage')
 def view_student(request):
-    # Retrieve the department name of the logged-in user
+    # Retrieve the department email of the logged-in user
     department_name = request.user.username
     
     # Retrieve all registered students belonging to the department along with their full names
     students = User.objects.filter(is_student=True, department_name=department_name)
     
-    # Initialize counters for male and female students
-    male_count = 0
-    female_count = 0
-
-    # Iterate through the students queryset to count male and female students
-    for student in students:
-        if student.sex == 'male':  # Corrected: accessing sex directly from student object
-            male_count += 1
-        elif student.sex == 'female':  # Corrected: accessing sex directly from student object
-            female_count += 1
-
-    # Fetch the total count of students belonging to the department
-    total_students = students.count()
-
-    # Pass the list of students, total count, and counts of male and female students to the template
+    # Pass the list of students to the template
     context = {
         'students': students,
-        'total_students': total_students,
-        'male_count': male_count,
-        'female_count': female_count,
     }
 
     return render(request, 'department_template/view_student.html', context)
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_students(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails[]')
+        success_count = 0
+        fail_count = 0
+        for email in emails:
+            try:
+                student = User.objects.get(email=email, is_student=True)
+                student.delete()
+                success_count += 1
+            except User.DoesNotExist:
+                fail_count += 1
+        if success_count > 0:
+            messages.success(request, f'{success_count} students deleted successfully!')
+        if fail_count > 0:
+            messages.error(request, f'{fail_count} students not found or could not be deleted.')
+        return JsonResponse({'success': success_count, 'fail': fail_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'})
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def generate_credentials_students(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails[]')
+        success_count = 0
+        for email in emails:
+            try:
+                user = User.objects.get(email=email, is_student=True)
+                # Generate a random password
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                
+                # Set the generated password
+                user.set_password(password)
+                user.credential_status = True
+                user.save()
+
+                # Render the email template with the dynamic login URL
+                html_message = render_to_string('email/student_account_email.html', {
+                    'user': user,
+                    'password': password,
+                })
+
+                # Send the email
+                subject = 'Student Account Verification'
+                plain_message = strip_tags(html_message)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+                
+                success_count += 1  # Increment success count
+            except User.DoesNotExist:
+                pass
+        
+        # Return a JsonResponse with success count
+        return JsonResponse({'success': success_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 
 
 from django.contrib import messages
@@ -2074,3 +2138,29 @@ def send_message(request):
         message = Message.objects.create(content=content, sender=sender)
         return redirect('chat_room')
     return redirect('chat_room')
+
+
+
+from django.http import JsonResponse
+
+@login_required(login_url='login_view')
+@user_passes_test(is_admin, login_url='NoPage')
+def delete_departments(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails[]')
+        success_count = 0
+        fail_count = 0
+        for email in emails:
+            try:
+                department = User.objects.get(email=email, is_department=True)
+                department.delete()
+                success_count += 1
+            except User.DoesNotExist:
+                fail_count += 1
+        if success_count > 0:
+            messages.success(request, f'{success_count} departments deleted successfully!')
+        if fail_count > 0:
+            messages.error(request, f'{fail_count} departments not found or could not be deleted.')
+        return JsonResponse({'success': success_count, 'fail': fail_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'})

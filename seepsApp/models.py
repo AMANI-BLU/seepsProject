@@ -3,7 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 import uuid
-
 class User(AbstractUser):
     is_admin = models.BooleanField('Is admin', default=False)
     is_department = models.BooleanField('Is department', default=False)
@@ -12,8 +11,9 @@ class User(AbstractUser):
     college = models.CharField(max_length=255, blank=True, null=True)
     department_name = models.CharField(max_length=255, blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True) 
-    sex = models.CharField(max_length=10, choices=(('Male', 'Male'), ('Female', 'Female')),blank=True, null=True)
+    sex = models.CharField(max_length=10, choices=(('Male', 'Male'), ('Female', 'Female')), blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    credential_status = models.BooleanField('Credential Status', default=False)  # New field for credential status
 
 
 class Exam(models.Model):
