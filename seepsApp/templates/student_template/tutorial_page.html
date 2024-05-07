@@ -36,7 +36,25 @@
   <link rel="stylesheet" href="{% static "plugins/datatables-buttons/css/buttons.bootstrap4.min.css" %}">
 
     <title>seeps</title>
-    <style></style>
+    
+    <style>
+       /* CSS modifications for enhanced attractiveness */
+/* CSS modifications for enhanced attractiveness */
+.list-group-item {
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.list-group-item a {
+    color: #138496; /* Default text color (#138496) */
+    transition: color 0.3s ease; /* Smooth transition for text color */
+}
+
+.list-group-item a.active-link {
+    color: #1929BB !important; /* Text color when active (#002261) */
+}
+
+
+    </style>
 </head>
   {% include 'student_template/navbar.html' %}
 <body>
@@ -74,7 +92,7 @@
                     {% else %}
                       {% with tutorial_url="https://www.youtube.com/embed/"|add:video_id %}
                         <li class="list-group-item">
-                            <a href="#" class="list-group-link text-decoration-none" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
+                            <a href="#" class="list-group-link" data-url="{{ tutorial_url }}" onclick="changeVideo(this)">
                                 {{ forloop.counter }}) {{ tutorial.title }}
                             </a>
                         </li>
@@ -150,32 +168,32 @@
         </div>
     </div>
 </div>
+
 <script>
     var currentIndex = 0;
     var tutorialLinks = document.getElementById('tutorialLinks').getElementsByTagName('a');
-document.addEventListener('DOMContentLoaded', function() {
-    // Load the URL of the first video
-    var firstLink = document.querySelector('#tutorialLinks li:first-child a');
-    changeVideo(firstLink);
-});
-
-function changeVideo(link) {
-    var videoUrl = link.getAttribute('data-url');
-    document.getElementById('videoPlayer').src = videoUrl;
-
-    // Remove 'active' class from all links
-    var links = document.querySelectorAll('.list-group-item a');
-    links.forEach(function(item) {
-        item.classList.remove('active-link');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load the URL of the first video
+        var firstLink = document.querySelector('#tutorialLinks li:first-child a');
+        changeVideo(firstLink);
     });
 
-    // Add 'active' class to the clicked link
-    link.classList.add('active-link');
+    function changeVideo(link) {
+        var videoUrl = link.getAttribute('data-url');
+        document.getElementById('videoPlayer').src = videoUrl;
 
-    // Prevent default link behavior
-    event.preventDefault();
-}
+        // Remove 'active-link' class from all links
+        var links = document.querySelectorAll('.list-group-item a');
+        links.forEach(function(item) {
+            item.classList.remove('active-link');
+        });
 
+        // Add 'active-link' class to the clicked link
+        link.classList.add('active-link');
+
+        // Prevent default link behavior
+        event.preventDefault();
+    }
 
     function showNextTutorial() {
         if (currentIndex < tutorialLinks.length - 1) {

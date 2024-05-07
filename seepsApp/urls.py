@@ -64,6 +64,7 @@ urlpatterns = [
     path('delete-instructors/', delete_instructors, name='delete_instructors'),
     path('generate-credentials-instructors/', generate_credentials_instructors, name='generate_credentials_instructors'),
 
+ 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset.html',
@@ -154,9 +155,7 @@ urlpatterns = [
     path('study-dashboard/', study_dashboard, name='study_dashboard'),
     path('chat/', chat_room, name='chat_room'),
     path('send-message/', send_message, name='send_message'),
-
-
-
+  
 
 
 

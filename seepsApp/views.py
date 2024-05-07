@@ -906,16 +906,18 @@ def update_tutorial(request, tutorial_id):
             tutorial.order = form.cleaned_data['order']
             # Save the tutorial object
             tutorial.save()
-            messages.success(request, 'tutorial successfully updated!')
+            messages.success(request, 'tutorial updated successfully updated!')
             return redirect('manage_tutorials')  # Return success response
         else:
-           # Get the specific error message for the 'order' field
-            error_message = form.errors['order'][0] if 'order' in form.errors else 'Unknown error'
-            messages.error(request, error_message)
+          
+            # Return form errors in case of invalid form data
+            messages.error(request, f'errors : str{form.errors}')
             return redirect('manage_tutorials')  # Return success response
     else:
-        messages.error(request, 'Invalid request method')
         return redirect('manage_tutorials')  # Return success response
+
+        return JsonResponse({'success': False, 'errors': 'Invalid request method'})
+
 
 def delete_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
