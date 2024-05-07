@@ -12,21 +12,59 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
 
-             {% if messages %}
-                        {% for message in messages %}
-                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                            <script>
-                                Swal.fire({
-                                    toast: true,
-                                    position: 'top-end',
-                                    icon: 'success',
-                                    text: "{{ message }}",
-                                    showConfirmButton: false,
-                                    timer: 6000,
-                                });
-                            </script>
-                        {% endfor %}
-                    {% endif %}
+          {% if messages %}
+              {% for message in messages %}
+                  {% if message.tags == 'success' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'success',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'error' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'error',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'warning' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'warning',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% elif message.tags == 'info' %}
+                      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                      <script>
+                          Swal.fire({
+                              toast: true,
+                              position: 'top-end',
+                              icon: 'info',
+                              text: "{{ message }}",
+                              showConfirmButton: false,
+                              timer: 6000,
+                          });
+                      </script>
+                  {% endif %}
+              {% endfor %}
+          {% endif %}
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
@@ -68,6 +106,7 @@
                         <thead>
                             <tr>
                                 <th>No.</th>
+                                <th>Order</th>
                                 <th>Course</th>
                                 <th>Title</th>
                                
@@ -78,6 +117,7 @@
                             {% for tutorial in tutorials %}
                             <tr>
                                 <td>{{ forloop.counter }}</td>
+                                <td>{{ tutorial.order }}</td> <!-- Display the order -->
                                 <td>{{ tutorial.course.title }}</td>
                                 <td>{{ tutorial.title }}</td>
                               
@@ -104,46 +144,56 @@
                 </button>
             </div>
             <div class="modal-body">
-                    <!-- Update Form -->
-                    <form action="{% url 'update_tutorial' tutorial.id %}" method="post">
-                        {% csrf_token %}
-                        <!-- Course Selection -->
-                        <div class="form-group">
-                            <label for="course">Course</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-book"></i></span>
-                                </div>
-                                <select class="form-control" id="course" name="course">
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}" {% if course.id == tutorial.course.id %}selected{% endif %}>{{ course.title }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Tutorial Title -->
-                        <div class="form-group">
-                            <label for="title">Tutorial Title</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-heading"></i></span>
-                                </div>
-                                <input type="text" class="form-control" id="title" name="title" value="{{ tutorial.title }}">
-                            </div>
-                        </div>
-                        <!-- Tutorial URL -->
-                        <div class="form-group">
-                            <label for="tutorial_url">Tutorial URL</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-link"></i></span>
-                                </div>
-                                <input type="text" class="form-control" id="tutorial_url" name="tutorial_url" value="{{ tutorial.tutorial_url }}">
-                            </div>
-                        </div>
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Save Changes</button>
-                    </form>
+                  <!-- Update Form -->
+<form action="{% url 'update_tutorial' tutorial.id %}" method="post">
+    {% csrf_token %}
+    <!-- Course Selection -->
+    <div class="form-group">
+        <label for="course">Course</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-book"></i></span>
+            </div>
+            <select class="form-control" id="course" name="course">
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if course.id == tutorial.course.id %}selected{% endif %}>{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <!-- Tutorial Title -->
+    <div class="form-group">
+        <label for="title">Tutorial Title</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-heading"></i></span>
+            </div>
+            <input type="text" class="form-control" id="title" name="title" value="{{ tutorial.title }}">
+        </div>
+    </div>
+    <!-- Tutorial URL -->
+    <div class="form-group">
+        <label for="tutorial_url">Tutorial URL</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-link"></i></span>
+            </div>
+            <input type="text" class="form-control" id="tutorial_url" name="tutorial_url" value="{{ tutorial.tutorial_url }}">
+        </div>
+    </div>
+    <!-- Tutorial Order -->
+    <div class="form-group">
+        <label for="order">Order</label>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fas fa-sort-numeric-up"></i></span>
+            </div>
+            <input type="number" class="form-control" id="order" name="order" value="{{ tutorial.order }}">
+        </div>
+    </div>
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Save Changes</button>
+</form>
 
                 </div>
             </div>

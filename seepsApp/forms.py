@@ -92,11 +92,15 @@ from .models import Course
 
 from django import forms
 from .models import Tutorial
+from django import forms
+from .models import Tutorial, Course
 
 class TutorialForm(forms.ModelForm):
+    order = forms.IntegerField(label='Order', required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))  # Add order field with widget
+
     class Meta:
         model = Tutorial
-        fields = ['course', 'title', 'tutorial_url']
+        fields = ['course', 'title', 'tutorial_url', 'order']
         widgets = {
             'course': forms.Select(attrs={'class': 'form-control'}),
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Tutorial Title'}),
@@ -121,6 +125,15 @@ class TutorialForm(forms.ModelForm):
             raise forms.ValidationError("Please select a course.")
 
         return cleaned_data
+
+    def clean_order(self):
+        # Retrieve the course and order from the form data
+        course = self.cleaned_data['course']
+        order = self.cleaned_data['order']
+        # Check if there is any tutorial with the same course and order
+        if Tutorial.objects.filter(course=course, order=order).exists():
+            raise forms.ValidationError("A tutorial with the same order already exists for this course.")
+        return order
 
     def save(self, commit=True):
         tutorial = super(TutorialForm, self).save(commit=False)

@@ -105,12 +105,11 @@ class Tutorial(models.Model):
     title = models.CharField(max_length=100)
     tutorial_url = models.CharField(max_length=100)  # New field for tutorial URL
     added_by = models.CharField(max_length=255, blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)  # Field for specifying the order
 
     def __str__(self):
         return self.title
 
-    def __str__(self):
-        return self.title
 
 
 

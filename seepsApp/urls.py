@@ -60,6 +60,9 @@ urlpatterns = [
     path('update_instructor/<str:username>/', update_instructor, name='update_instructor'),
     path('delete-students/', delete_students, name='delete_students'),
     path('generate-credentials-students/', generate_credentials_students, name='generate_credentials_students'),
+    
+    path('delete-instructors/', delete_instructors, name='delete_instructors'),
+    path('generate-credentials-instructors/', generate_credentials_instructors, name='generate_credentials_instructors'),
 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(

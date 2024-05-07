@@ -839,7 +839,7 @@ def delete_course(request, course_id):
 def manage_tutorials(request):
     department_name = request.user.username
     courses = Course.objects.filter(department_name=department_name)
-    tutorials = Tutorial.objects.filter(course__in=courses)
+    tutorials = Tutorial.objects.filter(course__in=courses).order_by('order')
     return render(request, 'department_template/manage_tutorials.html', {'tutorials': tutorials, 'courses': courses})
 
 from django.contrib import messages
@@ -875,41 +875,47 @@ from django.shortcuts import render, redirect
 from .forms import TutorialForm
 from .models import Course
 
-
-@login_required(login_url='login_view')
-@user_passes_test(is_department, login_url='NoPage')
 def add_tutorial(request):
     if request.method == 'POST':
         form = TutorialForm(request.POST)
         if form.is_valid():
-            form.save()
+            tutorial = form.save(commit=False)
+            tutorial.added_by = request.user.username
+            tutorial.save()
             messages.success(request, 'Tutorial Added successfully!')
-            return redirect('add_tutorial')  # Redirect to the same page after adding a tutorial
+            return redirect('add_tutorial')
     else:
-        department_name = request.user.username  # Get department name from user
-        courses = Course.objects.filter(department_name=department_name)  # Filter courses by department
-        # Pass the department to the form
+        department_name = request.user.username
+        courses = Course.objects.filter(department_name=department_name)
         form = TutorialForm(department=department_name)
         
     return render(request, 'department_template/add_tutorial.html', {
         'form': form,
     })
-    
- 
+
+
+
 def update_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
     if request.method == 'POST':
         form = TutorialForm(request.POST, instance=tutorial)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Tutorial updated successfully!')
-            return redirect('manage_tutorials')
+            # Save the form data without committing
+            tutorial = form.save(commit=False)
+            # Update the order field
+            tutorial.order = form.cleaned_data['order']
+            # Save the tutorial object
+            tutorial.save()
+            messages.success(request, 'tutorial successfully updated!')
+            return redirect('manage_tutorials')  # Return success response
+        else:
+           # Get the specific error message for the 'order' field
+            error_message = form.errors['order'][0] if 'order' in form.errors else 'Unknown error'
+            messages.error(request, error_message)
+            return redirect('manage_tutorials')  # Return success response
     else:
-        form = TutorialForm(instance=tutorial)
-        department_name = request.user.username
-        courses = Course.objects.filter(department_name=department_name)
-    return render(request, 'department_template/update_tutorial.html', {'form': form, 'courses': courses})
-
+        messages.error(request, 'Invalid request method')
+        return redirect('manage_tutorials')  # Return success response
 
 def delete_tutorial(request, tutorial_id):
     tutorial = get_object_or_404(Tutorial, pk=tutorial_id)
@@ -1421,27 +1427,16 @@ def add_instructor(request):
                 user.is_instructor = True
                 user.set_password(password)  # Hash the password
                 user.save()
-                success_msg = 'Instructor registered successfully!'
-
-                # Send email
-                subject = 'Instructor Account Verification'
-                html_message = render_to_string('email/instructor_account_email.html', {
-                    'user': user,
-                    'password': password,  # Pass the generated password to the email template
-                    # 'login_url': 'http://127.0.0.1:8000/login/',  # Provide the login URL
-                })
-                plain_message = strip_tags(html_message)  # Strip HTML tags for plain text message
-                from_email = settings.DEFAULT_FROM_EMAIL
-                to_email = user.email
-                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+                messages.success(request, 'Instructor added successfully!')
             except Exception as e:
-                error_msg = f'An error occurred: {str(e)}'
+                messages.error(request, f'An error occurred: {str(e)}')
         else:
-            error_msg = 'Form is not valid'
+                messages.error(request, 'Form is invalid!')
     else:
         form = InstructorRegistrationForm(department_name=request.user.username)
     
     return render(request, 'department_template/add_instructor.html', {'form': form})
+
 
 
 def update_instructor(request, username):
@@ -1479,6 +1474,68 @@ def delete_instructor(request, username):
     return redirect('manage_instructors')
 
 
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def delete_instructors(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails[]')
+        success_count = 0
+        fail_count = 0
+        for email in emails:
+            try:
+                student = User.objects.get(email=email, is_instructor=True)
+                student.delete()
+                success_count += 1
+            except User.DoesNotExist:
+                fail_count += 1
+        if success_count > 0:
+            messages.success(request, f'{success_count} instructors deleted successfully!')
+        if fail_count > 0:
+            messages.error(request, f'{fail_count} instructors not found or could not be deleted.')
+        return JsonResponse({'success': success_count, 'fail': fail_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method.'})
+
+
+@login_required(login_url='login_view')
+@user_passes_test(is_department, login_url='NoPage')
+def generate_credentials_instructors(request):
+    if request.method == 'POST':
+        emails = request.POST.getlist('emails[]')
+        success_count = 0
+        for email in emails:
+            try:
+                user = User.objects.get(email=email, is_instructor=True)
+                # Generate a random password
+                password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+                
+                # Set the generated password
+                user.set_password(password)
+                user.credential_status = True
+                user.save()
+
+                # Render the email template with the dynamic login URL
+                html_message = render_to_string('email/instructor_account_email.html', {
+                    'user': user,
+                    'password': password,
+                })
+
+                # Send the email
+                subject = 'Instructor Account Verification'
+                plain_message = strip_tags(html_message)
+                from_email = settings.DEFAULT_FROM_EMAIL
+                to_email = user.email
+                send_mail(subject, plain_message, from_email, [to_email], html_message=html_message)
+                
+                success_count += 1  # Increment success count
+            except User.DoesNotExist:
+                pass
+        
+        # Return a JsonResponse with success count
+        return JsonResponse({'success': success_count})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 ####################### Instructor Views ########################
 

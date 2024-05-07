@@ -100,7 +100,7 @@
                                                   {% if student.credential_status %}
                                                                             <span class="badge badge-success">Generated</span>
                                                                         {% else %}
-                                                                            <span class="badge badge-warning">Pending</span>
+                                                                            <span class="badge badge-warning">not generated</span>
                                                                         {% endif %}
                                             </td>
                                             <td>
@@ -229,7 +229,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            Are you sure you want to delete the selected students?
+                            Are you sure you want to delete the selected student(s)?
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -261,7 +261,7 @@
                 $(document).Swal.fire('create', {
                     class: 'bg-warning',
                     title: 'Warning',
-                    body: 'Please select at least one department to delete.',
+                    body: 'Please select at least one student to delete.',
                     autohide: true,
                     delay: 3000
                 });
@@ -351,7 +351,7 @@
                 $(document).Toasts('create', {
                     class: 'bg-warning',
                     title: 'Warning',
-                    body: 'Please select departments whose credentials are not generated yet.',
+                    body: 'Please select students whose credentials are not generated yet.',
                     autohide: true,
                     delay: 3000
                 });
