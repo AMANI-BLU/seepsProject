@@ -977,7 +977,7 @@ from django.contrib import messages
 from .models import Exam, Question
 from random import shuffle
 
-def exam_detail(request, exam_id):
+def exam_detail(request, exam_id,attempts_remaining):
     exam = get_object_or_404(Exam, id=exam_id)
 
     # Check if the user has entered the correct exam code
@@ -1004,6 +1004,8 @@ def exam_detail(request, exam_id):
     context = {
         'exam': exam,
         'questions': questions,
+        'attempts_remaining': attempts_remaining,
+
     }
 
     return render(request, 'student_template/exam_detail.html', context)
@@ -1130,7 +1132,7 @@ def enter_exam_code(request, exam_id):
                     # Store the entered exam code in the session
                     request.session[f'exam_code_{exam_id}'] = entered_exam_code
                     # Redirect to the exam detail page if the entered code is correct and attempts are within limit
-                    return redirect('exam_detail', exam_id=exam_id)
+                    return redirect('exam_detail', exam_id=exam_id,attempts_remaining=attempts_remaining)
                 else:
                     messages.error(request, 'You have reached the maximum number of attempts for this exam.')
             else:

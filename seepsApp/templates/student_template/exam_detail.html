@@ -12,6 +12,11 @@
       <div class="text-center">
         <span id="timer">Time Remaining: {{ exam.timer }}:00</span>
       </div>
+      <!-- Include a hidden div to store attempts_remaining -->
+<div id="attemptsRemaining">{{ attempts_remaining }}</div>
+
+<!-- Your existing HTML content -->
+
       <!-- Progress bar -->
       <div class="progress mt-3 mb-3">
         <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -59,6 +64,7 @@
     localStorage.removeItem('examProgress_' + username);
     localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
   }
+  var attemptsRemaining = document.getElementById('attemptsRemaining').innerText;
 
   var timerElement = document.getElementById('timer');
   var progressBar = document.getElementById('timerProgressBar');
@@ -81,7 +87,7 @@
       progressBar.classList.add('bg-danger');
     }
 
-    if (timerValue === 0) {
+    if (timerValue === 0 || attemptsRemaining===1) {
       document.getElementById('examForm').submit();
       localStorage.removeItem('examProgress_' + username);
       localStorage.removeItem('timerValue_' + username);
