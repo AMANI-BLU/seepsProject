@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'seepsApp',
     'import_export', 
-   
+    'schedule',   
 ]
 
 MIDDLEWARE = [
@@ -71,6 +71,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'seepsProject.wsgi.application'
+
+SCHEDULE_TEMPLATE_DIRS = [
+    os.path.join(BASE_DIR, 'templates'),  # Path to your templates directory
+]
 
 
 # Database

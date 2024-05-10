@@ -115,8 +115,13 @@ urlpatterns = [
     path('submit_feedback/', submit_feedback, name='submit_feedback'),
     path('tutorial/<int:course_id>/', tutorial_page, name='tutorial_page'),
     path('materials/', materials, name='materials'),
-
-
+    
+    path('calendar/', event_calendar, name='event_calendar'),
+    path('create/', create_event, name='create_event'),
+    path('edit-event/<int:event_id>/', edit_event, name='edit_event'),
+    path('delete-event/<int:event_id>/', delete_event, name='delete_event'),
+    
+  
    #teacher urls
    path('teacher_home/', instructor_home, name='instructor_home'),
    path('view_students/', view_students, name='view_students'),

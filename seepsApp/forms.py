@@ -697,3 +697,16 @@ class InstructorRegistrationForm(UserCreationForm):
 
 class DashboardForm(forms.Form):
     text = forms.CharField(max_length=100, label='', widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your search here'}))
+    
+    
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['title', 'start_date', 'end_date', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter event title'}),
+            'start_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'end_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter event description'}),
+        }

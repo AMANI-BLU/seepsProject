@@ -2225,3 +2225,51 @@ def delete_departments(request):
         return JsonResponse({'success': success_count, 'fail': fail_count})
     else:
         return JsonResponse({'error': 'Invalid request method.'})
+
+
+
+
+@login_required
+def event_calendar(request):
+    # Retrieve events only for the current user
+    events = Event.objects.filter(user=request.user.username)
+    form = EventForm()  # Create an instance of the EventForm
+    return render(request, 'student_template/calendar/calendar.html', {'events': events, 'form': form})
+
+@login_required
+def create_event(request):
+    if request.method == 'POST':
+        form = EventForm(request.POST)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.user = request.user.username  # Assign the current user to the event
+            event.save()
+            return redirect('event_calendar')
+    else:
+        form = EventForm()
+    return redirect('event_calendar')
+
+@login_required
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    if event.user != request.user.username:
+        # Unauthorized access, redirect or handle appropriately
+        return redirect('event_calendar')
+    if request.method == 'POST':
+        form = EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+            return redirect('event_calendar')
+    else:
+        form = EventForm(instance=event)
+    return redirect('event_calendar')
+
+@login_required
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    if event.user != request.user.username:
+        # Unauthorized access, redirect or handle appropriately
+        return redirect('event_calendar')
+    if request.method == 'POST':
+        event.delete()
+    return redirect('event_calendar')

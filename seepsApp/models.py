@@ -155,3 +155,15 @@ class Message(models.Model):
     content = models.TextField()
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+    description = models.TextField(blank=True)
+    user = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return self.title
