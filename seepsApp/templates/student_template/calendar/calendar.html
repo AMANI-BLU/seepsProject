@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Event Calendar{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-info">
+                <div class="card-body">
+                    <h2 class="card-title text-white"><i class="fas fa-running mr-2"></i>Running Events</h2>
+                    <div id="runningEvents">
+                        <!-- Running events will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="card-title text-white"><i class="far fa-calendar-alt mr-2"></i>Event Calendar</h1>
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Modals -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="far fa-calendar-check mr-2"></i>Event Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="eventTitle"></div>
+                <div id="eventDescription"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="editEventBtn"><i class="far fa-edit mr-2"></i>Edit</button>
+                <button type="button" class="btn btn-danger" id="deleteEventBtn"><i class="far fa-trash-alt mr-2"></i>Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteEventModal" tabindex="-1" role="dialog" aria-labelledby="deleteEventModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="deleteEventForm" method="POST">
+                {% csrf_token %}
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="far fa-calendar-times mr-2"></i>Delete Event</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this event?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger" id="confirmDeleteEventBtn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createEventModal" tabindex="-1" role="dialog" aria-labelledby="createEventModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="far fa-calendar-plus mr-2"></i>Create Event</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="createEventForm" method="POST" action="{% url 'create_event' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: [
+                {% for event in events %}
+                {
+                    title: '{{ event.title }}',
+                    start: '{{ event.start_date|date:"Y-m-d" }}T{{ event.start_date|date:"H:i:s" }}',
+                    end: '{{ event.end_date|date:"Y-m-d" }}T{{ event.end_date|date:"H:i:s" }}',
+                    description: '{{ event.description }}',
+                    id: '{{ event.id }}'
+                },
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                $('#eventTitle').text(info.event.title);
+                $('#eventDescription').text(info.event.extendedProps.description);
+                $('#editEventBtn').attr('href', '#editEventModal'); // Set href to edit event modal
+                $('#deleteEventBtn').attr('data-event-id', info.event.id); // Set event ID for delete
+                $('#deleteEventForm').attr('action', '/delete-event/' + info.event.id + '/'); // Set action attribute dynamically
+                $('#eventModal').modal('show');
+            },
+            dateClick: function(info) {
+                $('#createEventModal').modal('show');
+                $('#id_start_date').val(info.dateStr);
+                $('#id_end_date').val(info.dateStr);
+            }
+        });
+        calendar.render();
+
+        // Delete event button click handler
+        $('#deleteEventBtn').click(function() {
+            $('#deleteEventModal').modal('show'); // Show confirmation modal
+        });
+
+        // Edit event button click handler
+        $('#editEventBtn').click(function() {
+            $('#editEventModal').modal('show'); // Show edit event modal
+        });
+
+        // Confirm delete event form submission
+        $('#confirmDeleteEventBtn').click(function() {
+            $('#deleteEventForm').submit(); // Submit delete event form
+        });
+    });
+</script>
+
+{% endblock %}
