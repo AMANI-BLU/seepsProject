@@ -1141,6 +1141,7 @@ def enter_exam_code(request, exam_id):
             messages.error(request, 'Please enter a valid exam code.')
 
     return render(request, 'student_template/enter_exam_code.html', {'exam': exam, 'num_questions': num_questions, 'attempts_remaining': attempts_remaining})
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import FeedbackForm
@@ -2321,7 +2322,7 @@ co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_
 def chatbot(request):
     if 'messages' not in request.session:
         request.session['messages'] = []
-    
+
     if request.method == 'POST':
         user_message = request.POST.get('message', '')
         bot_response = co.chat(message=user_message, model="command-r-plus").text
@@ -2331,3 +2332,22 @@ def chatbot(request):
         request.session['messages'].append({'sender': 'bot', 'text': bot_response})
         
     return render(request, 'student_template/chatbot.html', {'messages': request.session['messages']})
+
+
+
+
+@login_required
+def student_profile(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('student_profile')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'student_template/profile.html', {'form': form})

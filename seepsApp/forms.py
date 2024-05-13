@@ -710,4 +710,13 @@ class EventForm(forms.ModelForm):
             'end_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter event description'}),
         }
-    
+
+
+class ProfilePictureUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['profile_picture']
+
+    def __init__(self, *args, **kwargs):
+        super(ProfilePictureUpdateForm, self).__init__(*args, **kwargs)
+        self.fields['profile_picture'].required = False  # Make profile picture not required

@@ -64,6 +64,7 @@
     localStorage.removeItem('examProgress_' + username);
     localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
   }
+  
   var attemptsRemaining = document.getElementById('attemptsRemaining').innerText;
 
   var timerElement = document.getElementById('timer');
@@ -87,7 +88,7 @@
       progressBar.classList.add('bg-danger');
     }
 
-    if (timerValue === 0 || attemptsRemaining===1) {
+    if (timerValue === 0 || attemptsRemaining === 1) {
       document.getElementById('examForm').submit();
       localStorage.removeItem('examProgress_' + username);
       localStorage.removeItem('timerValue_' + username);
@@ -136,6 +137,18 @@
   loadProgress();
 
   // Code to prevent navigation away, opening new tabs, fullscreen...
+
+  // Function to handle page visibility change
+  function handleVisibilityChange() {
+    if (document.visibilityState === 'hidden' && attemptsRemaining === 1) {
+      document.getElementById('examForm').submit();
+      localStorage.removeItem('examProgress_' + username);
+      localStorage.removeItem('timerValue_' + username);
+    }
+  }
+
+  // Add event listener for visibility change
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 </script>
 
 {% endblock %}

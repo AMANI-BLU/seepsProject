@@ -107,6 +107,7 @@ urlpatterns = [
 
     #student urls
     path('student/', student_home, name='student_home'),
+    path('my_profile/', student_profile, name='student_profile'),
     path('view_exams/', view_exams, name='view_exams'),
     path('exam/<int:exam_id>/<int:attempts_remaining>/', exam_detail, name='exam_detail'),
     path('result/<int:result_id>/', result, name='result'),
