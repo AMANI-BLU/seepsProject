@@ -1,0 +1,219 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-footer {
+            border-top: none;
+            background-color: #f8f9fa;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .input-group-append button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        .card-body {
+            max-height: 300px;
+            /* Adjust the height as needed */
+            overflow-y: auto;
+        }
+
+        .message {
+            border-radius: 15px;
+            max-width: 70%;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.bot-message {
+            background-color: #28a745;
+            color: #fff;
+            margin-right: auto;
+        }
+
+        .message.user-message {
+            background-color: #007bff;
+            color: #fff;
+            margin-left: auto;
+        }
+
+        .message-content {
+            margin-bottom: 5px;
+        }
+
+        .message-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .message.user-message .message-icon {
+            left: -30px;
+        }
+
+        .message.bot-message .message-icon {
+            right: -30px;
+        }
+
+        .back-to-home,
+        .clear-conversation {
+            position: fixed;
+            font-size: 24px;
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-to-home:hover,
+        .clear-conversation:hover {
+            color: #0056b3;
+        }
+
+        .back-to-home {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .clear-conversation {
+            bottom: 70px;
+            right: 20px;
+        }
+
+        .animation-text {
+            display: inline-block;
+            opacity: 0;
+            animation: revealText 1s ease forwards;
+        }
+
+        @keyframes revealText {
+            0% {
+                opacity: 0;
+                transform: translateX(-100%);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card mt-5">
+        <!-- Welcome message -->
+        <div class="row mb-3 text-center pb-5">
+            <div class="col">
+                <img src="{% static "images/mb.jpg" %}" class="img-fluid" style="display: block; margin: auto; width: 100px;" alt="Chatbot Image">
+                <div class="" role="alert">
+                    <h4 class="alert-heading">Welcome!</h4>
+                    <p class="mb-0">
+                        <span class="animation-text">H</span>
+                        <span class="animation-text">o</span>
+                        <span class="animation-text">w</span>
+                        <span class="animation-text">&nbsp;</span>
+                        <span class="animation-text">c</span>
+                        <span class="animation-text">a</span>
+                        <span class="animation-text">n</span>
+                        <span class="animation-text">&nbsp;</span>
+                        <span class="animation-text">I</span>
+                        <span class="animation-text">&nbsp;</span>
+                        <span class="animation-text">a</span>
+                        <span class="animation-text">s</span>
+                        <span class="animation-text">s</span>
+                        <span class="animation-text">i</span>
+                        <span class="animation-text">s</span>
+                        <span class="animation-text">t</span>
+                        <span class="animation-text">&nbsp;</span>
+                        <span class="animation-text">y</span>
+                        <span class="animation-text">o</span>
+                        <span class="animation-text">u</span>
+                        <span class="animation-text">&nbsp;</span>
+                        <span class="animation-text">t</span>
+                        <span class="animation-text">o</span>
+                        <span class="animation-text">d</span>
+                        <span class="animation-text">a</span>
+                        <span class="animation-text">y</span>
+                        <span class="animation-text">?</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body" id="chat-history">
+            <!-- Chat history messages -->
+            {% for message in messages %}
+                {% if message.sender == 'user' %}
+                    <div class="row mb-3 justify-content-end">
+                        <div class="col">
+                            <div class="message user-message">
+                                <i class="fas fa-user message-icon"></i>
+                                <div class="message-content">{{ message.text }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif message.sender == 'bot' %}
+                    <div class="row mb-3">
+                        <div class="col">
+                            <div class="message bot-message">
+                                <i class="fas fa-robot message-icon"></i>
+                                <div class="message-content">{{ message.text }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <form id="chat-form" method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" id="user-input" name="message" class="form-control" placeholder="Type your message...">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary "><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Back to Home icon -->
+<div class="position-fixed" style="bottom: 20px; right: 20px;">
+    <a href="/student/"><i class="fas fa-home fa-2x text-primary"></i></a>
+</div>
+<!-- Clear Conversation icon -->
+<div class="position-fixed" style="bottom: 70px; right: 20px;">
+    <a href="#" onclick="clearConversation()"><i class="fas fa-trash-alt fa-2x text-danger"></i></a>
+</div>
+
+<script>
+    function clearConversation() {
+        document.getElementById('chat-history').innerHTML = '';
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
