@@ -2273,3 +2273,61 @@ def delete_event(request, event_id):
     if request.method == 'POST':
         event.delete()
     return redirect('event_calendar')
+
+
+# cohere_project/cohere_app/views.py
+# from django.shortcuts import render
+import cohere
+import secrets
+
+# def chatbot(request):
+#     form = CohereForm()
+
+#     if request.method == 'POST':
+#         form = CohereForm(request.POST)
+#         if form.is_valid():
+#             text = form.cleaned_data['text']
+#             co = cohere.Client('hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a')
+#             response = co.chat(
+#                 model='command-r',
+#                 message=text,
+#                 max_tokens=300,
+#                 temperature=0.9,
+#                 k=0,
+#                 p=0.75,
+#                 stop_sequences=[],
+#                 return_likelihoods='NONE'
+#             )
+#             output = response.generations[0].text
+#             return render(request, 'student_template/chatbot.html', {'form': form, 'output': output})
+
+#     return render(request, 'student_template/chatbot.html', {'form': form, 'output': None})
+
+
+
+co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_COHERE_API_KEY" with your actual API key
+
+
+# def chatbot(request):
+#     if request.method == 'POST':
+#         message = request.POST.get('message', '')
+#         response = co.chat(message=message, model="command-r-plus")
+#         return JsonResponse({'response': response.text})
+#     return render(request, 'student_template/chatbot.html')
+
+
+
+
+def chatbot(request):
+    if 'messages' not in request.session:
+        request.session['messages'] = []
+    
+    if request.method == 'POST':
+        user_message = request.POST.get('message', '')
+        bot_response = co.chat(message=user_message, model="command-r-plus").text
+
+        # Append new message to session
+        request.session['messages'].append({'sender': 'user', 'text': user_message})
+        request.session['messages'].append({'sender': 'bot', 'text': bot_response})
+        
+    return render(request, 'student_template/chatbot.html', {'messages': request.session['messages']})

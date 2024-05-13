@@ -120,7 +120,8 @@ urlpatterns = [
     path('create/', create_event, name='create_event'),
     path('edit-event/<int:event_id>/', edit_event, name='edit_event'),
     path('delete-event/<int:event_id>/', delete_event, name='delete_event'),
-    
+    path('chatbot/', chatbot, name='chatbot'),
+
   
    #teacher urls
    path('teacher_home/', instructor_home, name='instructor_home'),

@@ -61,10 +61,23 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Add Chat Bot Card -->
+<div class="col-md-4">
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <i class="fas fa-robot fa-3x mb-3 text-secondary"></i>
+            <h5>Chat Bot</h5>
+            <p>Interact with a chat bot for assistance.</p>
+            <a href="{% url 'chatbot' %}" class="btn btn-outline-secondary">Chat Now</a>
+        </div>
+    </div>
+</div>
+
             <!-- Add more cards for other options -->
         </div>
     </div> 
-    <a href="{% url 'chat_room' %}" class="btn btn-lg btn-primary btn-fab" style="position: fixed; bottom: 20px; right: 30px; border-radius: 50%;">
+    <a href="{% url 'chatbot' %}" class="btn btn-lg btn-primary btn-fab" style="position: fixed; bottom: 20px; right: 30px; border-radius: 50%;">
         <i class="fa fa-comment"></i>
     </a>
 {% endblock %}
