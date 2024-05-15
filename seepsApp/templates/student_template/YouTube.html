@@ -4,19 +4,22 @@
 {% block content %}
 <section class="container py-5">
     <div class="text-center">
-        <i class="fab fa-youtube fa-3x text-danger mb-3"></i>
+                <i class="fab fa-youtube fa-3x text-danger mb-3"></i>
+
         <h2 class="mb-4">Search Videos in YouTube</h2>
         <p>Search for videos and select any video to open in YouTube.</p>
-        <form action="" method="post" class="form-inline justify-content-center">
+        <form action="" id="ytform" method="post" class="form-inline justify-content-center">
             {% csrf_token %}
             <div class="input-group mb-3">
                 {{ form }}
                 <div class="input-group-append">
-                    <button class="btn btn-danger" type="submit">Search</button>
+                    <button id="searchButton" class="btn btn-danger" type="submit">Search</button>
                 </div>
             </div>
         </form>
     </div>
+
+    <a href="{% url 'navigation_options' %}" class="btn btn-light back-button"><i class="fas fa-arrow-left"></i> Back</a>
 
     <div class="row mt-5">
         {% for result in results %}
@@ -47,4 +50,21 @@
         {% endfor %}
     </div>
 </section>
+
+<script>
+    document.getElementById('ytform').addEventListener('submit', function () {
+        var searchButton = document.getElementById('searchButton');
+        searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> please wait...';
+        searchButton.setAttribute('disabled', true);
+    });
+</script>
+
+<style>
+    .back-button {
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        z-index: 1000;
+    }
+</style>
 {% endblock %}

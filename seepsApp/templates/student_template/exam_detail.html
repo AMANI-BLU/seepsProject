@@ -1,154 +1,379 @@
-{% extends 'student_template/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="{% static "fontawesome-free/css/all.min.css" %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+  <!-- Tempusdominus Bbootstrap 4 -->
+  <link rel="stylesheet" href="{% static 'tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css' %}">
+  <!-- iCheck -->
+  <link rel="stylesheet" href="{% static "icheck-bootstrap/icheck-bootstrap.min.css" %}">
+  <!-- JQVMap -->
+  <link rel="stylesheet" href="{% static "jqvmap/jqvmap.min.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'  %}">
+  <!-- overlayScrollbars -->
+  <link rel="stylesheet" href="{% static "overlayScrollbars/css/OverlayScrollbars.min.css" %}">
+  <!-- Daterange picker -->
+  <link rel="stylesheet" href="{% static "daterangepicker/daterangepicker.css" %}">
+  <!-- summernote -->
+  <link rel="stylesheet" href="{% static "summernote/summernote-bs4.css" %}">
 
-{% block title %}Exam Detail{% endblock %}
+   <link rel="stylesheet" href="{% static "plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css" %}">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="{% static "plugins/toastr/toastr.min.css" %}">
+  <!-- Theme style -->
+  <!-- Google Font: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
-{% block content %}
-<div class="container mt-5">
-  <div class="card shadow p-3 mb-5 bg-white rounded">
-    <div class="card-header bg-info text-white text-center">
-      <h5>{{ exam.name }} - Exam</h5>
+  <!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+<link rel="stylesheet" href="{% static "plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" %}">
+<link rel="stylesheet" href="{% static "plugins/datatables-responsive/css/responsive.bootstrap4.min.css" %}">
+<link rel="stylesheet" href="{% static "plugins/datatables-buttons/css/buttons.bootstrap4.min.css" %}">
+
+
+
+
+    <title>seeps</title>
+<style>
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow">
+    <a href="#" class="navbar-brand">
+        <h6 class="text-muted">Exam <span class="text-info">{{ exam.name }}</span></h6>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <span class="nav-link"><i class="far fa-clock mr-1"></i><span id="timer">--:--</span></span>
+            </li>
+            <li class="nav-item">
+                <span class="nav-link"><i class="fas fa-exclamation-circle text-warning mr-1"></i>Attempts Remaining: <span
+                        id="attemptsRemaining">{{ attempts_remaining }}</span></span>
+            </li>
+        </ul>
     </div>
-    <div class="card-body">
-      <div class="text-center">
-        <span id="timer">Time Remaining: {{ exam.timer }}:00</span>
-      </div>
-      <!-- Include a hidden div to store attempts_remaining -->
-<div id="attemptsRemaining">{{ attempts_remaining }}</div>
 
-<!-- Your existing HTML content -->
+    <div class="progress navbar-progress bg-info" style="width: 100%;" id="timerProgressBar"></div>
+</nav>
 
-      <!-- Progress bar -->
-      <div class="progress mt-3 mb-3">
-        <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-      </div>
-      <!-- Your exam content here -->
-    <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
-        {% csrf_token %}
-     {% for question in questions %}
-  <div class="card card-info mb-4">
-    <div class="card-header">
-      {% comment %} <h4 class="card-title mb-0">{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4> {% endcomment %}
-            <h4 class="card-title mb-0">{{ forloop.counter }}) {{ question.content}}</h4>
 
-    </div>
-    <div class="card-body">
-      <div class="list-group">
-        {% for choice in question.choice_set.all %}
-          <label class="list-group-item list-group-item-action">
-            <div class="icheck-info d-inline">
-              <input type="radio" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}">
-              <label for="choice{{ choice.id }}">{{ choice.text }}</label>
-            </div>
-          </label>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-{% endfor %}
-
-        
-        <div class="text-center">
-          <button type="submit" onclick="handleSubmit()" class="btn btn-info btn-lg">
-            <i class="fas fa-check-circle"></i> Submit Exam
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-<script>
-  // Function to handle form submission
-  function handleSubmit() {
-    // Clear progress data from localStorage for the current user
-    const username = "{{ user.username }}";
-    localStorage.removeItem('examProgress_' + username);
-    localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
-  }
+    <body>
   
-  var attemptsRemaining = document.getElementById('attemptsRemaining').innerText;
 
-  var timerElement = document.getElementById('timer');
-  var progressBar = document.getElementById('timerProgressBar');
-  var username = "{{ user.username }}";
-  var timerValue = localStorage.getItem('timerValue_' + username) ? parseInt(localStorage.getItem('timerValue_' + username)) : {{ exam.timer }} * 60;
+    <div class="container mt-5 content-container">
+  <div class="container mt-5">
+    <div class="card p-3 mb-5 bg-white rounded" style="margin-top: 80px;">
+      {% comment %} <div class="card-header bg-info text-white text-center">
+        <h5>{{ exam.name }} - Exam</h5>
+      </div> {% endcomment %}
+      <div class="card-body" >
+        {% comment %} <div class="text-center">
+          <span id="timer">{{ exam.timer }}:00</span>
+        </div> {% endcomment %}
+        <!-- Include a hidden div to store attempts_remaining -->
+  {% comment %} <div id="attemptsRemaining">{{ attempts_remaining }}</div> {% endcomment %}
 
-  function updateTimer() {
-    var minutes = Math.floor(timerValue / 60);
-    var seconds = timerValue % 60;
-    var progressPercentage = (timerValue / ({{ exam.timer }} * 60)) * 100;
+  <!-- Your existing HTML content -->
 
-    // Set timer text content
-    timerElement.textContent = 'Time Remaining: ' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        {% comment %} <!-- Progress bar -->
+        <div class="progress mt-3 mb-3">
+          <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div> {% endcomment %}
+        <!-- Your exam content here -->
+      <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
+          {% csrf_token %}
+      {% for question in questions %}
+    <div class="card card-info mb-4">
+      <div class="card-header">
+        {% comment %} <h4 class="card-title mb-0">{{ forloop.counter }}) {{ question.content|slice:"3:"|safe }}</h4> {% endcomment %}
+              <h4 class="card-title mb-0">{{ forloop.counter }}) {{ question.content}}</h4>
+
+      </div>
+      <div class="card-body">
+        <div class="list-group">
+          {% for choice in question.choice_set.all %}
+            <label class="list-group-item list-group-item-action">
+              <div class="icheck-info d-inline">
+                <input type="radio" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}">
+                <label for="choice{{ choice.id }}">{{ choice.text }}</label>
+              </div>
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+          
+          <div class="text-center">
+            <button type="submit" onclick="handleSubmit()" class="btn btn-info btn-lg">
+              <i class="fas fa-check-circle"></i> Submit Exam
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script>
+    // Function to handle form submission
+    function handleSubmit() {
+      // Clear progress data from localStorage for the current user
+      const username = "{{ user.username }}";
+      localStorage.removeItem('examProgress_' + username);
+      localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
+    }
     
-    // Set progress bar width
-    progressBar.style.width = progressPercentage + '%';
+    var attemptsRemaining = document.getElementById('attemptsRemaining').innerText;
 
-    // Change progress bar color to red when 3 minutes left
-    if (timerValue <= 180) {
-      progressBar.classList.add('bg-danger');
-    }
+    var timerElement = document.getElementById('timer');
+    var progressBar = document.getElementById('timerProgressBar');
+    var username = "{{ user.username }}";
+    var timerValue = localStorage.getItem('timerValue_' + username) ? parseInt(localStorage.getItem('timerValue_' + username)) : {{ exam.timer }} * 60;
 
-    if (timerValue === 0 || attemptsRemaining === 1) {
-      document.getElementById('examForm').submit();
-      localStorage.removeItem('examProgress_' + username);
-      localStorage.removeItem('timerValue_' + username);
-    } else {
-      timerValue--;
-      localStorage.setItem('timerValue_' + username, timerValue); // Store timer value in localStorage
-      setTimeout(updateTimer, 1000);
-    }
+    function updateTimer() {
+      var minutes = Math.floor(timerValue / 60);
+      var seconds = timerValue % 60;
+      var progressPercentage = (timerValue / ({{ exam.timer }} * 60)) * 100;
 
-    // Auto-save progress every 5 seconds
-    if (timerValue % 5 === 0) {
-      saveProgress();
-    }
-  }
+      // Set timer text content
+      timerElement.textContent = 'Time Remaining: ' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+      
+      // Set progress bar width
+      progressBar.style.width = progressPercentage + '%';
 
-  updateTimer();
-
-  // Save progress
-  function saveProgress() {
-    const selectedAnswers = {};
-    {% for question in questions %}
-      var selectedOption = document.querySelector('input[name="question_{{ question.id }}"]:checked');
-      if (selectedOption) {
-        selectedAnswers[{{ question.id }}] = selectedOption.value;
+      // Change progress bar color to red when 3 minutes left
+      if (timerValue <= 180) {
+        progressBar.classList.add('bg-danger');
       }
-    {% endfor %}
-    const progressData = {
-      selectedAnswers: selectedAnswers
-    };
-    localStorage.setItem('examProgress_' + username, JSON.stringify(progressData));
-  }
 
-  // Load progress
-  function loadProgress() {
-    const savedProgress = localStorage.getItem('examProgress_' + username);
-    if (savedProgress) {
-      const progressData = JSON.parse(savedProgress);
-      for (const questionId in progressData.selectedAnswers) {
-        const selectedOptionValue = progressData.selectedAnswers[questionId];
-        document.querySelector('input[name="question_' + questionId + '"][value="' + selectedOptionValue + '"]').checked = true;
+      if (timerValue === 0) {
+        document.getElementById('examForm').submit();
+        localStorage.removeItem('examProgress_' + username);
+        localStorage.removeItem('timerValue_' + username);
+      } else {
+        timerValue--;
+        localStorage.setItem('timerValue_' + username, timerValue); // Store timer value in localStorage
+        setTimeout(updateTimer, 1000);
+      }
+
+      // Auto-save progress every 5 seconds
+      if (timerValue % 5 === 0) {
+        saveProgress();
       }
     }
-  }
 
-  // Auto-load progress on page load
-  loadProgress();
+    updateTimer();
 
-  // Code to prevent navigation away, opening new tabs, fullscreen...
+    // Save progress
+    function saveProgress() {
+      const selectedAnswers = {};
+      {% for question in questions %}
+        var selectedOption = document.querySelector('input[name="question_{{ question.id }}"]:checked');
+        if (selectedOption) {
+          selectedAnswers[{{ question.id }}] = selectedOption.value;
+        }
+      {% endfor %}
+      const progressData = {
+        selectedAnswers: selectedAnswers
+      };
+      localStorage.setItem('examProgress_' + username, JSON.stringify(progressData));
+    }
 
-  // Function to handle page visibility change
-  function handleVisibilityChange() {
-    if (document.visibilityState === 'hidden' && attemptsRemaining === 1) {
+    // Load progress
+    function loadProgress() {
+      const savedProgress = localStorage.getItem('examProgress_' + username);
+      if (savedProgress) {
+        const progressData = JSON.parse(savedProgress);
+        for (const questionId in progressData.selectedAnswers) {
+          const selectedOptionValue = progressData.selectedAnswers[questionId];
+          document.querySelector('input[name="question_' + questionId + '"][value="' + selectedOptionValue + '"]').checked = true;
+        }
+      }
+    }
+
+    // Auto-load progress on page load
+    loadProgress();
+
+    // Code to prevent navigation away, opening new tabs, fullscreen...
+
+// Function to handle window focus event
+function handleWindowFocus() {
+  // Display a SweetAlert dialog when the window gains focus
+  Swal.fire({
+    icon: 'info',
+    title: 'Another Access not allowed!',
+    text: 'You returned to the exam page.',
+    timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+    timerProgressBar: true,
+    toast: true,
+    position: 'top',
+    showConfirmButton: false
+  });
+
+  // Reduce attempt if user returns to the page
+  const remainingAttemptsElement = document.getElementById('attemptsRemaining');
+  if (remainingAttemptsElement) {
+    let remainingAttempts = parseInt(remainingAttemptsElement.innerText);
+    if (remainingAttempts > 0) {
+      remainingAttempts--;
+      remainingAttemptsElement.innerText = remainingAttempts;
+      localStorage.setItem('remainingAttempts', remainingAttempts); // Update localStorage
+      Swal.fire({
+        icon: 'warning',
+        text: `Your attempt for this exam has been reduced. You have ${remainingAttempts} attempts remaining.`,
+        timer: 5000, // Duration in milliseconds (e.g., 5000ms = 5 seconds)
+        timerProgressBar: true,
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false
+      });
+    }
+
+     if (remainingAttempts === 0) {
+      // If attempts reach 0, auto-submit the exam
       document.getElementById('examForm').submit();
-      localStorage.removeItem('examProgress_' + username);
-      localStorage.removeItem('timerValue_' + username);
+      // Optionally, display a message informing the user that the exam has been automatically submitted
+      Swal.fire({
+        icon: 'info',
+        title: 'Exam Submitted',
+        text: 'Your exam has been automatically submitted as you have exhausted all your attempts.',
+        timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+        timerProgressBar: true,
+        toast: true,
+        position: 'top-right',
+        showConfirmButton: false
+      });
     }
   }
 
-  // Add event listener for visibility change
-  document.addEventListener('visibilitychange', handleVisibilityChange);
+
+}
+
+
+
+// Add event listener for window focus
+window.addEventListener('focus', handleWindowFocus);
+
+ 
+// Function to check if attempts are over and auto-submit the exam
+function checkAttemptsAndSubmit() {
+  const remainingAttempts = parseInt(document.getElementById('attemptsRemaining').innerText);
+  if (remainingAttempts === 1) {
+    document.getElementById('examForm').submit();
+    // Optionally, display a message informing the user that the exam has been automatically submitted
+    Swal.fire({
+      icon: 'info',
+      title: 'Exam Submitted',
+      text: 'Your exam has been automatically submitted as you have exhausted all your attempts.',
+      timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+      timerProgressBar: true,
+      toast: true,
+      position: 'top',
+      showConfirmButton: false
+    });
+  }
+}
+
+// Call the function to check attempts and submit on page load
+checkAttemptsAndSubmit();
+
+
+  </script>
+   </div>
+    
+    {% comment %} <footer class="footer mt-4 py-3 bg-dark">
+        <div class="container">
+            <span class="text-muted">Useful Links</span>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="#">Home</a></li>
+                <li class="list-inline-item"><a href="#">Exam</a></li>
+                <li class="list-inline-item"><a href="#">Study Material</a></li>
+                <li class="list-inline-item"><a href="#">Feedback</a></li>
+            </ul>
+            <p class="text-center mb-0">&copy; 2024 Hu Isy Students</p>
+        </div>
+    </footer>
+     {% endcomment %}
+
+
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<!-- jQuery -->
+<!-- SweetAlert2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+ 
+<script src="{% static "jquery/jquery.min.js"  %}"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="{% static "jquery-ui/jquery-ui.min.js"  %}"></script>
+<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<script>
+  $.widget.bridge('uibutton', $.ui.button)
 </script>
+<!-- Bootstrap 4 -->
+<script src="{% static "bootstrap/js/bootstrap.bundle.min.js"  %}"></script>
+<!-- ChartJS -->
+<script src="{% static "chart.js/Chart.min.js"  %}"></script>
+<!-- Sparkline -->
+<script src="{% static "sparklines/sparkline.js"  %}"></script>
+<!-- JQVMap -->
+<script src="{% static "jqvmap/jquery.vmap.min.js"  %}"></script>
+<script src="{% static "jqvmap/maps/jquery.vmap.usa.js"  %}"></script>
+<!-- jQuery Knob Chart -->
+<script src="{% static "jquery-knob/jquery.knob.min.js"  %}"></script>
+<!-- daterangepicker -->
+<script src="{% static "moment/moment.min.js"  %}"></script>
+<script src="{% static "daterangepicker/daterangepicker.js"  %}"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="{% static "tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"  %}"></script>
+<!-- Summernote -->
+<script src="{% static "summernote/summernote-bs4.min.js"  %}"></script>
+<!-- overlayScrollbars -->
+<script src="{% static "overlayScrollbars/js/jquery.overlayScrollbars.min.js"  %}"></script>
+<!-- AdminLTE App -->
+{% comment %} <script src="{% static 'dist/js/adminlte.js'  %}"></script> {% endcomment %}
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+{% comment %} <script src="{% static 'dist/js/pages/dashboard.js'  %}"></script> {% endcomment %}
+<!-- AdminLTE for demo purposes -->
+{% comment %} <script src="{% static 'dist/js/demo.js'%}"></script> {% endcomment %}
+ <script src="{% static "plugins/sweetalert2/sweetalert2.min.js" %}"></script>
+<!-- Toastr -->
+<script src="{% static "plugins/toastr/toastr.min.js" %}"></script>
 
-{% endblock %}
+<!-- DataTables  & Plugins -->
+<script src="{% static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/datatables-responsive/js/dataTables.responsive.min.js"%}"></script>
+<script src="{% static "plugins/datatables-responsive/js/responsive.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/dataTables.buttons.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.bootstrap4.min.js"%}"></script>
+<script src="{% static "plugins/jszip/jszip.min.js"%}"></script>
+<script src="{% static "plugins/pdfmake/pdfmake.min.js"%}"></script>
+<script src="{% static "plugins/pdfmake/vfs_fonts.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.html5.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.print.min.js"%}"></script>
+<script src="{% static "plugins/datatables-buttons/js/buttons.colVis.min.js"%}"></script>
+
+
+</body>
+
+</html>

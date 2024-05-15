@@ -4,15 +4,16 @@
 <section class="container py-5">
     <div class="text-center">
         <h2 class="mb-4">Search Books</h2>
-        <form action="{% url 'book_search' %}" method="GET" class="form-inline justify-content-center">
+        <form id="searchForm" action="{% url 'book_search' %}" method="GET" class="form-inline justify-content-center">
             <div class="input-group mb-3">
                 <input type="text" name="query" class="form-control" placeholder="Search for books">
                 <div class="input-group-append">
-                    <button class="btn btn-success" type="submit">Search</button>
+                    <button id="searchButton" class="btn btn-success" type="submit">Search</button>
                 </div>
             </div>
         </form>
     </div>
+ <a href="{% url 'navigation_options' %}" class="btn btn-light back-button"><i class="fas fa-arrow-left"></i> Back</a>
 
     {% if query %}
     <div class="text-center">
@@ -38,4 +39,22 @@
     </div>
     {% endif %}
 </section>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function () {
+        var searchButton = document.getElementById('searchButton');
+        searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> please wait...';
+        searchButton.setAttribute('disabled', true);
+    });
+</script>
+
+   
+<style>
+    .back-button {
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        z-index: 1000;
+    }
+</style>
 {% endblock %}

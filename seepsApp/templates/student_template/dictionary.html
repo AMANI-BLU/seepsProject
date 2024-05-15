@@ -2,7 +2,7 @@
 
 {% block content %}
     <div class="container-fluid py-4" style="margin-top: 75px;">
-        <h3 class="text-muted mb-4"><i class="fas fa-book-open" style="color: #007bff;"></i> Dictionary</h3>
+        <h3 class="text-muted mb-4"> <a href="{% url 'navigation_options' %}" class=""><i class="fas fa-book-open" style="color: #007bff;"></i></a> Dictionary</h3>
         <hr class="my-4"/>
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -11,7 +11,7 @@
                         <input type="text" name="word" id="word-input" class="form-control" placeholder="Enter a word">
                         <div class="input-group-append">
                             <button type="button" id="voice-search" class="btn btn-primary"><i class="fas fa-microphone" style="color: #fff;"></i></button>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-search" style="color: #fff;"></i> Search</button>
+                            <button type="submit" id="searchButton"class="btn btn-primary"><i class="fas fa-search" style="color: #fff;"></i> Search</button>
                         </div>
                     </div>
                 </form>
@@ -47,7 +47,13 @@
             {% endif %}
         {% endif %}
     </div>
-
+<script>
+    document.getElementById('dictionary-form').addEventListener('submit', function () {
+        var searchButton = document.getElementById('searchButton');
+        searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> please wait...';
+        searchButton.setAttribute('disabled', true);
+    });
+</script>
     <script>
         const voiceSearchButton = document.getElementById('voice-search');
         const wordInput = document.getElementById('word-input');
@@ -94,4 +100,14 @@
             }
         });
     </script>
+
+    
+<style>
+    .back-button {
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        z-index: 1000;
+    }
+</style>
 {% endblock %}

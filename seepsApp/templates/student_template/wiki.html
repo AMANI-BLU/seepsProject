@@ -1,43 +1,67 @@
 {% extends 'student_template/base.html' %}
 
 {% block content %}
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8 text-center">
-                <h2 class="mb-4"><i class="fab fa-wikipedia-w text-info"></i>ikipedia Search</h2>
-                <p class="lead mb-4">Explore articles in Wikipedia. Enter your search query to discover interesting topics.</p>
-                <form method="POST" class="input-group">
-                    {% csrf_token %}
-                    {{ form.text }}
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
-                    </div>
-                </form>
+<div class="container py-5">
+    <a href="{% url 'navigation_options' %}" class="btn btn-light back-button"><i class="fas fa-arrow-left"></i> Back</a>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2 class="mb-4"><i class="fab fa-wikipedia-w text-info"></i>ikipedia Search</h2>
+            <p class="lead mb-4">Explore articles in Wikipedia. Enter your search query to discover interesting topics.</p>
+            <form id="searchForm" method="POST" class="input-group">
+                {% csrf_token %}
+                {{ form.text }}
+                <div class="input-group-append">
+                    <button id="searchButton" type="submit" class="btn btn-info"><i class="fas fa-search"></i> Search</button>
+                </div>
+                <div id="loadingSpinner" class="spinner-border text-light ml-2" role="status" style="display: none;">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if title %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ title }}</h4>
+                    <p class="card-text">{{ details }}</p>
+                    <a href="{{ link }}" class="btn btn-info" target="_blank"><i class="fas fa-external-link-alt"></i> Read more on Wikipedia</a>
+                </div>
             </div>
         </div>
-
-        {% if title %}
-            <div class="row justify-content-center mt-5">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">{{ title }}</h4>
-                            <p class="card-text">{{ details }}</p>
-                            <a href="{{ link }}" class="btn btn-primary" target="_blank"><i class="fas fa-external-link-alt"></i> Read more on Wikipedia</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-
-        {% if error %}
-            <div class="row justify-content-center mt-5">
-                <div class="col-md-8">
-                    <div class="alert alert-danger" role="alert">
-                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8">
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function () {
+        var searchButton = document.getElementById('searchButton');
+        var loadingSpinner = document.getElementById('loadingSpinner');
+        searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> please wait...';
+        searchButton.setAttribute('disabled', true);
+        loadingSpinner.style.display = 'inline-block';
+    });
+</script>
+
+
+<style>
+    .back-button {
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        z-index: 1000;
+    }
+</style>
 {% endblock %}

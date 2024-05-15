@@ -7,117 +7,83 @@
     <title>Chatbot</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-        }
+<style>
 
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
-        }
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
 
-        .card-footer {
-            border-top: none;
-            background-color: #f8f9fa;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-        }
+.container {
+    max-width: 800px;
+    margin: 50px auto;
+}
 
-        .input-group-append button {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        }
+.card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff; /* Add a background color */
+}
 
-        .card-body {
-            max-height: 300px;
-            /* Adjust the height as needed */
-            overflow-y: auto;
-        }
+.card-footer {
+    border-top: none;
+    background-color: #f8f9fa;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
 
-        .message {
-            border-radius: 15px;
-            max-width: 70%;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            position: relative;
-            word-wrap: break-word;
-        }
+.card-body {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 20px; /* Add padding */
+}
 
-        .message.bot-message {
-            background-color: #28a745;
-            color: #fff;
-            margin-right: auto;
-        }
+.message {
+    border-radius: 20px; /* Increase border radius */
+    max-width: 80%; /* Increase maximum width */
+    padding: 10px 15px; /* Adjust padding */
+    margin-bottom: 15px;
+    position: relative;
+    word-wrap: break-word;
+}
 
-        .message.user-message {
-            background-color: #007bff;
-            color: #fff;
-            margin-left: auto;
-        }
+.message.bot-message {
+    background-color: #28a745; /* Change bot message color */
+    color: #fff;
+    margin-right: auto;
+}
 
-        .message-content {
-            margin-bottom: 5px;
-        }
+.message.user-message {
+    background-color: #007bff; /* Change user message color */
+    color: #fff;
+    margin-left: auto;
+}
 
-        .message-icon {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
 
-        .message.user-message .message-icon {
-            left: -30px;
-        }
+.animation-text {
+    display: inline-block;
+    opacity: 0;
+    animation: revealText 1s ease forwards;
+}
 
-        .message.bot-message .message-icon {
-            right: -30px;
-        }
+@keyframes revealText {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
 
-        .back-to-home,
-        .clear-conversation {
-            position: fixed;
-            font-size: 24px;
-            color: #007bff;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
 
-        .back-to-home:hover,
-        .clear-conversation:hover {
-            color: #0056b3;
-        }
-
-        .back-to-home {
-            bottom: 20px;
-            right: 20px;
-        }
-
-        .clear-conversation {
-            bottom: 70px;
-            right: 20px;
-        }
-
-        .animation-text {
-            display: inline-block;
-            opacity: 0;
-            animation: revealText 1s ease forwards;
-        }
-
-        @keyframes revealText {
-            0% {
-                opacity: 0;
-                transform: translateX(-100%);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-    </style>
+</style>
 </head>
+
 <body>
 <div class="container">
     <div class="card mt-5">
@@ -161,55 +127,92 @@
         </div>
 
         <div class="card-body" id="chat-history">
-            <!-- Chat history messages -->
-            {% for message in messages %}
-                {% if message.sender == 'user' %}
-                    <div class="row mb-3 justify-content-end">
-                        <div class="col">
-                            <div class="message user-message">
-                                <i class="fas fa-user message-icon"></i>
-                                <div class="message-content">{{ message.text }}</div>
-                            </div>
+            <!-- Display chat history -->
+            {% for message in conversation %}
+                <div class="row mb-3 {% if message.sender == 'user' %} justify-content-end {% endif %}">
+                    <div class="col">
+                        <div class="message {% if message.sender == 'user' %} user-message {% else %} bot-message {% endif %}" id="{% if forloop.last %}last-message{% endif %}">
+                            <div class="message-content">{{ message.text }}</div>
                         </div>
                     </div>
-                {% elif message.sender == 'bot' %}
-                    <div class="row mb-3">
-                        <div class="col">
-                            <div class="message bot-message">
-                                <i class="fas fa-robot message-icon"></i>
-                                <div class="message-content">{{ message.text }}</div>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
+                </div>
             {% endfor %}
         </div>
+        
         <div class="card-footer">
-            <form id="chat-form" method="post">
+            <form id="chat-form" action=""  method="post">
                 {% csrf_token %}
                 <div class="input-group">
                     <input type="text" id="user-input" name="message" class="form-control" placeholder="Type your message...">
                     <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary "><i class="fas fa-paper-plane"></i></button>
+                        <!-- Replace the button markup with this -->
+                        <button type="submit" class="btn btn-primary" id="submit-button">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+
 <!-- Back to Home icon -->
 <div class="position-fixed" style="bottom: 20px; right: 20px;">
     <a href="/student/"><i class="fas fa-home fa-2x text-primary"></i></a>
 </div>
-<!-- Clear Conversation icon -->
 <div class="position-fixed" style="bottom: 70px; right: 20px;">
-    <a href="#" onclick="clearConversation()"><i class="fas fa-trash-alt fa-2x text-danger"></i></a>
+    <a href="#" onclick="clearConversation(event)"><i class="fas fa-trash-alt fa-2x text-danger"></i></a>
 </div>
 
+
 <script>
+    function clearConversation(event) {
+        event.preventDefault();  // Prevent default behavior of anchor tag
+        document.getElementById('chat-history').innerHTML = '';  // Clear chat history displayed on the page
+        fetch('/clear-conversation/', {
+            method: 'POST',  // Send a POST request
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token for Django protection
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // If conversation is cleared successfully, reload the page to clear session data
+                location.reload();
+            } else {
+                console.error('Failed to clear conversation');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+
+<script>
+    {% comment %} // Function to clear conversation
     function clearConversation() {
         document.getElementById('chat-history').innerHTML = '';
+    } {% endcomment %}
+
+    // Function to scroll the chat history container to the last message element
+    function scrollToLastMessage() {
+        var chatHistory = document.getElementById('chat-history');
+        var lastMessage = document.getElementById('last-message');
+        if (chatHistory && lastMessage) {
+            chatHistory.scrollTop = lastMessage.offsetTop;
+        }
     }
+
+    // Scroll to last message when the page is loaded
+    window.addEventListener('load', scrollToLastMessage);
+</script>
+
+<script>
+    document.getElementById('chat-form').addEventListener('submit', function() {
+        var button = document.getElementById('submit-button');
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+        button.disabled = true;
+    });
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

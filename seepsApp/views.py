@@ -2315,8 +2315,6 @@ import secrets
 
 
 
-co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_COHERE_API_KEY" with your actual API key
-
 
 # def chatbot(request):
 #     if request.method == 'POST':
@@ -2325,23 +2323,43 @@ co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_
 #         return JsonResponse({'response': response.text})
 #     return render(request, 'student_template/chatbot.html')
 
+import cohere
 
-
+from django.shortcuts import redirect
+co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_COHERE_API_KEY" with your actual API key
 
 def chatbot(request):
-    if 'messages' not in request.session:
-        request.session['messages'] = []
+    # Retrieve conversation history from session or initialize it if not exists
+    conversation = request.session.get('conversation', [])
 
     if request.method == 'POST':
         user_message = request.POST.get('message', '')
+
+        # Append user message to conversation
+        conversation.append({'sender': 'user', 'text': user_message})
+
+        # Get bot response
         bot_response = co.chat(message=user_message, model="command-r-plus").text
 
-        # Append new message to session
-        request.session['messages'].append({'sender': 'user', 'text': user_message})
-        request.session['messages'].append({'sender': 'bot', 'text': bot_response})
-        
-    return render(request, 'student_template/chatbot.html', {'messages': request.session['messages']})
+        # Append bot response to conversation
+        conversation.append({'sender': 'bot', 'text': bot_response})
 
+        # Update conversation in session
+        request.session['conversation'] = conversation
+
+        # Redirect to the same page to prevent form resubmission
+        return redirect('chatbot')  # Replace 'chatbot' with the name of your view
+
+    return render(request, 'student_template/chatbot.html', {'conversation': conversation})
+
+
+def clear_conversation(request):
+    if request.method == 'POST':
+        # Clear conversation from session
+        request.session.pop('conversation', None)
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'success': False})
 
 
 
