@@ -32,13 +32,13 @@
                 {% if questions_with_choices %}
                 <form method="post">
                     {% csrf_token %}
-                    {% comment %} <h2>Exam: {{ name }}</h2> {% endcomment %}
                     {% for question_with_choices in questions_with_choices %}
                     <div class="card card-info">
                         <div class="card-header">
                             <h3 class="card-title">{{ question_with_choices.question }}</h3>
                         </div>
                         <div class="card-body">
+                            <input type="hidden" name="question_number_{{ forloop.counter }}" value="{{ forloop.counter }}">
                             <ul class="list-group">
                                 {% for choice in question_with_choices.choices %}
                                 <li class="list-group-item">
@@ -49,6 +49,10 @@
                                 </li>
                                 {% endfor %}
                             </ul>
+                            <div class="form-group mt-3">
+                                <label for="answer_description_{{ forloop.counter }}">Answer Description</label>
+                                <textarea class="form-control" id="answer_description_{{ forloop.counter }}" name="answer_description_{{ forloop.counter }}" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
                     {% endfor %}

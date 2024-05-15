@@ -1262,6 +1262,8 @@ def upload_pdf_view(request):
     
     return render(request, 'department_template/import_question.html', {'form': form})
 
+
+
 def preview_questions_view(request):
     questions_with_choices = request.session.get('questions_with_choices')
     selected_exam_id = request.session.get('selected_exam')
@@ -1291,16 +1293,24 @@ def preview_questions_view(request):
         return redirect('upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
     
     if request.method == 'POST':
-        # Get the selected choices from POST data
+        # Get the selected choices and answer descriptions from POST data
         selected_choices = {}
+        answer_descriptions = {}
         for key, value in request.POST.items():
             if key.startswith('selected_choice_'):
                 question_number = key.split('_')[2]  # Extract the question number from the key
                 selected_choices[question_number] = value  # Store the selected choice for this question
+            elif key.startswith('answer_description_'):
+                question_number = key.split('_')[2]  # Extract the question number from the key
+                answer_descriptions[question_number] = value  # Store the answer description for this question
+            elif key.startswith('question_number_'):
+                question_number = key.split('_')[2]  # Extract the question number from the key
+                answer_descriptions[question_number] = value  # Store the answer description for this question
 
-        # If the user confirms, save questions and choices to the database
-        for qwc in questions_with_choices:
-            question = Question.objects.create(exam=selected_exam, content=qwc['question'])
+        # If the user confirms, save questions, choices, and answer descriptions to the database
+        for question_number, qwc in enumerate(questions_with_choices, start=1):
+            # Create the question object
+            question = Question.objects.create(exam=selected_exam, content=qwc['question'], answer_description=answer_descriptions.get(str(question_number)))
             for choice_text in qwc['choices']:
                 # Check if this choice is selected
                 is_correct = choice_text in selected_choices.values()
@@ -1317,7 +1327,6 @@ def preview_questions_view(request):
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
     
     return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
-
 
 from .forms import EditQuestionForm, EditChoiceFormSet  # Import the EditQuestionForm and EditChoiceFormSet
 
@@ -1988,10 +1997,10 @@ def latest_department_notifications(request):
     
     serialized_notifications = []
     for notification in latest_notifications:
-        truncated_message = notification.message[:30] + '...' if len(notification.message) > 30 else notification.message
+        truncated_message = notification.message[:10] + '...' if len(notification.message) > 10 else notification.message
         serialized_notifications.append({
             'message': truncated_message,
-            'timestamp': notification.timestamp.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp as string
+            'timestamp': notification.timestamp  # Format timestamp as string
         })
     
     return JsonResponse({'notifications': serialized_notifications})

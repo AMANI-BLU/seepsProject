@@ -102,7 +102,7 @@
                     </form>
                 </div>
                 <h6><i class="icon fas fa-bell"></i> {{ notification.message|safe}}</h6>
-                <p class="small">{{ notification.timestamp|date:"F j, Y, g:i a" }}</p> <!-- Display timestamp -->
+                <p class="small">{{ notification.timestamp }}</p> <!-- Display timestamp -->
             </div>
             {% endfor %}
         </div>
@@ -133,7 +133,7 @@
                     </form>
                 </div>
                 <h6><i class="icon fas fa-check-circle"></i>{{ notification.message|safe }}</h6>
-                <p class="small">{{ notification.timestamp|date:"F j, Y, g:i a" }}</p> <!-- Display timestamp -->
+                <p class="small">{{ notification.timestamp}}</p> <!-- Display timestamp -->
 
             </div>
             {% endfor %}

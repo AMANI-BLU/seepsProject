@@ -101,7 +101,7 @@ urlpatterns = [
     path('manage/tutorials/', manage_tutorials, name='manage_tutorials'),
     # path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
     # path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
-        path('delete_selected_students/', delete_selected_students, name='delete_selected_students'),
+    path('delete_selected_students/', delete_selected_students, name='delete_selected_students'),
 
     
 

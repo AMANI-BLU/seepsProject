@@ -105,7 +105,7 @@
                         <table id="tutorialsTable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th style="display:none;">No.</th>
                                 <th>Order</th>
                                 <th>Course</th>
                                 <th>Title</th>
@@ -116,7 +116,7 @@
                         <tbody>
                             {% for tutorial in tutorials %}
                             <tr>
-                                <td>{{ forloop.counter }}</td>
+                                <td style="display:none;">{{ forloop.counter }}</td>
                                 <td>{{ tutorial.order }}</td> <!-- Display the order -->
                                 <td>{{ tutorial.course.title }}</td>
                                 <td>{{ tutorial.title }}</td>

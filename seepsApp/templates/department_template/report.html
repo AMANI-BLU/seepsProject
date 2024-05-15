@@ -1,7 +1,7 @@
 <!-- department_template/report.html -->
 {% extends 'base.html' %}
 
-{% block title %}Department | Exam Scores Report{% endblock %}
+{% block title %}{{user.department_name}} | Exam Scores Report{% endblock %}
 
 {% block content %}
 <!-- Main content -->
@@ -21,7 +21,7 @@
             </div>
         </div>
         <!-- /.content-header -->
-{% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script> {% endcomment %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 
         <!-- Main content -->
         <section class="content">
@@ -42,7 +42,7 @@
                                     <th>Average Score</th>
                                     <th>Students Passed Exam</th>
                                     <th>Students Failed Exam</th>
-                                    <th>Action</th> <!-- New column for delete button -->
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -57,13 +57,9 @@
                                     <td>{{ data.passed_students_count }}</td>
                                     <td>{{ data.failed_students_count }}</td>
                                     <td>
-                                        <!-- Button trigger modal -->
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteConfirmationModal{{ forloop.counter }}">
                                             <i class="fas fa-trash"></i>
                                         </button>
-
-
-                                        <!-- Modal -->
                                         <div class="modal fade" id="deleteConfirmationModal{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmationModalLabel{{ forloop.counter }}" aria-hidden="true">
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
@@ -106,18 +102,17 @@
                         </div>
                     </div>
 
-                    <!-- Pass/Fail Students Bar Chart -->
                     <div class="col-md-6">
                         <div class="card card-outline card-info">
                             <div class="card-header">
                                 <h3 class="card-title">Pass/Fail Students</h3>
                             </div>
                             <div class="card-body">
-                                <!-- Chart -->
                                 <canvas id="passFailStudentsChart" style="height: 300px;"></canvas>
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-6">
                         <div class="card card-outline card-success">
                             <div class="card-header">
@@ -129,18 +124,22 @@
                         </div>
                     </div>
                     
-                    
+                    <!-- New Line Chart for Average Score Trend -->
+                    <div class="col-md-6">
+                        <div class="card card-outline card-warning">
+                            <div class="card-header">
+                                <h3 class="card-title">Average Score Trend</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="averageScoreTrendChart" style="height: 300px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-               
             </div>
-            <!-- /.container-fluid -->
         </section>
-        <!-- /.content -->
-
     </div>
 
-<!-- Add these links to your HTML file for DataTables -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.6/css/jquery.dataTables.min.css">
 <script type="text/javascript" src="https://cdn.datatables.net/1.11.6/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.1/js/dataTables.buttons.min.js"></script>
@@ -149,171 +148,181 @@
 
 <script>
 $(document).ready(function() {
-    // Initialize DataTable with necessary features
     $('#exam-scores-table').DataTable({
-        
-        "dom": 'Bfrtip', // Add buttons for exporting
-         "paging": true, // Enable pagination
-        "searching": true, // Enable searching
-        "ordering": true, // Enable sorting
-        "info": true, // Enable table information display
+        "dom": 'Bfrtip',
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
         "responsive": true, 
         "buttons": [
             {
                 extend: 'copy',
                 exportOptions: {
-                    columns: ':not(:last-child)' // Exclude last column from copying
+                    columns: ':not(:last-child)'
                 }
             },
             {
                 extend: 'csv',
                 exportOptions: {
-                    columns: ':not(:last-child)' // Exclude last column from CSV export
+                    columns: ':not(:last-child)'
                 }
             },
             {
                 extend: 'excel',
                 exportOptions: {
-                    columns: ':not(:last-child)' // Exclude last column from Excel export
+                    columns: ':not(:last-child)'
                 }
             },
             {
                 extend: 'pdf',
                 exportOptions: {
-                    columns: ':not(:last-child)' // Exclude last column from PDF export
+                    columns: ':not(:last-child)'
                 }
             },
             {
                 extend: 'print',
                 exportOptions: {
-                    columns: ':not(:last-child)' // Exclude last column from printing
+                    columns: ':not(:last-child)'
                 }
             }
         ],
-         // Add Bootstrap classes to the table
-            "language": {
-                "search": "_INPUT_", // Search input style
-                "searchPlaceholder": "Search...", // Placeholder for search input
-                "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
-                "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
-                "paginate": {
-                    "previous": '<i class="fas fa-angle-left"></i>', // Previous button
-                    "next": '<i class="fas fa-angle-right"></i>' // Next button
-                }
+        "language": {
+            "search": "_INPUT_",
+            "searchPlaceholder": "Search...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "paginate": {
+                "previous": '<i class="fas fa-angle-left"></i>',
+                "next": '<i class="fas fa-angle-right"></i>'
             }
-      
+        }
     });
 });
 </script>
 
-   
-    <script>
-        // Prepare data for the average scores chart
-        var examNames = [];
-        var averageScores = [];
-        {% for data in exam_scores_data %}
-            examNames.push("{{ data.exam__name }}");
-            averageScores.push({{ data.average_score }});
-        {% endfor %}
+<script>
+    var examNames = [];
+    var averageScores = [];
+    {% for data in exam_scores_data %}
+        examNames.push("{{ data.exam__name }}");
+        averageScores.push({{ data.average_score }});
+    {% endfor %}
 
-        // Initialize the average scores chart
-        var ctx1 = document.getElementById('averageScoresChart').getContext('2d');
-        var averageScoresChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: examNames,
-                datasets: [{
-                    label: 'Average Score',
-                    data: averageScores,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    var ctx1 = document.getElementById('averageScoresChart').getContext('2d');
+    var averageScoresChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: examNames,
+            datasets: [{
+                label: 'Average Score',
+                data: averageScores,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
+        }
+    });
 
-        // Prepare data for the pass/fail ratio chart
-        var passedCounts = [];
-        var failedCounts = [];
-        {% for data in exam_scores_data %}
-            passedCounts.push({{ data.passed_students_count }});
-            failedCounts.push({{ data.failed_students_count }});
-        {% endfor %}
+    var passedCounts = [];
+    var failedCounts = [];
+    {% for data in exam_scores_data %}
+        passedCounts.push({{ data.passed_students_count }});
+        failedCounts.push({{ data.failed_students_count }});
+    {% endfor %}
 
-        // Initialize the pass/fail ratio chart
-        var ctx2 = document.getElementById('passFailChart').getContext('2d');
-        var passFailChart = new Chart(ctx2, {
-            type: 'pie',
-            data: {
-                labels: examNames,
-                datasets: [{
-                    label: 'Pass/Fail Ratio',
-                    data: passedCounts,
-                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)','rgba(25, 66, 150, 0.2)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+    var ctx2 = document.getElementById('passFailChart').getContext('2d');
+    var passFailChart = new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: examNames,
+            datasets: [{
+                label: 'Pass/Fail Ratio',
+                data: passedCounts,
+                backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)','rgba(25, 66, 150, 0.2)'],
+                borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
+        }
+    });
+
+    var passFailStudentsData = [];
+    {% for data in exam_scores_data %}
+        passFailStudentsData.push({
+            examName: "{{ data.exam__name }}",
+            passedStudents: {{ data.passed_students_count }},
+            failedStudents: {{ data.failed_students_count }}
         });
+    {% endfor %}
 
-        // Prepare data for the pass/fail students count chart
-        var passFailStudentsData = [];
-        {% for data in exam_scores_data %}
-            passFailStudentsData.push({
-                examName: "{{ data.exam__name }}",
-                passedStudents: {{ data.passed_students_count }},
-                failedStudents: {{ data.failed_students_count }}
-            });
-        {% endfor %}
-
-        // Initialize the pass/fail students count chart
-        var ctx3 = document.getElementById('passFailStudentsChart').getContext('2d');
-        var passFailStudentsChart = new Chart(ctx3, {
-            type: 'bar',
-            data: {
-                labels: passFailStudentsData.map(data => data.examName),
-                datasets: [{
-                    label: 'Passed Students',
-                    data: passFailStudentsData.map(data => data.passedStudents),
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Failed Students',
-                    data: passFailStudentsData.map(data => data.failedStudents),
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
+    var ctx3 = document.getElementById('passFailStudentsChart').getContext('2d');
+    var passFailStudentsChart = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: passFailStudentsData.map(data => data.examName),
+            datasets: [{
+                label: 'Passed Students',
+                data: passFailStudentsData.map(data => data.passedStudents),
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
             },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+            {
+                label: 'Failed Students',
+                data: passFailStudentsData.map(data => data.failedStudents),
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
                 }
             }
-        });
+        }
+    });
 
-        
-    </script>
+    // Data for the new average score trend chart
+    var ctx4 = document.getElementById('averageScoreTrendChart').getContext('2d');
+    var averageScoreTrendChart = new Chart(ctx4, {
+        type: 'line',
+        data: {
+            labels: examNames,
+            datasets: [{
+                label: 'Average Score Trend',
+                data: averageScores,
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
-    {% include 'department_template/footer.html' %}
+{% include 'department_template/footer.html' %}
 </div>
-<!-- ./wrapper -->
 {% endblock %}

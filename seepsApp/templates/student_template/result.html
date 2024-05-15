@@ -55,7 +55,7 @@
            {% if question.answer_description %}
           <div class="alert alert-info mt-3" role="alert">
             <strong><i class="fas fa-info-circle"></i> Answer Description:</strong>
-            {{ question.answer_description |slice:"3:"|safe }}
+            {{ question.answer_description |safe }}
           </div>
           {% endif %}
         </p>
