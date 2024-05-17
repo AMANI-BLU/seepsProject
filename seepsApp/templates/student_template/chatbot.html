@@ -131,22 +131,19 @@
         </div>
 
         <div class="card-body" id="chat-history">
-            <!-- Display chat history -->
-            {% for message in conversation %}
-                <div class="row mb-3 {% if message.sender == 'user' %} justify-content-end {% endif %}">
-                    <div class="col">
-                        <div class="message {% if message.sender == 'user' %} user-message {% else %} bot-message {% endif %}" id="{% if forloop.last %}last-message{% endif %}">
-                            <div class="message-content">
-                                {% if message.text|linebreaksbr|safe %}
-                                    {{ message.text|linebreaksbr|safe }}
-                                {% else %}
-                                    <pre><code>{{ message.text }}</code></pre>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+   <!-- Display chat history -->
+{% for message in conversation %}
+    <div class="row mb-3 {% if message.sender == 'user' %} justify-content-end {% endif %}">
+        <div class="col">
+            <div class="message {% if message.sender == 'user' %} user-message {% else %} bot-message {% endif %}" id="{% if forloop.last %}last-message{% endif %}">
+                <div class="message-content">
+                      {{ message.text|linebreaksbr|safe }}
                 </div>
-            {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
         </div>
         
         <div class="card-footer">

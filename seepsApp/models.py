@@ -164,6 +164,8 @@ class Event(models.Model):
     end_date = models.DateTimeField()
     description = models.TextField(blank=True)
     user = models.CharField(max_length=255, blank=True, null=True)
+    is_done = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.title

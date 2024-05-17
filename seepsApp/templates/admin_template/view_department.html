@@ -32,7 +32,9 @@
                               icon: 'success',
                               text: "{{ message }}",
                               showConfirmButton: false,
-                              timer: 6000,
+                              timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+                              timerProgressBar: true,
+                              toast: true,
                           });
                       </script>
                   {% elif message.tags == 'error' %}
@@ -68,7 +70,9 @@
                               icon: 'info',
                               text: "{{ message }}",
                               showConfirmButton: false,
-                              timer: 6000,
+                              timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+                              timerProgressBar: true,
+                              toast: true,
                           });
                       </script>
                   {% endif %}
@@ -272,7 +276,7 @@
                 $('#deleteConfirmationModal').modal('show');
             } else {
                 // Show AdminLTE alert
-                $(document).Swal.fire('create', {
+                $(document).Toasts('create',{
                     class: 'bg-warning',
                     title: 'Warning',
                     body: 'Please select at least one department to delete.',

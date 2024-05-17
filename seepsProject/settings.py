@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'seepsApp',
-    'import_export', 
-    'schedule',   
+    'import_export',   
+  
+
 ]
 
 MIDDLEWARE = [

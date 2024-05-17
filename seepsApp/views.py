@@ -2322,9 +2322,7 @@ import secrets
 #         response = co.chat(message=message, model="command-r-plus")
 #         return JsonResponse({'response': response.text})
 #     return render(request, 'student_template/chatbot.html')
-
 import cohere
-
 from django.shortcuts import redirect
 co = cohere.Client("hCol7ATI1rkUKAPSyBIWU51AqN9zXFw1K6kBc38a")  # Replace "YOUR_COHERE_API_KEY" with your actual API key
 
@@ -2351,7 +2349,6 @@ def chatbot(request):
         return redirect('chatbot')  # Replace 'chatbot' with the name of your view
 
     return render(request, 'student_template/chatbot.html', {'conversation': conversation})
-
 
 def clear_conversation(request):
     if request.method == 'POST':

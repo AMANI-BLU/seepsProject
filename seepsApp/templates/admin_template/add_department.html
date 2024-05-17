@@ -42,7 +42,9 @@
                                     icon: 'success',
                                     text: '{{ success_msg }}',
                                     showConfirmButton: false,
-                                    timer: 6000,
+                                    timer: 3000, // Duration in milliseconds (e.g., 3000ms = 3 seconds)
+                                    timerProgressBar: true,
+                                    toast: true,
                                 });
                             </script>
                             {% endif %}
@@ -139,7 +141,17 @@
         </section>
     </div>
 
-    
+    <!-- In your HTML template -->
+<script>
+    $(document).ready(function() {
+        // Initialize input mask for phone number field
+        $('#id_phone').inputmask('+251999999999');
+    });
+</script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 <!-- Script to handle button click event and show loading effect -->
 <script>
     $(document).ready(function() {

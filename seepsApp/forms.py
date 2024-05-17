@@ -193,28 +193,34 @@ class CourseForm(forms.ModelForm):
         return course
    
 
-from django import forms
 from django.forms.models import inlineformset_factory
 from .models import Question, Choice, Exam
+from django.core.exceptions import ValidationError
+
+
 class ChoiceForm(forms.ModelForm):
     class Meta:
         model = Choice
         fields = ['text', 'is_correct']
         labels = {
             'text': 'Choice',
-            
         }
         widgets = {
             'is_correct': forms.CheckboxInput(attrs={'class': 'form-check-input mt-2 ml-2'}),
-            'text': forms.TextInput(attrs={'class':'form-control','placeholder':'Enter choice here..'})
+            'text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter choice here..'})
         }
 
-# Custom formset class to dynamically set extra forms
+# Custom formset class to dynamically set extra forms and validate minimum number of choices
 class BaseChoiceFormSet(forms.BaseInlineFormSet):
     def __init__(self, *args, **kwargs):
         extra = kwargs.pop('extra', 4)
         super().__init__(*args, **kwargs)
         self.extra = extra
+
+    def clean(self):
+        super().clean()
+        if len(self.forms) < 2:
+            raise ValidationError('You must enter at least two choices.')
 
 ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, formset=BaseChoiceFormSet, can_delete=False)
 
@@ -224,15 +230,12 @@ class QuestionForm(forms.ModelForm):
         fields = ['exam', 'content', 'answer_description']
         labels = {
             'content': 'question',
-            
         }
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
             'answer_description': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter answer description here..'}),
         }
-
-    choices = ChoiceFormSet()
 
     def __init__(self, *args, **kwargs):
         department_username = kwargs.pop('department_username', None)
@@ -254,6 +257,8 @@ class QuestionForm(forms.ModelForm):
             'placeholder': 'Enter answer description here..',
         })
 
+    # Include the choice formset
+    choices = ChoiceFormSet()
 
 
 # No need to override __init__, is_valid, or save methods for basic Django admin usage
@@ -333,8 +338,6 @@ class DepartmentRegistrationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('This email address is already in use.')
         return email
-    
-    
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         
@@ -346,17 +349,28 @@ class DepartmentRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
         
         return phone
+    
+    def clean_department_name(self):
+        department_name = self.cleaned_data.get('department_name')
+        if not re.match(r'^[a-zA-Z ]+$', department_name):
+            raise forms.ValidationError("Department name must contain only alphabetic characters and spaces")
+        return department_name
+    
+    
+    def clean_college(self):
+        college = self.cleaned_data.get('college')
+        if not re.match(r'^[a-zA-Z ]+$', college):
+            raise forms.ValidationError("College name must contain only alphabetic characters and spaces")
+        return college
 
-
+   
 
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
         if password1 != password2:
-            raise forms.ValidationError(
-                "Passwords do not match"
-            )
+            raise forms.ValidationError("Passwords do not match")
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -369,32 +383,19 @@ class DepartmentRegistrationForm(UserCreationForm):
 
     def generate_username(self):
         department_name = self.cleaned_data.get('department_name')
-        email = self.cleaned_data.get('email')
-        combined = self.combine_randomly(department_name, email)
-        combined = combined.replace(" ", "")  # Remove spaces
-        combined = combined[:6]  # Limit to 6 characters
-        username = f"{combined}_{random.randint(100, 999)}"  # Adding random numbers to ensure uniqueness
+        college = self.cleaned_data.get('college')
+
+        # Get the first character of department_name and college
+        initials = department_name[0].upper() + college[0].upper()
+
+        # Add random numbers for uniqueness
+        username = f"{initials}_{random.randint(100, 999)}"
         return username
-
-
-
-    def combine_randomly(self, str1, str2):
-        combined = ''
-        min_len = min(len(str1), len(str2))
-        max_len = max(len(str1), len(str2))
-        for i in range(max_len):
-            if i < min_len:
-                combined += random.choice([str1[i], str2[i]])
-            else:
-                combined += str1[i] if len(str1) > len(str2) else str2[i]
-        return combined
 
     def generate_password(self):
         length = 12
         characters = string.ascii_letters + string.digits + string.punctuation
-        return ''.join(random.choice(characters) for i in range(length))
-
-
+        return ''.join(random.choice(characters) for _ in range(length))
 
 class StudentRegistrationForm(UserCreationForm):
     first_name = forms.CharField(
@@ -422,7 +423,8 @@ class StudentRegistrationForm(UserCreationForm):
     phone = forms.CharField(
         widget=forms.TextInput(attrs={
             "class": "form-control",
-            "placeholder": "Enter your phone number"
+            "placeholder": "Enter your phone number",
+  
         })
     )
     password1 = forms.CharField(
@@ -464,6 +466,12 @@ class StudentRegistrationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already exists")
         return email
+    
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not re.match(r'^[a-zA-Z ]+$', first_name):
+            raise forms.ValidationError("First name must contain only alphabetic characters and spaces")
+        return first_name
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
@@ -664,7 +672,13 @@ class InstructorRegistrationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("Email already exists")
         return email
-
+    
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not re.match(r'^[a-zA-Z ]+$', first_name):
+            raise forms.ValidationError("First name must contain only alphabetic characters and spaces")
+        return first_name
+    
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         # Define the regular expression pattern
