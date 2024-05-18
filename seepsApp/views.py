@@ -2359,19 +2359,39 @@ def clear_conversation(request):
         return JsonResponse({'success': False})
 
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import PasswordChangeForm
+from .forms import ProfileUpdateForm
 
 @login_required
 def student_profile(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(user=request.user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            update_session_auth_hash(request, form.user)
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('student_profile')
+        if 'old_password' in request.POST:
+            # Handle password change
+            password_form = PasswordChangeForm(user=request.user, data=request.POST)
+            profile_form = ProfileUpdateForm(instance=request.user)
+            if password_form.is_valid():
+                password_form.save()
+                update_session_auth_hash(request, password_form.user)
+                messages.success(request, 'Your password was successfully updated!')
+                return redirect('student_profile')
+            else:
+                messages.error(request, 'Please correct the error below.')
         else:
-            messages.error(request, 'Please correct the error below.')
+            # Handle profile update
+            profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user)
+            password_form = PasswordChangeForm(request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Your profile was successfully updated!')
+                return redirect('student_profile')
+            else:
+                messages.error(request, 'Please correct the error below.')
     else:
-        form = PasswordChangeForm(request.user)
-    
-    return render(request, 'student_template/profile.html', {'form': form})
+        password_form = PasswordChangeForm(request.user)
+        profile_form = ProfileUpdateForm(instance=request.user)
+
+    return render(request, 'student_template/profile.html', {'password_form': password_form, 'profile_form': profile_form})

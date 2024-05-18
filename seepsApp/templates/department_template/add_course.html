@@ -23,7 +23,7 @@
                     timer: 6000,
                 });
             </script>
-        {% elif message.tags == 'error' %}
+        {% comment %} {% elif message.tags == 'error' %}
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 Swal.fire({
@@ -34,7 +34,7 @@
                     showConfirmButton: false,
                     timer: 6000,
                 });
-            </script>
+            </script> {% endcomment %}
         {% elif message.tags == 'warning' %}
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
@@ -87,12 +87,6 @@
               <form action="{% url 'add_course' %}" method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
-                {% if form.non_field_errors %}
-                  <div class="text-danger">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    {{ form.non_field_errors.as_text }}
-                  </div>
-                {% endif %}
 
                 <!-- Course Title -->
                 <div class="form-group">

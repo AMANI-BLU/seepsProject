@@ -95,8 +95,16 @@ from .models import Tutorial
 from django import forms
 from .models import Tutorial, Course
 
+from django import forms
+from django.core.exceptions import ValidationError
+from .models import Tutorial, Course
+
 class TutorialForm(forms.ModelForm):
-    order = forms.IntegerField(label='Order', required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))  # Add order field with widget
+    order = forms.IntegerField(
+        label='Order',
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = Tutorial
@@ -113,6 +121,9 @@ class TutorialForm(forms.ModelForm):
         if department:
             # Filter the queryset based on the department
             self.fields['course'].queryset = Course.objects.filter(department_name=department)
+        else:
+            # Default to an empty queryset if no department is provided
+            self.fields['course'].queryset = Course.objects.none()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -120,19 +131,20 @@ class TutorialForm(forms.ModelForm):
         course = cleaned_data.get('course')
 
         if not title:
-            raise forms.ValidationError("Tutorial title cannot be empty.")
+            self.add_error('title', "Tutorial title cannot be empty.")
         if not course:
-            raise forms.ValidationError("Please select a course.")
+            self.add_error('course', "Please select a course.")
 
         return cleaned_data
 
     def clean_order(self):
-        # Retrieve the course and order from the form data
-        course = self.cleaned_data['course']
-        order = self.cleaned_data['order']
-        # Check if there is any tutorial with the same course and order
-        if Tutorial.objects.filter(course=course, order=order).exists():
-            raise forms.ValidationError("A tutorial with the same order already exists for this course.")
+        order = self.cleaned_data.get('order')
+        course = self.cleaned_data.get('course')
+
+        if order is not None and course:
+            if Tutorial.objects.filter(course=course, order=order).exists():
+                raise ValidationError("A tutorial with the same order already exists for this course.")
+        
         return order
 
     def save(self, commit=True):
@@ -140,6 +152,8 @@ class TutorialForm(forms.ModelForm):
         if commit:
             tutorial.save()
         return tutorial
+
+
 
 
 
@@ -726,11 +740,11 @@ class EventForm(forms.ModelForm):
         }
 
 
-class ProfilePictureUpdateForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['profile_picture']
+# class ProfilePictureUpdateForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ['profile_picture']
 
-    def __init__(self, *args, **kwargs):
-        super(ProfilePictureUpdateForm, self).__init__(*args, **kwargs)
-        self.fields['profile_picture'].required = False  # Make profile picture not required
+#     def __init__(self, *args, **kwargs):
+#         super(ProfilePictureUpdateForm, self).__init__(*args, **kwargs)
+#         self.fields['profile_picture'].required = False  # Make profile picture not required
