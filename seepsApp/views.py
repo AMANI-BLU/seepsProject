@@ -2395,3 +2395,46 @@ def student_profile(request):
         profile_form = ProfileUpdateForm(instance=request.user)
 
     return render(request, 'student_template/profile.html', {'password_form': password_form, 'profile_form': profile_form})
+
+
+def community(request):
+    questions = CommunityQuestion.objects.all()
+    newest_questions = CommunityQuestion.objects.order_by('-created_at')[:10]
+    unanswered_questions = CommunityQuestion.objects.filter(answers__isnull=True)
+    frequent_questions = CommunityQuestion.objects.annotate(answer_count=Count('answers')).order_by('-answer_count')[:10]
+
+    context = {
+        'questions': questions,
+        'newest_questions': newest_questions,
+        'unanswered_questions': unanswered_questions,
+        'frequent_questions': frequent_questions,
+    }
+    return render(request, 'student_template/community.html', context)
+
+@login_required
+def ask_question(request):
+    if request.method == 'POST':
+        form = CommunityQuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.author = request.user
+            question.save()
+            return redirect('community')
+    else:
+        form = CommunityQuestionForm()
+    return render(request, 'student_template/ask_question.html', {'form': form})
+
+@login_required
+def answer_question(request, id):
+    question = get_object_or_404(CommunityQuestion, id=id)
+    if request.method == 'POST':
+        form = CommunityAnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.author = request.user
+            answer.question = question
+            answer.save()
+            return redirect('answer_question', id=question.id)
+    else:
+        form = CommunityAnswerForm()
+    return render(request, 'student_template/answer_question.html', {'question': question, 'form': form})

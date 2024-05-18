@@ -127,8 +127,11 @@ urlpatterns = [
     path('chatbot/', chatbot, name='chatbot'),
     path('clear-conversation/', clear_conversation, name='clear_conversation'),
 
-
-  
+    path('community/', community, name='community'),
+    path('ask-question/', ask_question, name='ask_question'),
+    path('answer-question/<int:id>/', answer_question, name='answer_question'),
+    # path('add-comment/<int:answer_id>/', add_comment, name='add_comment'),
+    
    #teacher urls
    path('teacher_home/', instructor_home, name='instructor_home'),
    path('view_students/', view_students, name='view_students'),

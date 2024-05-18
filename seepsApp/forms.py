@@ -775,20 +775,23 @@ class EventForm(forms.ModelForm):
 
 from .models import CommunityQuestion, CommunityAnswer
 
+
+
 class CommunityQuestionForm(forms.ModelForm):
     class Meta:
         model = CommunityQuestion
         fields = ['title', 'body', 'tags']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'body': forms.Textarea(attrs={'class': 'form-control'}),
-            'tags': forms.TextInput(attrs={'class': 'form-control'}),
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the title of your question'}),
+            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter your question here'}),
+            'tags': forms.TextInput(attrs={'class': 'form-control', 'data-role': 'tagsinput'}),
         }
-
 class CommunityAnswerForm(forms.ModelForm):
     class Meta:
         model = CommunityAnswer
         fields = ['body']
-        widgets = {
-            'body': forms.Textarea(attrs={'class': 'form-control'}),
-        }
+
+class CommunityCommentForm(forms.ModelForm):
+    class Meta:
+        model = CommunityComment
+        fields = ['body']
