@@ -4,22 +4,25 @@
 {% block content %}
   {% for message in messages %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: 'success',
-        text: "{{ message }}",
-        showConfirmButton: false,
-        timer: 6000,
-    });
-  </script>
+
+                {% if message.tags == 'success' %}
+                    <script>
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            text: "{{ message }}",
+                            showConfirmButton: false,
+                            timer: 6000,
+                        });
+                    </script>
+                    {% endif %}
   {% endfor %}
 
   <div class="container mt-5 py-4">
       <div class="row">
           <div class="col-md-8 offset-md-2">
-              <div class="card shadow-lg">
+              <div class="card">
                   <div class="card-header bg-info text-white text-center">
                       <h3>Student Profile</h3>
                   </div>
@@ -30,13 +33,10 @@
                           {% else %}
                               <img class="profile-img img-fluid rounded-circle mb-4" src="{% static 'dist/img/avatar5.png' %}" alt="Placeholder profile picture" style="width: 150px; height: 150px;">
                           {% endif %}
-                          <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#changeProfilePictureModal">
-                              <i class="fas fa-edit"></i> Edit
-                          </button>
                       </div>
                       <form method="post" enctype="multipart/form-data" action="{% url 'student_profile' %}">
                           {% csrf_token %}
-                          {{ profile_form.department_name }}
+                          {% comment %} {{ profile_form.department_name }} {% endcomment %}
                           <input type="hidden" name="department_name" value="{{ user.department_name }}">
                           <div class="mb-3">
                               <label for="first_name" class="form-label">First Name</label>
@@ -73,16 +73,22 @@
                                   <div class="text-danger">{{ error }}</div>
                               {% endfor %}
                           </div>
-                          <div class="text-center mt-4">
-                              <button type="submit" class="btn btn-info">Update Profile</button>
-                          </div>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                            <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                <i class="fas fa-key"></i> Change Password
+                            </button>
+                        </div>
+
                       </form>
-                      <hr>
-                      <div class="text-center mt-4">
+          
+                      {% comment %} <div class="text-center mt-4">
                           <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
                               Change Password
                           </button>
-                      </div>
+                      </div> {% endcomment %}
                   </div>
               </div>
           </div>

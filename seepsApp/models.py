@@ -169,3 +169,37 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+    
+    
+    
+
+class CommunityQuestion(models.Model):
+    title = models.CharField(max_length=255)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    tags = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.title
+
+class CommunityAnswer(models.Model):
+    question = models.ForeignKey(CommunityQuestion, related_name='answers', on_delete=models.CASCADE)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.body[:50]
+
+class CommunityComment(models.Model):
+    answer = models.ForeignKey(CommunityAnswer, related_name='comments', on_delete=models.CASCADE)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.body[:50]

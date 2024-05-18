@@ -1,116 +1,12 @@
 {% extends 'student_template/base.html' %}
 
 {% block content %}
-{% load static %}
-
-<div class="row" style="margin-top: 75px;">
-    <div class="col-md-9">
-        <div class="card card-primary card-outline direct-chat direct-chat-primary">
-            <div class="card-header">
-                <h3 class="card-title">Chat Room</h3>
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
-                </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-                <div class="direct-chat-messages" style="height: 400px; overflow-y: auto;">
-                    {% for message in messages|dictsort:"timestamp" %}
-                    <div class="direct-chat-msg {% if message.sender == request.user %}right{% else %}left{% endif %}">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">{{ message.sender.first_name }}</span>
-                            <span class="direct-chat-timestamp float-right">{{ message.timestamp }}</span>
-                        </div>
-                        <img class="direct-chat-img" src="{% if message.sender.profile_picture %}{{ message.sender.profile_picture.url }}{% else %}{% static 'dist/img/user1-128x128.jpg' %}{% endif %}" alt="User image">
-                        <div class="direct-chat-text">
-                            {{ message.content }}
-                            {% if message.file %}
-                                <a href="{{ message.file.url }}" target="_blank">Download File</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <!-- /.direct-chat-msg -->
-                    {% endfor %}
-                </div>
-                <!-- /.direct-chat-messages -->
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-                <form id="message-form" action="{% url 'send_message' %}" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="input-group">
-                        <input id="message-input" type="text" name="content" placeholder="Type your message ..." class="form-control">
-                        <div class="input-group-append">
-                            <button id="emoji-picker-btn" type="button" class="btn btn-default"><i class="far fa-smile"></i></button>
-                            <input id="file-input" type="file" name="file" style="display: none;">
-                            <button id="file-picker-btn" type="button" class="btn btn-default"><i class="far fa-file"></i></button>
-                            <button type="submit" class="btn btn-primary">Send</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <!-- /.card-footer-->
-        </div>
-        <!-- /.card -->
-    </div>
-    <div class="col-md-3">
-        <div class="card card-primary card-outline">
-            <div class="card-header">
-                <h3 class="card-title">Online Contacts</h3>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for user in online_users %}
-                    <li class="list-group-item">{{ user.first_name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <!-- /.card-body -->
-        </div>
-        <!-- /.card -->
-    </div>
+<div class="container mt-5">
+    <h2>Ask a Question</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Post Your Question</button>
+    </form>
 </div>
-
-<style>
-    /* Custom CSS to adjust the width of the direct-chat-messages */
-    .direct-chat-messages {
-        width: 100%; /* Adjust the width as needed */
-    }
-</style>
-
 {% endblock %}
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/js/all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/emojipickerjs/1.1.0/emojiPicker.min.js"></script>
-<script>
-    $(document).ready(function () {
-        // Emoji Picker
-        const emojiPicker = new EmojiPicker();
-        const emojiPickerBtn = document.getElementById('emoji-picker-btn');
-        const messageInput = document.getElementById('message-input');
-
-        emojiPickerBtn.addEventListener('click', () => {
-            emojiPicker.togglePicker(emojiPickerBtn);
-            emojiPicker.on('emoji', emoji => {
-                messageInput.value += emoji;
-            });
-        });
-
-        // File Picker
-        const fileInput = document.getElementById('file-input');
-        const filePickerBtn = document.getElementById('file-picker-btn');
-
-        filePickerBtn.addEventListener('click', () => {
-            fileInput.click(); // Trigger click event on file input
-        });
-
-        // Handle file selection
-        fileInput.addEventListener('change', (event) => {
-            // Display selected file name (optional)
-            const fileName = event.target.files[0].name;
-            console.log('Selected file:', fileName);
-        });
-    });
-</script>

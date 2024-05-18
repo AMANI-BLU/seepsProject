@@ -17,7 +17,7 @@
         {% endif %}
       </p>
 
-      <form method="post">
+      <form method="post" id="loginForm">
         {% csrf_token %}
         <div class="input-group mb-3">
           {{ form.email }}
@@ -39,7 +39,10 @@
 
         <div class="row">
           <div class="col-12">
-            <button type="submit" class="btn btn-info btn-block">Login</button>
+            <button type="submit" class="btn btn-info btn-block" id="loginBtn">
+              <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              Login
+            </button>
           </div>
         </div>
       </form>
@@ -60,5 +63,11 @@
   <!-- /.card -->
 </div>
 <!-- /.login-box -->
+
+<script>
+  document.getElementById("loginForm").addEventListener("submit", function() {
+    document.getElementById("loginBtn").innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+  });
+</script>
 
 {% endblock content %}

@@ -139,7 +139,12 @@
                 url: '/count_department/notifications/', // URL to fetch notification count
                 type: 'GET',
                 success: function (response) {
-                    $('#notification-badge').text(response.count); // Update notification count
+                  var notificationBadge = $('#notification-badge');
+                    if (response.count > 0) {
+                        notificationBadge.text(response.count).show(); // Update and show notification count
+                    } else {
+                        notificationBadge.hide(); // Hide notification badge if count is zero
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error fetching notification count:', error);

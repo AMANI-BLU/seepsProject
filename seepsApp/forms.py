@@ -527,6 +527,10 @@ class ProfileUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({
+                'class': 'form-control'
+            })
         if self.instance.is_superuser:
             self.fields['department_name'].required = False
             del self.fields['department_name']
@@ -536,6 +540,34 @@ class ProfileUpdateForm(forms.ModelForm):
         elif self.instance.is_instructor:
             self.fields['department_name'].required = False
             del self.fields['department_name']
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email:
+            raise ValidationError("Email address is required * ")
+        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
+            raise forms.ValidationError("Email address is already in use.")
+        return email
+    
+    def clean_first_name(self):
+        first_name = self.cleaned_data.get('first_name')
+        if not first_name:
+            raise forms.ValidationError("First name is required * ")
+        if not re.match(r'^[a-zA-Z ]+$', first_name):
+            raise forms.ValidationError("First name must contain only alphabetic characters and spaces")
+        return first_name
+    
+    def clean_phone(self):
+            phone = self.cleaned_data.get('phone')
+            
+            # Define the regular expression pattern
+            pattern = r'^(\+2519\d{8}|09\d{8}|07\d{8}|\+2517\d{8})$'
+            
+            # Check if the phone matches the pattern
+            if not re.match(pattern, phone):
+                raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
+            
+            return phone
 
     def save(self, commit=True):
         user = super(ProfileUpdateForm, self).save(commit=False)
@@ -739,12 +771,24 @@ class EventForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Enter event description'}),
         }
 
+# forms.py
 
-# class ProfilePictureUpdateForm(forms.ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ['profile_picture']
+from .models import CommunityQuestion, CommunityAnswer
 
-#     def __init__(self, *args, **kwargs):
-#         super(ProfilePictureUpdateForm, self).__init__(*args, **kwargs)
-#         self.fields['profile_picture'].required = False  # Make profile picture not required
+class CommunityQuestionForm(forms.ModelForm):
+    class Meta:
+        model = CommunityQuestion
+        fields = ['title', 'body', 'tags']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'body': forms.Textarea(attrs={'class': 'form-control'}),
+            'tags': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class CommunityAnswerForm(forms.ModelForm):
+    class Meta:
+        model = CommunityAnswer
+        fields = ['body']
+        widgets = {
+            'body': forms.Textarea(attrs={'class': 'form-control'}),
+        }
