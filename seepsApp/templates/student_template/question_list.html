@@ -1,0 +1,18 @@
+<div class="list-group">
+    {% for question in questions %}
+    <a href="{% url 'answer_question' question.id %}" class="list-group-item list-group-item-action mb-2 p-3">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ question.title }}</h5>
+            <small class="text-muted">{{ question.created_at|date:"M d, Y" }}</small>
+        </div>
+        <p class="mb-1">{{ question.body|truncatewords:20 }}</p>
+        <small class="text-muted">Tags: {{ question.tags }}</small>
+        <br>
+        <small class="text-muted">Author: {{ question.author }}</small>
+    </a>
+    {% empty %}
+    <div class="alert alert-warning" role="alert">
+        No questions available.
+    </div>
+    {% endfor %}
+</div>

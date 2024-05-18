@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Site</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.1/css/all.css">
+   
+</head>
+<body>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5">Community Questions</h1>
+        <a href="{% url 'ask_question' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-question-circle"></i> Ask a Question
+        </a>
+    </div>
+
+    <nav id="question-filter" class="nav nav-pills mb-3" role="tablist">
+        <a class="nav-link active" id="all-questions-tab" data-toggle="pill" href="#all-questions" role="tab" aria-controls="all-questions" aria-selected="true">
+            <i class="fas fa-list"></i> All
+        </a>
+        <a class="nav-link" id="newest-questions-tab" data-toggle="pill" href="#newest-questions" role="tab" aria-controls="newest-questions" aria-selected="false">
+            <i class="fas fa-clock"></i> Newest
+        </a>
+        <a class="nav-link" id="unanswered-questions-tab" data-toggle="pill" href="#unanswered-questions" role="tab" aria-controls="unanswered-questions" aria-selected="false">
+            <i class="fas fa-question"></i> Unanswered
+        </a>
+        <a class="nav-link" id="frequent-questions-tab" data-toggle="pill" href="#frequent-questions" role="tab" aria-controls="frequent-questions" aria-selected="false">
+            <i class="fas fa-fire"></i> Frequent
+        </a>
+    </nav>
+<hr>
+    <div class="tab-content" id="question-filter-content">
+        <div class="tab-pane fade show active" id="all-questions" role="tabpanel" aria-labelledby="all-questions-tab">
+            {% include 'student_template/question_list.html' with questions=questions %}
+        </div>
+        <div class="tab-pane fade" id="newest-questions" role="tabpanel" aria-labelledby="newest-questions-tab">
+            {% include 'student_template/question_list.html' with questions=newest_questions %}
+        </div>
+        <div class="tab-pane fade" id="unanswered-questions" role="tabpanel" aria-labelledby="unanswered-questions-tab">
+            {% include 'student_template/question_list.html' with questions=unanswered_questions %}
+        </div>
+        <div class="tab-pane fade" id="frequent-questions" role="tabpanel" aria-labelledby="frequent-questions-tab">
+            {% include 'student_template/question_list.html' with questions=frequent_questions %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .nav-pills .nav-link {
+        border-radius: 0.25rem;
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .nav-pills .nav-link:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .nav-pills .nav-link i {
+        margin-right: 0.5rem;
+    }
+
+    .list-group-item-action {
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
+
+    .list-group-item-action:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-fab {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-primary.btn-fab {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary.btn-fab:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+</style>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

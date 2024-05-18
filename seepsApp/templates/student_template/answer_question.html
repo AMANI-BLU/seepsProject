@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Question Post -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">{{ question.title }}</h2>
+                    <p class="card-text">{{ question.body }}</p>
+                    <div class="text-muted mt-2">Posted by {{ question.author }} on {{ question.created_at }}</div>
+                </div>
+            </div>
+
+            <!-- Answers (Comments) -->
+            <div class="mt-4">
+                <h3 class="mb-3">Answers</h3>
+                {% for answer in question.answers.all %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p class="card-text">{{ answer.body }}</p>
+                        <div class="text-muted">Answered by {{ answer.author }} on {{ answer.created_at }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-warning" role="alert">
+                    No answers yet.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Your Answer Form -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Your Answer</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea class="form-control" name="body" rows="5" placeholder="Enter your answer here" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
