@@ -123,6 +123,10 @@
                               
                                 <td class="d-flex align-items-center">
                                     <!-- Update Button - Open Modal -->
+                                      <!-- View Button - Collapse -->
+                                    <button class="btn btn-success me-3" type="button" data-toggle="collapse" data-target="#tutorialDetails{{ tutorial.id }}" aria-expanded="false" aria-controls="tutorialDetails{{ tutorial.id }}">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>&nbsp;&nbsp;
                                     <button type="button" class="btn btn-info me-3" data-toggle="modal" data-target="#updateTutorialModal{{ tutorial.id }}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>&nbsp;&nbsp;
@@ -132,6 +136,24 @@
                                     </button>
                                 </td>
                             </tr>
+                            <!-- Collapse Section for Tutorial Details -->
+<tr class="collapse" id="tutorialDetails{{ tutorial.id }}">
+    <td colspan="5">
+        <!-- Tutorial Details -->
+        <div class="card card-body">
+            <h5 class="card-title">Tutorial Details</h5>
+            <hr>
+            <div class="details-content">
+                <p class="badge badge-success"><strong>Order</strong> {{ tutorial.order }}</p>
+                <p><strong>Course</strong> {{ tutorial.course.title }}</p>
+                <p><strong>Title</strong> {{ tutorial.title }}</p>
+                <p><span id="videoPlayer{{ tutorial.id }}"></span></p>
+            </div>
+        </div>
+    </td>
+</tr>
+
+
                             <!-- Update Tutorial Modal -->
                            <!-- Update Tutorial Modal -->
 <div class="modal fade" id="updateTutorialModal{{ tutorial.id }}" tabindex="-1" role="dialog" aria-labelledby="updateTutorialModalLabel{{ tutorial.id }}" aria-hidden="true">
@@ -234,7 +256,39 @@
             <!-- /.content -->
         </div>
 
-  
+  <script>
+    // Function to extract video ID from YouTube URL
+    function getYouTubeVideoId(url) {
+        var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        if (match && match[2].length == 11) {
+            return match[2];
+        } else {
+            return null;
+        }
+    }
+
+    // Function to create embedded video player
+    function createEmbeddedVideoPlayer(videoId, elementId) {
+        var iframe = document.createElement('iframe');
+        iframe.setAttribute('src', 'https://www.youtube.com/embed/' + videoId);
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowfullscreen', '');
+        document.getElementById(elementId).appendChild(iframe);
+    }
+
+    // Extract video ID and create embedded video player for each tutorial
+    {% for tutorial in tutorials %}
+        var videoUrl{{ tutorial.id }} = "{{ tutorial.tutorial_url }}";
+        var videoId{{ tutorial.id }} = getYouTubeVideoId(videoUrl{{ tutorial.id }});
+        if (videoId{{ tutorial.id }}) {
+            createEmbeddedVideoPlayer(videoId{{ tutorial.id }}, "videoPlayer{{ tutorial.id }}");
+        } else {
+            document.getElementById("videoPlayer{{ tutorial.id }}").innerHTML = "<p>" + videoUrl{{ tutorial.id }} + "</p>";
+        }
+    {% endfor %}
+</script>
+
         <script>
             $(document).ready(function () {
                 $('#tutorialsTable').DataTable({

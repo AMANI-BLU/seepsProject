@@ -59,6 +59,8 @@ class Question(models.Model):
     content = models.TextField()
     answer_description = models.TextField(blank=True, null=True)
     added_by = models.CharField(max_length=255, blank=True, null=True)
+    weight = models.IntegerField(default=1)  # Add a weight field
+
 
   
     def __str__(self):

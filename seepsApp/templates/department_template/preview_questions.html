@@ -3,14 +3,11 @@
 {% block title %}Preview Questions{% endblock %}
 
 {% block content %}
-<!-- Main content -->
 <div class="wrapper">
     {% include 'department_template/navbar.html' %}
     {% include 'department_template/aside.html' %}
 
-    <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -18,9 +15,7 @@
                 </div>
             </div>
         </div>
-        <!-- /.content-header -->
 
-        <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
                 <div class="alert alert-warning alert-dismissible">
@@ -40,18 +35,23 @@
                         <div class="card-body">
                             <input type="hidden" name="question_number_{{ forloop.counter }}" value="{{ forloop.counter }}">
                             <ul class="list-group">
-                                {% for choice in question_with_choices.choices %}
-                                <li class="list-group-item">
-                                    <div class="custom-control custom-radio">
-                                        <input type="radio" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}" class="custom-control-input" value="{{ choice }}" required>
-                                        <label class="custom-control-label" for="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ choice }}</label>
-                                    </div>
-                                </li>
+                              {% for choice in question_with_choices.choices %}
+                                    <li class="list-group-item">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}[]" class="custom-control-input" value="{{ choice }}">
+                                            <label class="custom-control-label" for="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}">{{ choice }}</label>
+                                        </div>
+                                    </li>
                                 {% endfor %}
+
                             </ul>
                             <div class="form-group mt-3">
-                                <label for="answer_description_{{ forloop.counter }}">Answer Description</label>
+                                <label for="answer_description_{{ forloop.counter }}" class="text-muted">Answer Description</label>
                                 <textarea class="form-control" id="answer_description_{{ forloop.counter }}" name="answer_description_{{ forloop.counter }}" rows="3"></textarea>
+                            </div>
+                            <div class="form-group mt-3">
+                                <label for="question_weight_{{ forloop.counter }}" class="text-muted">Question Weight</label>
+                                <input type="number" step="0.1" class="form-control" id="question_weight_{{ forloop.counter }}" name="question_weight_{{ forloop.counter }}" required>
                             </div>
                         </div>
                     </div>
@@ -67,10 +67,8 @@
                 {% endif %}
             </div>
         </section>
-        <!-- /.content -->
     </div>
 
     {% include 'department_template/footer.html' %}
 </div>
-<!-- ./wrapper -->
 {% endblock %}

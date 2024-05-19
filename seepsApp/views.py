@@ -874,10 +874,10 @@ from .forms import TutorialForm
 from django.shortcuts import render, redirect
 from .forms import TutorialForm
 from .models import Course
-
 def add_tutorial(request):
+    department_name = request.user.username
     if request.method == 'POST':
-        form = TutorialForm(request.POST)
+        form = TutorialForm(request.POST, department=department_name)
         if form.is_valid():
             tutorial = form.save(commit=False)
             tutorial.added_by = request.user.username
@@ -885,8 +885,6 @@ def add_tutorial(request):
             messages.success(request, 'Tutorial Added successfully!')
             return redirect('add_tutorial')
     else:
-        department_name = request.user.username
-        courses = Course.objects.filter(department_name=department_name)
         form = TutorialForm(department=department_name)
         
     return render(request, 'department_template/add_tutorial.html', {
@@ -977,7 +975,7 @@ from django.contrib import messages
 from .models import Exam, Question
 from random import shuffle
 
-def exam_detail(request, exam_id,attempts_remaining):
+def exam_detail(request, exam_id, attempts_remaining):
     exam = get_object_or_404(Exam, id=exam_id)
 
     # Check if the user has entered the correct exam code
@@ -1001,15 +999,17 @@ def exam_detail(request, exam_id,attempts_remaining):
         shuffled_question_ids = shuffled_questions
         questions = [Question.objects.get(id=question_id) for question_id in shuffled_question_ids]
 
+    # Add the count of correct choices to each question
+    for question in questions:
+        question.correct_choices_count = question.choice_set.filter(is_correct=True).count()
+
     context = {
         'exam': exam,
         'questions': questions,
         'attempts_remaining': attempts_remaining,
-
     }
 
     return render(request, 'student_template/exam_detail.html', context)
-
 
 
 
@@ -1023,14 +1023,14 @@ from django.shortcuts import redirect
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Result, Exam, Question, Choice
 from .models import ExamSubmission
-
 def submit_exam(request, exam_id):
     exam = Exam.objects.get(pk=exam_id)
     questions = Question.objects.filter(exam=exam)
 
     if request.method == 'POST':
-        # Calculate the number of correct answers
-        correct_answers = 0
+        # Initialize variables to store score and total weight
+        score = 0
+        total_weight = 0
 
         # Initialize dictionary to store user answers
         user_answers = {}
@@ -1040,7 +1040,9 @@ def submit_exam(request, exam_id):
             if selected_choice_id:
                 selected_choice = Choice.objects.get(pk=selected_choice_id)
                 if selected_choice.is_correct:
-                    correct_answers += 1
+                    # Increment score by question weight if the choice is correct
+                    score += question.weight
+                total_weight += question.weight
 
                 # Store user answer in session
                 user_answers[str(question.id)] = selected_choice_id
@@ -1049,20 +1051,21 @@ def submit_exam(request, exam_id):
         request.session['user_answers'] = user_answers
 
         # Store the result in the database
-        result = Result.objects.create(student=request.user, exam=exam, score=correct_answers)
+        result = Result.objects.create(student=request.user, exam=exam, score=score)
 
         # Record the submission
         ExamSubmission.objects.create(exam=exam, user=request.user)
 
         return render(request, 'student_template/exam_submitted.html', {
-            'correct_answers': correct_answers,
-            'total_questions': len(questions),
+            'score': score,
+            'total_weight': total_weight,
             'result': result,
         })
 
     return redirect('view_exams')  # Redirect to the view_exams page if it's not a POST request
-  # Redirect to the view_exams page if it's not a POST request
 
+from django.shortcuts import render, get_object_or_404
+from .models import Result, Question, Choice
 
 def result(request, result_id):
     result = get_object_or_404(Result, pk=result_id)
@@ -1085,11 +1088,25 @@ def result(request, result_id):
     # Serialize the selected choices into a dictionary
     selected_choices = {str(question.id): str(user_answers.get(str(question.id))) for question in questions}
 
+    # Calculate the weighted score
+    total_weight = sum(question.weight for question in questions)
+    weighted_score = 0
+
+    for question in questions:
+        selected_choice_id = user_answers.get(str(question.id))
+        if selected_choice_id:
+            selected_choice = Choice.objects.get(id=selected_choice_id)
+            if selected_choice.is_correct:
+                weighted_score += question.weight
+
     return render(request, 'student_template/result.html', {
         'result': result,
         'questions_with_choices': questions_with_choices,
         'selected_choices': selected_choices,
+        'weighted_score': weighted_score,
+        'total_weight': total_weight,
     })
+
 
 # views.py
 from django.shortcuts import render, redirect
@@ -1275,58 +1292,55 @@ def preview_questions_view(request):
             selected_exam = Exam.objects.get(pk=selected_exam_id)
         except Exam.DoesNotExist:
             # Handle the case where the Exam object does not exist
-            # You might want to redirect or render an error page
             pass
     
     # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
-        # Check if questions_with_choices is empty or None
         if not questions_with_choices:
             message = "Please upload a file with correct format."
         else:
             message = "Please select an exam."
         
-        # Add the message to the messages framework
         messages.warning(request, message)
-        
-        # Redirect to the upload page if session data is missing
-        return redirect('upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
+        return redirect('upload_pdf_view')  # Replace 'upload_pdf_view' with the name of your upload page URL pattern
     
     if request.method == 'POST':
-        # Get the selected choices and answer descriptions from POST data
         selected_choices = {}
         answer_descriptions = {}
+        question_weights = {}
+
         for key, value in request.POST.items():
             if key.startswith('selected_choice_'):
-                question_number = key.split('_')[2]  # Extract the question number from the key
-                selected_choices[question_number] = value  # Store the selected choice for this question
+                question_number = key.split('_')[2]
+                selected_choices[question_number] = value
             elif key.startswith('answer_description_'):
-                question_number = key.split('_')[2]  # Extract the question number from the key
-                answer_descriptions[question_number] = value  # Store the answer description for this question
-            elif key.startswith('question_number_'):
-                question_number = key.split('_')[2]  # Extract the question number from the key
-                answer_descriptions[question_number] = value  # Store the answer description for this question
+                question_number = key.split('_')[2]
+                answer_descriptions[question_number] = value
+            elif key.startswith('question_weight_'):
+                question_number = key.split('_')[2]
+                question_weights[question_number] = float(value)
 
-        # If the user confirms, save questions, choices, and answer descriptions to the database
+        # Save questions, choices, and weights to the database
         for question_number, qwc in enumerate(questions_with_choices, start=1):
-            # Create the question object
-            question = Question.objects.create(exam=selected_exam, content=qwc['question'], answer_description=answer_descriptions.get(str(question_number)))
+            question = Question.objects.create(
+                exam=selected_exam,
+                content=qwc['question'],
+                answer_description=answer_descriptions.get(str(question_number)),
+                weight=question_weights.get(str(question_number), 1)  # Default weight to 1 if not provided
+            )
             for choice_text in qwc['choices']:
-                # Check if this choice is selected
-                is_correct = choice_text in selected_choices.values()
+                is_correct = choice_text == selected_choices.get(str(question_number))
                 Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
         
         # Clear session data
         del request.session['questions_with_choices']
         del request.session['selected_exam']
         
-        # Add success message
         messages.success(request, 'Questions added successfully!')
-        
-        # Redirect to a success page or any other desired page
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
     
     return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
+
 
 from .forms import EditQuestionForm, EditChoiceFormSet  # Import the EditQuestionForm and EditChoiceFormSet
 
@@ -1863,7 +1877,8 @@ def inst_add_resource(request):
 @user_passes_test(is_instructor, login_url='NoPage')
 def inst_add_tutorial(request):
     if request.method == 'POST':
-        form = TutorialForm(request.POST)
+        department_name = request.user.department_name
+        form = TutorialForm(request.POST,department=department_name)
         if form.is_valid():
             tutorial = form.save(commit=False)
             tutorial.added_by = request.user.username
@@ -2165,7 +2180,7 @@ def dictionary_search(request):
         meaning = dictionary.meaning(word)
         synonyms = dictionary.synonym(word)
         antonyms = dictionary.antonym(word)
-    return render(request, 'student_template/dictionary.html', {'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})
+    return render(request, 'student_template/dictionary.html', {'word':word, 'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})
 
 
 

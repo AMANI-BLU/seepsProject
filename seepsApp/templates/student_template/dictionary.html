@@ -8,7 +8,7 @@
             <div class="col-md-6">
                 <form id="dictionary-form" method="GET" action="{% url 'dictionary_search' %}">
                     <div class="input-group">
-                        <input type="text" name="word" id="word-input" class="form-control" placeholder="Enter a word">
+                        <input type="text" name="word" id="word-input" class="form-control" placeholder="Enter a word" required>
                         <div class="input-group-append">
                             <button type="button" id="voice-search" class="btn btn-primary"><i class="fas fa-microphone" style="color: #fff;"></i></button>
                             <button type="submit" id="searchButton"class="btn btn-primary"><i class="fas fa-search" style="color: #fff;"></i> Search</button>
@@ -19,7 +19,7 @@
         </div>
         {% if meaning %}
             <div class="mt-4">
-                <h5 class="mb-3"><i class="fas fa-info-circle" style="color: #28a745;"></i> Result for word <b>{{ word }}</b></h5>
+                <h5 class="mb-3"><i class="fas fa-info-circle" style="color: #28a745;"></i> Result for word <b>"{{ word }}"</b></h5>
                 {% for part_of_speech, definitions in meaning.items %}
                     <div class="mb-4">
                         <h6 class="text-muted">{{ part_of_speech }}</h6>

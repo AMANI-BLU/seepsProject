@@ -145,7 +145,7 @@
                                         
                                         {% comment %} <p class="mb-2"><strong>Question:</strong></p> {% endcomment %}
                                         <div class="alert alert-info" role="alert">
-                                            {{ question.content|safe }}
+                                            {{ question.content|safe }} 
                                         </div>
                                         
                                 {% comment %} <p class="mb-2"><strong>Choices:</strong></p> {% endcomment %}
@@ -160,10 +160,10 @@
                                     {% endfor %}
                                 </div>
 
-
-    <p class="mb-2"><strong>Exam:</strong> <span class="badge badge-info">{{ question.exam.name }}</span></p>
-    <p class="mb-2"><strong>Difficulty:</strong> <span class="badge badge-warning">{{ question.exam.difficulty }}</span></p>
-</div>
+                                <p class="mb-2 text-muted"><strong>Weight</strong> <span class="badge badge-success">{{ question.weight }}</span></p>
+                                    <p class="mb-2 text-muted"><strong>Exam</strong> <span class="badge badge-info">{{ question.exam.name }}</span></p>
+                                    <p class="mb-2 text-muted"><strong>Difficulty</strong> <span class="badge badge-warning">{{ question.exam.difficulty }}</span></p>
+                                </div>
 
                                         </td>
                                     </tr>

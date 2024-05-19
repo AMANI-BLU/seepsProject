@@ -99,12 +99,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Tutorial, Course
 
+
 class TutorialForm(forms.ModelForm):
-    order = forms.IntegerField(
-        label='Order',
-        required=False,
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
-    )
+    order = forms.IntegerField(label='Order', required=False, widget=forms.NumberInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Tutorial
@@ -119,32 +116,27 @@ class TutorialForm(forms.ModelForm):
         department = kwargs.pop('department', None)
         super(TutorialForm, self).__init__(*args, **kwargs)
         if department:
-            # Filter the queryset based on the department
             self.fields['course'].queryset = Course.objects.filter(department_name=department)
-        else:
-            # Default to an empty queryset if no department is provided
-            self.fields['course'].queryset = Course.objects.none()
 
     def clean(self):
         cleaned_data = super().clean()
-        title = cleaned_data.get('title')
         course = cleaned_data.get('course')
 
-        if not title:
-            self.add_error('title', "Tutorial title cannot be empty.")
         if not course:
-            self.add_error('course', "Please select a course.")
-
+            raise forms.ValidationError("Please select a course.")
+        
         return cleaned_data
 
     def clean_order(self):
         order = self.cleaned_data.get('order')
         course = self.cleaned_data.get('course')
 
-        if order is not None and course:
-            if Tutorial.objects.filter(course=course, order=order).exists():
-                raise ValidationError("A tutorial with the same order already exists for this course.")
-        
+        if not course:
+            return order
+
+        if Tutorial.objects.filter(course=course, order=order).exists():
+            raise forms.ValidationError("A tutorial with the same order already exists for this course.")
+
         return order
 
     def save(self, commit=True):
@@ -152,8 +144,6 @@ class TutorialForm(forms.ModelForm):
         if commit:
             tutorial.save()
         return tutorial
-
-
 
 
 
@@ -241,14 +231,15 @@ ChoiceFormSet = inlineformset_factory(Question, Choice, form=ChoiceForm, formset
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['exam', 'content', 'answer_description']
+        fields = ['exam', 'content', 'weight','answer_description']  # Include 'weight' field
         labels = {
-            'content': 'question',
+            'content': 'Question',
         }
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
             'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
             'answer_description': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter answer description here..'}),
+            'weight': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter Question weight'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -270,7 +261,6 @@ class QuestionForm(forms.ModelForm):
             'class': 'form-control summernote',
             'placeholder': 'Enter answer description here..',
         })
-
     # Include the choice formset
     choices = ChoiceFormSet()
 
@@ -757,7 +747,12 @@ class InstructorRegistrationForm(UserCreationForm):
 
 class DashboardForm(forms.Form):
     text = forms.CharField(max_length=100, label='', widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter your search here'}))
-    
+    def clean_text(self):
+        text = self.cleaned_data.get('text')
+        if not text:
+            raise forms.ValidationError('This field cannot be empty.')
+        return text
+        
     
 
 class EventForm(forms.ModelForm):
@@ -772,8 +767,6 @@ class EventForm(forms.ModelForm):
         }
 
 # forms.py
-
-from .models import CommunityQuestion, CommunityAnswer
 
 
 

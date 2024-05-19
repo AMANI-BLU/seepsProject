@@ -6,7 +6,7 @@
         <h2 class="mb-4">Search Books</h2>
         <form id="searchForm" action="{% url 'book_search' %}" method="GET" class="form-inline justify-content-center">
             <div class="input-group mb-3">
-                <input type="text" name="query" class="form-control" placeholder="Search for books">
+                <input type="text" name="query" class="form-control" placeholder="Search for books" required>
                 <div class="input-group-append">
                     <button id="searchButton" class="btn btn-success" type="submit">Search</button>
                 </div>
