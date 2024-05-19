@@ -70,7 +70,7 @@
                     <div class="row mb-2">
                         <div class="col-sm-6">
                             <div class="btn-group">
-                                <a href="{% url 'add_tutorial' %}" class="btn btn-info">
+                                <a href="{% url 'inst_add_tutorial' %}" class="btn btn-info">
                                     <i class="fas fa-plus"></i> Add New
                                 </a>
                             </div>
@@ -105,8 +105,7 @@
                         <table id="tutorialsTable" class="table table-bordered table-striped">
                         <thead>
                             <tr>
-                                <th style="display:none;">No.</th>
-                                <th>Order</th>
+                                <th>No.</th>
                                 <th>Course</th>
                                 <th>Title</th>
                                
@@ -116,8 +115,7 @@
                         <tbody>
                             {% for tutorial in tutorials %}
                             <tr>
-                                <td style="display:none;">{{ forloop.counter }}</td>
-                                <td>{{ tutorial.order }}</td> <!-- Display the order -->
+                                <td>{{ forloop.counter }}</td>
                                 <td>{{ tutorial.course.title }}</td>
                                 <td>{{ tutorial.title }}</td>
                               
@@ -144,7 +142,6 @@
             <h5 class="card-title">Tutorial Details</h5>
             <hr>
             <div class="details-content">
-                <p class="badge badge-success"><strong>Order</strong> {{ tutorial.order }}</p>
                 <p><strong>Course</strong> {{ tutorial.course.title }}</p>
                 <p><strong>Title</strong> {{ tutorial.title }}</p>
                 <p><span id="videoPlayer{{ tutorial.id }}"></span></p>
