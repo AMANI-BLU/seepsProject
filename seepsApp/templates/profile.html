@@ -12,14 +12,14 @@
   {% if user.is_department %}
     {% include 'department_template/navbar.html' %}
      {% include 'department_template/aside.html' %}
+  {% elif user.is_staff and user.is_superuser %}
+    {% include 'admin_template/aside.html' %}
+    {% include 'admin_template/navbar.html' %}
   {% elif user.is_instructor %}
     {% include 'teacher_template/aside.html' %} 
     {% include 'teacher_template/navbar.html' %} 
   {% elif user.is_student %}
     {% include 'student_template/navbar.html' %}
- {% elif user.is_staff and user.is_superuser %}
-    {% include 'admin_template/aside.html' %}
-    {% include 'admin_template/navbar.html' %}
   {% endif %}
 
   {% if messages %}
@@ -179,7 +179,7 @@
                                   <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>
                                 {% elif user.is_instructor %}
                                   <input type="text" class="form-control" id="inputName" name="first_name" value="{{ user.first_name }}" required>    
-                              {% elif user.is_department %}
+                              {% else %}
                                   <input type="text" class="form-control" id="inputName" name="department_name" value="{{ user.department_name }}" required>
                               {% endif %}
 

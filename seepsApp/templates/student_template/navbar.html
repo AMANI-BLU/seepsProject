@@ -84,6 +84,8 @@
                          <li class="nav-item">
                             <a href="{% url "submit_feedback" %}" class="nav-link">Feedback</a>
                         </li>
+
+                        
                     </ul>
                 </div>
 
@@ -103,9 +105,9 @@
                     <i class="fas fa-user-circle"></i>&nbsp; Profile
                 </a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-muted" href="{% url 'event_calendar' %}">
+                {% comment %} <a class="dropdown-item text-muted" href="{% url 'event_calendar' %}">
                     <i class="fas fa-calendar-alt"></i>&nbsp; My Plan
-                </a>
+                </a> {% endcomment %}
                 <a class="dropdown-item text-muted" href="{% url 'navigation_options' %}">
                     <i class="fas fa-ellipsis-h"></i>&nbsp; More Options
                 </a>

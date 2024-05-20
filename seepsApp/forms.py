@@ -509,7 +509,6 @@ class StudentRegistrationForm(UserCreationForm):
         return user
     
     
-
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = User
@@ -523,41 +522,15 @@ class ProfileUpdateForm(forms.ModelForm):
             })
         if self.instance.is_superuser:
             self.fields['department_name'].required = False
-            del self.fields['department_name']
+            if 'department_name' in self.fields:
+                del self.fields['department_name']
             self.fields['username'] = forms.CharField(max_length=150, required=True)
         elif self.instance.is_student:
-            self.fields['department_name'].required = True  # Retain department_name for students
+            self.fields['department_name'].required = True
         elif self.instance.is_instructor:
             self.fields['department_name'].required = False
-            del self.fields['department_name']
-    
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if not email:
-            raise ValidationError("Email address is required * ")
-        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():
-            raise forms.ValidationError("Email address is already in use.")
-        return email
-    
-    def clean_first_name(self):
-        first_name = self.cleaned_data.get('first_name')
-        if not first_name:
-            raise forms.ValidationError("First name is required * ")
-        if not re.match(r'^[a-zA-Z ]+$', first_name):
-            raise forms.ValidationError("First name must contain only alphabetic characters and spaces")
-        return first_name
-    
-    def clean_phone(self):
-            phone = self.cleaned_data.get('phone')
-            
-            # Define the regular expression pattern
-            pattern = r'^(\+2519\d{8}|09\d{8}|07\d{8}|\+2517\d{8})$'
-            
-            # Check if the phone matches the pattern
-            if not re.match(pattern, phone):
-                raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
-            
-            return phone
+            if 'department_name' in self.fields:
+                del self.fields['department_name']
 
     def save(self, commit=True):
         user = super(ProfileUpdateForm, self).save(commit=False)
@@ -566,7 +539,6 @@ class ProfileUpdateForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
 
 
 class ResourceForm(forms.ModelForm):
@@ -601,8 +573,8 @@ class EditQuestionForm(forms.ModelForm):
         }
         widgets = {
             'exam': forms.Select(attrs={'class': 'form-control'}),
-            'content': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter Question here..'}),
-            'answer_description': forms.Textarea(attrs={'class': 'form-control summernote', 'placeholder': 'Enter answer description here..'}),
+            'content': forms.Textarea(attrs={'class': 'form-control','id': 'summernote', 'placeholder': 'Enter Question here..'}),
+            'answer_description': forms.Textarea(attrs={'class': 'form-control','id': 'summernote', 'placeholder': 'Enter answer description here..'}),
         }
 
     choices = ChoiceFormSet()
@@ -773,11 +745,11 @@ class EventForm(forms.ModelForm):
 class CommunityQuestionForm(forms.ModelForm):
     class Meta:
         model = CommunityQuestion
-        fields = ['title', 'body', 'tags']
+        fields = ['title', 'body']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the title of your question'}),
             'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter your question here'}),
-            'tags': forms.TextInput(attrs={'class': 'form-control', 'data-role': 'tagsinput'}),
+            # 'tags': forms.TextInput(attrs={'class': 'form-control', 'data-role': 'tagsinput'}),
         }
 class CommunityAnswerForm(forms.ModelForm):
     class Meta:

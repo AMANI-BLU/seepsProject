@@ -93,47 +93,45 @@
                 </h2>
                 <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                   <div class="accordion-body">
-                <form method="post" action="{% url 'student_profile' %}">
-                    {% csrf_token %}
-                    <div class="form-group mb-3">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                            </div>
-                            <input type="password" name="old_password" class="form-control" id="old_password" placeholder="Old Password" required>
-                        </div>
-                        {% for error in password_form.old_password.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group mb-3">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-lock-open"></i></span>
-                            </div>
-                            <input type="password" name="new_password1" class="form-control" id="new_password1" placeholder="Enter New Password" required>
-                        </div>
-                        {% for error in password_form.new_password1.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="form-group mb-3">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fas fa-lock-open"></i></span>
-                            </div>
-                            <input type="password" name="new_password2" class="form-control" id="new_password2" placeholder="Confirm New Password" required>
-                        </div>
-                        {% for error in password_form.new_password2.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-info"> <i class="fas fa-key"></i> Change Password</button>
-                    </div>
-                </form>
-
-
+                    <form method="post" action="{% url 'student_profile' %}">
+                      {% csrf_token %}
+                      <div class="form-group mb-3">
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                              </div>
+                              <input type="password" name="old_password" class="form-control" id="old_password" placeholder="Old Password" required>
+                          </div>
+                          {% for error in password_form.old_password.errors %}
+                          <div class="text-danger">{{ error }}</div>
+                          {% endfor %}
+                      </div>
+                      <div class="form-group mb-3">
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-lock-open"></i></span>
+                              </div>
+                              <input type="password" name="new_password1" class="form-control" id="new_password1" placeholder="Enter New Password" required>
+                          </div>
+                          {% for error in password_form.new_password1.errors %}
+                          <div class="text-danger">{{ error }}</div>
+                          {% endfor %}
+                      </div>
+                      <div class="form-group mb-3">
+                          <div class="input-group">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text"><i class="fas fa-lock-open"></i></span>
+                              </div>
+                              <input type="password" name="new_password2" class="form-control" id="new_password2" placeholder="Confirm New Password" required>
+                          </div>
+                          {% for error in password_form.new_password2.errors %}
+                          <div class="text-danger">{{ error }}</div>
+                          {% endfor %}
+                      </div>
+                      <div class="modal-footer">
+                          <button type="submit" class="btn btn-info"> <i class="fas fa-key"></i> Change Password</button>
+                      </div>
+                  </form>
                   </div>
                 </div>
               </div>
@@ -149,43 +147,14 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
   <!-- Font Awesome -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <style>
-    .profile-img {
-      border: 3px solid #ddd;
-      padding: 5px;
-      margin-bottom: 20px;
-    }
 
-    .card {
-      border-radius: 10px;
-    }
-
-    .card-header {
-      border-top-left-radius: 10px;
-      border-top-right-radius: 10px;
-    }
-
-    .btn-info {
-      background-color: #17a2b8;
-      border-color: #17a2b8;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-info:hover {
-      background-color: #138496;
-      border-color: #117a8b;
-    }
-
-    .accordion-button {
-      background-color: #6c757d;
-      color: #fff;
-      border-color: #6c757d;
-      transition: background-color 0.3s ease;
-    }
-
-    .accordion-button:hover {
-      background-color: #495057;
-      border-color: #495057;
-    }
-  </style>
+  <script>
+    // Enable only profile picture input and password inputs
+    document.addEventListener("DOMContentLoaded", function() {
+      var inputs = document.querySelectorAll('input[type="file"], input[type="password"]');
+      inputs.forEach(function(input) {
+        input.disabled = false;
+      });
+    });
+  </script>
 {% endblock %}

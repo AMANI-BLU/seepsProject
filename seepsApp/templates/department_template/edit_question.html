@@ -39,6 +39,16 @@
       </div>
     </section>
   </div>
+  <script>
+  $(document).ready(function() {
+    $('.summernote').summernote({
+      height: 100, // set editor height
+      minHeight: null, // set minimum height of editor
+      maxHeight: null, // set maximum height of editor
+      focus: true // set focus to editable area after initializing Summernote
+    });
+  });   
+</script>
   {% include 'department_template/footer.html' %}
 </div>
 {% endblock %}

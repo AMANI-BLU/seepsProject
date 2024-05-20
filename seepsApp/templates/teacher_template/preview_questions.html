@@ -35,7 +35,7 @@
                         <div class="card-body">
                             <input type="hidden" name="question_number_{{ forloop.counter }}" value="{{ forloop.counter }}">
                             <ul class="list-group">
-                              {% for choice in question_with_choices.choices %}
+                                {% for choice in question_with_choices.choices %}
                                     <li class="list-group-item">
                                         <div class="custom-control custom-checkbox">
                                             <input type="checkbox" id="choice_{{ forloop.parentloop.counter }}_{{ forloop.counter }}" name="selected_choice_{{ forloop.parentloop.counter }}[]" class="custom-control-input" value="{{ choice }}">
@@ -43,7 +43,6 @@
                                         </div>
                                     </li>
                                 {% endfor %}
-
                             </ul>
                             <div class="form-group mt-3">
                                 <label for="answer_description_{{ forloop.counter }}" class="text-muted">Answer Description</label>
@@ -57,13 +56,13 @@
                     </div>
                     {% endfor %}
                     <button type="submit" name="confirm" class="btn btn-primary mb-4"><i class="fas fa-check"></i> Confirm</button>
-                    <a href="{% url 'upload_pdf_view' %}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+                    <a href="{% url 'inst_upload_pdf_view' %}" class="btn btn-secondary mb-4"><i class="fas fa-arrow-left"></i> Back to Upload</a>
                 </form>
                 {% else %}
                 <div class="alert alert-info" role="alert">
                     No questions to preview.
                 </div>
-                <a href="{% url 'upload_pdf_view' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Upload</a>
+                <a href="{% url 'inst_upload_pdf_view' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Upload</a>
                 {% endif %}
             </div>
         </section>

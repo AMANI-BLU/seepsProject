@@ -105,6 +105,7 @@ urlpatterns = [
     # path('manage/courses/edit/<int:course_id>/', edit_course, name='edit_course'),
     # path('manage/courses/delete/<int:course_id>/', delete_course, name='delete_course'),
     path('delete_selected_students/', delete_selected_students, name='delete_selected_students'),
+    path('bulk_delete_questions/', bulk_delete_questions, name='bulk_delete_questions'),
 
     
 
@@ -130,6 +131,8 @@ urlpatterns = [
     path('community/', community, name='community'),
     path('ask-question/', ask_question, name='ask_question'),
     path('answer-question/<int:id>/', answer_question, name='answer_question'),
+    path('delete_myquestion/<int:question_id>/', delete_myquestion, name='delete_myquestion'),
+
     # path('add-comment/<int:answer_id>/', add_comment, name='add_comment'),
     
    #teacher urls

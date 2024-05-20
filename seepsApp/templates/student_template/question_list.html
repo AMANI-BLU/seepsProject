@@ -6,9 +6,9 @@
             <small class="text-muted">{{ question.created_at|date:"M d, Y" }}</small>
         </div>
         <p class="mb-1">{{ question.body|truncatewords:20 }}</p>
-        <small class="text-muted">Tags: {{ question.tags }}</small>
+        {% comment %} <small class="text-muted">Tags: {{ question.tags }}</small> {% endcomment %}
         <br>
-        <small class="text-muted">Author: {{ question.author }}</small>
+        <small class="text-muted">Author: {{ question.author.first_name }}</small>
     </a>
     {% empty %}
     <div class="alert alert-warning" role="alert">

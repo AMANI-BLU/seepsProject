@@ -315,7 +315,7 @@ def change_password(request):
             elif is_student(request.user):
                 return redirect('student_home')
             elif is_admin(request.user):
-                return redirect('home')
+                return redirect('change_password')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -333,13 +333,12 @@ def profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Profile updated successfully.')
-            return redirect('profile')  # Redirect to profile page after successful update
+            return redirect('profile')
         else:
             messages.error(request, 'Failed to update profile. Please correct the errors.')
     else:
         form = ProfileUpdateForm(instance=request.user)
     return render(request, 'profile.html', {'form': form})
-
 
 
 
@@ -549,7 +548,8 @@ def add_question(request):
             question = form.save()
             formset.instance = question
             formset.save()
-            success_msg = 'Question added successfully!'
+            messages.success(request,'Question added successfully!')
+            return redirect('manage_questions')
         else:
             # error_msg = 'Form is not valid'
             print("Form errors outside if:", form.errors, formset.errors)
@@ -975,6 +975,7 @@ from django.contrib import messages
 from .models import Exam, Question
 from random import shuffle
 
+
 def exam_detail(request, exam_id, attempts_remaining):
     exam = get_object_or_404(Exam, id=exam_id)
 
@@ -1010,8 +1011,6 @@ def exam_detail(request, exam_id, attempts_remaining):
     }
 
     return render(request, 'student_template/exam_detail.html', context)
-
-
 
 # views.py
 from django.shortcuts import render, redirect
@@ -1290,38 +1289,42 @@ def preview_questions_view(request):
             selected_exam = Exam.objects.get(pk=selected_exam_id)
         except Exam.DoesNotExist:
             # Handle the case where the Exam object does not exist
-            # You might want to redirect or render an error page
             pass
     
     # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
-        # Check if questions_with_choices is empty or None
         if not questions_with_choices:
             message = "Please upload a file with correct format."
         else:
             message = "Please select an exam."
         
-        # Add the message to the messages framework
         messages.warning(request, message)
-        
-        # Redirect to the upload page if session data is missing
         return redirect('upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
     
     if request.method == 'POST':
         # Get the selected choices from POST data
         selected_choices = {}
-        for key, value in request.POST.items():
+        for key, values in request.POST.items():
             if key.startswith('selected_choice_'):
-                question_number = key.split('_')[2]  # Extract the question number from the key
-                selected_choices[question_number] = value  # Store the selected choice for this question
+                question_number = key.split('_')[2].replace('[]', '')  # Extract the question number from the key
+                selected_choices[question_number] = request.POST.getlist(key)  # Store the selected choices for this question
 
-        # If the user confirms, save questions and choices to the database
-        for qwc in questions_with_choices:
+        # If the user confirms, save questions, choices, descriptions, and weights to the database
+        for index, qwc in enumerate(questions_with_choices, start=1):
             question = Question.objects.create(exam=selected_exam, content=qwc['question'])
             for choice_text in qwc['choices']:
                 # Check if this choice is selected
-                is_correct = choice_text in selected_choices.values()
+                is_correct = str(index) in selected_choices and choice_text in selected_choices[str(index)]
                 Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
+            
+            # Get answer description and question weight from POST data
+            answer_description = request.POST.get(f'answer_description_{index}', '')
+            question_weight = request.POST.get(f'question_weight_{index}', 1.0)
+
+            # Save answer description and question weight to the question object
+            question.answer_description = answer_description
+            question.weight = question_weight
+            question.save()
         
         # Clear session data
         del request.session['questions_with_choices']
@@ -1334,8 +1337,6 @@ def preview_questions_view(request):
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
     
     return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
-
-
 from .forms import EditQuestionForm, EditChoiceFormSet  # Import the EditQuestionForm and EditChoiceFormSet
 
 def edit_question(request, question_id):
@@ -1723,6 +1724,7 @@ def inst_upload_pdf_view(request):
 
 from django.utils.html import mark_safe
 
+
 @login_required(login_url='login_view')
 @user_passes_test(is_instructor, login_url='NoPage')
 def inst_preview_questions_view(request):
@@ -1736,39 +1738,43 @@ def inst_preview_questions_view(request):
             selected_exam = Exam.objects.get(pk=selected_exam_id)
         except Exam.DoesNotExist:
             # Handle the case where the Exam object does not exist
-            # You might want to redirect or render an error page
             pass
     
     # Check if necessary session data is missing
     if not questions_with_choices or not selected_exam:
-        # Check if questions_with_choices is empty or None
         if not questions_with_choices:
             message = "Please upload a file with correct format."
         else:
             message = "Please select an exam."
         
-        # Add the message to the messages framework
         messages.warning(request, message)
-        
-        # Redirect to the upload page if session data is missing
-        return redirect('inst_upload_pdf_view')  # Replace 'upload_pdf' with the name of your upload page URL pattern
+        return redirect('inst_upload_pdf_view')  # Replace 'inst_upload_pdf_view' with the name of your upload page URL pattern
     
     if request.method == 'POST':
         # Get the selected choices from POST data
         selected_choices = {}
         for key, value in request.POST.items():
             if key.startswith('selected_choice_'):
-                question_number = key.split('_')[2]  # Extract the question number from the key
-                selected_choices[question_number] = value  # Store the selected choice for this question
-
-        # If the user confirms, save questions and choices to the database
-        for qwc in questions_with_choices:
+                question_number = key.split('_')[2].replace('[]', '')  # Extract the question number from the key
+                selected_choices[question_number] = request.POST.getlist(key)  # Store the selected choices for this question
+        
+        # If the user confirms, save questions, choices, descriptions, and weights to the database
+        for index, qwc in enumerate(questions_with_choices, start=1):
             question = Question.objects.create(exam=selected_exam, content=qwc['question'], added_by=request.user.username)
             for choice_text in qwc['choices']:
                 # Check if this choice is selected
-                is_correct = choice_text in selected_choices.values()
+                is_correct = str(index) in selected_choices and choice_text in selected_choices[str(index)]
                 Choice.objects.create(question=question, text=choice_text, is_correct=is_correct)
-                
+            
+            # Get answer description and question weight from POST data
+            answer_description = request.POST.get(f'answer_description_{index}', '')
+            question_weight = request.POST.get(f'question_weight_{index}', 1.0)
+
+            # Save answer description and question weight to the question object
+            question.answer_description = answer_description
+            question.weight = question_weight
+            question.save()
+            
             # Create notification for the department for each added question
             department_name = request.user.department_name
             exam_name = selected_exam.name
@@ -1784,7 +1790,7 @@ def inst_preview_questions_view(request):
         messages.success(request, 'Questions added successfully!')
         
         # Redirect to a success page or any other desired page
-        return redirect('inst_manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
+        return redirect('inst_manage_questions')  # Replace 'inst_manage_questions' with the name of your success page URL pattern
     
     return render(request, 'teacher_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
 
@@ -2174,7 +2180,7 @@ def dictionary_search(request):
         meaning = dictionary.meaning(word)
         synonyms = dictionary.synonym(word)
         antonyms = dictionary.antonym(word)
-    return render(request, 'student_template/dictionary.html', {'word':word, 'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})
+    return render(request, 'student_template/dictionary.html', {'meaning': meaning, 'synonyms': synonyms, 'antonyms': antonyms})
 
 
 
@@ -2404,19 +2410,31 @@ def student_profile(request):
         profile_form = ProfileUpdateForm(instance=request.user)
 
     return render(request, 'student_template/profile.html', {'password_form': password_form, 'profile_form': profile_form})
+from django.contrib.auth import get_user_model
 
-
+@login_required
 def community(request):
-    questions = CommunityQuestion.objects.all()
-    newest_questions = CommunityQuestion.objects.order_by('-created_at')[:10]
-    unanswered_questions = CommunityQuestion.objects.filter(answers__isnull=True)
-    frequent_questions = CommunityQuestion.objects.annotate(answer_count=Count('answers')).order_by('-answer_count')[:10]
+    User = get_user_model()
+    # Retrieve the department of the logged-in user
+    department_name = request.user.department_name
+
+    # Retrieve all questions posted by students belonging to the department
+    department_students = User.objects.filter(is_student=True, department_name=department_name)
+    questions = CommunityQuestion.objects.filter(author__in=department_students)
+
+    # Filter questions authored by the logged-in user
+    my_questions = questions.filter(author=request.user)
+
+    newest_questions = questions.order_by('-created_at')[:10]
+    unanswered_questions = questions.filter(answers__isnull=True)
+    frequent_questions = questions.annotate(answer_count=Count('answers')).order_by('-answer_count')[:10]
 
     context = {
         'questions': questions,
         'newest_questions': newest_questions,
         'unanswered_questions': unanswered_questions,
         'frequent_questions': frequent_questions,
+        'my_questions': my_questions,  # Adding my_questions to the context
     }
     return render(request, 'student_template/community.html', context)
 
@@ -2447,3 +2465,25 @@ def answer_question(request, id):
     else:
         form = CommunityAnswerForm()
     return render(request, 'student_template/answer_question.html', {'question': question, 'form': form})
+
+
+
+
+
+@login_required(login_url='login_view')
+def bulk_delete_questions(request):
+    if request.method == 'POST':
+        selected_question_ids = request.POST.getlist('selected_questions')
+        if selected_question_ids:
+            Question.objects.filter(id__in=selected_question_ids).delete()
+            messages.success(request, 'Selected questions deleted successfully!')
+        else:
+            messages.warning(request, 'No questions selected for deletion.')
+    return redirect('manage_questions')
+
+@login_required
+def delete_myquestion(request, question_id):
+    question = get_object_or_404(CommunityQuestion, id=question_id)
+    if request.user == question.author:
+        question.delete()
+    return redirect('community')

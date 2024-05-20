@@ -8,7 +8,7 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ question.title }}</h2>
                     <p class="card-text">{{ question.body }}</p>
-                    <div class="text-muted mt-2">Posted by {{ question.author }} on {{ question.created_at }}</div>
+                    <div class="text-muted mt-2">Posted by {{ question.author.first_name }} on {{ question.created_at }}</div>
                 </div>
             </div>
 
@@ -19,7 +19,7 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <p class="card-text">{{ answer.body }}</p>
-                        <div class="text-muted">Answered by {{ answer.author }} on {{ answer.created_at }}</div>
+                        <div class="text-muted">Answered by {{ answer.author.first_name }} on {{ answer.created_at }}</div>
                     </div>
                 </div>
                 {% empty %}

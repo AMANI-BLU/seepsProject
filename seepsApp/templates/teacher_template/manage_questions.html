@@ -151,12 +151,13 @@
                                                     {% for choice in question.choice_set.all %}
                                                         <label class="list-group-item list-group-item-action d-flex align-items-center">
                                                             <div class="icheck-info d-inline">
-                                                                <input type="radio" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %} disabled>
+                                                                <input type="checkbox" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %} disabled>
                                                                 <label for="choice{{ choice.id }}" class="mb-0 ml-2">{{ choice.text }}</label>
                                                             </div>
                                                         </label>
                                                     {% endfor %}
                                                 </div>
+                                                <p class="mb-2"><strong>weight:</strong> <span class="badge badge-info">{{ question.weight }}</span></p>
 
                                                 <p class="mb-2"><strong>Exam:</strong> <span class="badge badge-info">{{ question.exam.name }}</span></p>
                                                 <p class="mb-2"><strong>Difficulty:</strong> <span class="badge badge-warning">{{ question.exam.difficulty }}</span></p>

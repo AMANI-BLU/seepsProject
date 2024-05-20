@@ -3,112 +3,77 @@
 {% block title %}Department | Manage Questions{% endblock %}
 
 {% block content %}
-    <!-- Main content -->
-    <div class="wrapper">
-        {% include 'department_template/navbar.html' %}
-        {% include 'department_template/aside.html' %}
+<div class="wrapper">
+    {% include 'department_template/navbar.html' %}
+    {% include 'department_template/aside.html' %}
 
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper">
-            {% if messages %}
-                {% for message in messages %}
-                    {% if message.tags == 'success' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                        <script>
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                text: "{{ message }}",
-                                showConfirmButton: false,
-                                timer: 6000,
-                            });
-                        </script>
-                    {% elif message.tags == 'error' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                        <script>
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'error',
-                                text: "{{ message }}",
-                                showConfirmButton: false,
-                                timer: 6000,
-                            });
-                        </script>
-                    {% elif message.tags == 'warning' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                        <script>
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'warning',
-                                text: "{{ message }}",
-                                showConfirmButton: false,
-                                timer: 6000,
-                            });
-                        </script>
-                    {% elif message.tags == 'info' %}
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-                        <script>
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'info',
-                                text: "{{ message }}",
-                                showConfirmButton: false,
-                                timer: 6000,
-                            });
-                        </script>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+    <div class="content-wrapper">
+        {% if messages %}
+            {% for message in messages %}
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <script>
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: '{{ message.tags }}',
+                        text: "{{ message }}",
+                        showConfirmButton: false,
+                        timer: 6000,
+                    });
+                </script>
+            {% endfor %}
+        {% endif %}
 
-            <div class="content-header">
-                <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">
-                                    <i class="fas fa-plus"></i> Add New
-                                </button>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{% url 'add_question' %}">Add Question</a> 
-                                    <a class="dropdown-item" href="{% url 'upload_pdf_view' %}">Import Question</a>
-                                </div>
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-plus"></i> Add New
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{% url 'add_question' %}">Add Question</a> 
+                                <a class="dropdown-item" href="{% url 'upload_pdf_view' %}">Import Question</a>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
-                                <li class="breadcrumb-item active">Manage Questions</li>
-                            </ol>
-                        </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="{% url 'department_home' %}">Home</a></li>
+                            <li class="breadcrumb-item active">Manage Questions</li>
+                        </ol>
                     </div>
                 </div>
             </div>
-            <!-- /.content-header -->
+        </div>
 
-            <!-- Main content -->
-            <section class="content">
-                <div class="container-fluid">
-
-                    <!-- Manage Questions Section -->
+        <section class="content">
+            <div class="container-fluid">
+                <form method="post" action="{% url 'bulk_delete_questions' %}">
+                    {% csrf_token %}
                     <div class="card card-outline card-info">
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-md-6">
                                     <h3 class="card-title">Question List</h3>
                                 </div>
+                                <div class="col-md-6 text-right">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash-alt"></i> Delete Selected
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div class="card-body">
-                            <!-- Questions Table -->
                             <table id="questionsTable" class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAll">
+                                        </th>
                                         <th>No.</th>
                                         <th>Question Content</th>
                                         <th>Exam</th>
@@ -116,44 +81,39 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Sample Data -->
                                     {% for question in questions %}
                                     <tr>
+                                        <td>
+                                            <input type="checkbox" class="question-checkbox" name="selected_questions" value="{{ question.id }}">
+                                        </td>
                                         <td>{{ forloop.counter }}</td>
                                         <td>{{ question.content|safe }}</td>
-                                        <td>{{ question.exam.name }} ({{question.exam.difficulty}})</td>
+                                        <td>{{ question.exam.name }} ({{ question.exam.difficulty }})</td>
                                         <td>
-                                            <!-- View Button -->
                                             <button class="btn btn-success" type="button" data-toggle="collapse" data-target="#collapse{{ question.id }}" aria-expanded="false" aria-controls="collapse{{ question.id }}">
                                                 <i class="fas fa-eye"></i> View
                                             </button>
-                                            <!-- Edit Button -->
                                             <a href="{% url 'edit_question' question.id %}" class="btn btn-info">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <!-- Delete Button -->
                                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal{{ question.id }}">
                                                 <i class="fas fa-trash-alt"></i> Delete
                                             </button>
                                         </td>
                                     </tr>
-                                    <!-- Collapsible content -->
                                     <tr class="collapse" id="collapse{{ question.id }}">
-                                        <td colspan="4">
+                                        <td colspan="5">
                                            <div class="card card-body bg-light shadow-sm p-4 mb-3">
                                         <h5 class="text-info mb-3"><i class="fas fa-question-circle"></i> Question Details</h5>
                                         
-                                        {% comment %} <p class="mb-2"><strong>Question:</strong></p> {% endcomment %}
                                         <div class="alert alert-info" role="alert">
                                             {{ question.content|safe }} 
                                         </div>
-                                        
-                                {% comment %} <p class="mb-2"><strong>Choices:</strong></p> {% endcomment %}
                                 <div class="list-group mb-3">
                                     {% for choice in question.choice_set.all %}
                                         <label class="list-group-item list-group-item-action d-flex align-items-center">
                                             <div class="icheck-info d-inline">
-                                                <input type="radio" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %} disabled>
+                                                <input type="checkbox" id="choice{{ choice.id }}" name="question_{{ question.id }}" value="{{ choice.id }}" {% if choice.is_correct %}checked{% endif %} disabled>
                                                 <label for="choice{{ choice.id }}" class="mb-0 ml-2">{{ choice.text }}</label>
                                             </div>
                                         </label>
@@ -161,13 +121,13 @@
                                 </div>
 
                                 <p class="mb-2 text-muted"><strong>Weight</strong> <span class="badge badge-success">{{ question.weight }}</span></p>
+                                <p class="mb-2 text-muted"><strong>Description</strong> <span class="badge badge-primary">{{ question.answer_description }}</span></p>
                                     <p class="mb-2 text-muted"><strong>Exam</strong> <span class="badge badge-info">{{ question.exam.name }}</span></p>
                                     <p class="mb-2 text-muted"><strong>Difficulty</strong> <span class="badge badge-warning">{{ question.exam.difficulty }}</span></p>
                                 </div>
 
                                         </td>
                                     </tr>
-                                    <!-- Delete Question Modal -->
                                     <div class="modal fade" id="deleteQuestionModal{{ question.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteQuestionModalLabel{{ question.id }}" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
@@ -190,48 +150,54 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- End Delete Question Modal -->
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
-            </section>
-            <!-- /.content -->
-        </div>
+                </form>
+            </div>
+        </section>
+    </div><script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-        <script>
-            $(document).ready(function() {
-                // Initialize Summernote
-                $('.summernote').summernote({
-                    height: 200, // Set the height of the editor
-                    // Add other Summernote options here if needed
-                });
-            });
-        </script>
+<script>
+    $(document).ready(function() {
+        // Initialize Summernote
+        $('.summernote').summernote({
+            height: 200,
+        });
 
-        <!-- Datatables and other scripts -->
-        <script>
-            $(document).ready(function () {
-                var questionsTable = $('#questionsTable').DataTable({
-                    responsive: true, // Make the table responsive
-                    // Add Bootstrap classes to the table
-                    "language": {
-                        "search": "_INPUT_", // Search input style
-                        "searchPlaceholder": "Search...", // Placeholder for search input
-                        "lengthMenu": "Show _MENU_ entries", // Entries per page dropdown
-                        "info": "Showing _START_ to _END_ of _TOTAL_ entries", // Information about the table
-                        "paginate": {
-                            "previous": '<i class="fas fa-angle-left"></i>', // Previous button
-                            "next": '<i class="fas fa-angle-right"></i>' // Next button
-                        }
-                    }
-                });
-            });
-        </script>
+        // Initialize DataTables
+        $('#questionsTable').DataTable({
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                paginate: {
+                    previous: '<i class="fas fa-angle-left"></i>',
+                    next: '<i class="fas fa-angle-right"></i>'
+                }
+            }
+        });
 
-        {% include 'department_template/footer.html' %}
-    </div>
-    <!-- ./wrapper -->
+        // Select/Deselect all checkboxes
+        $('#selectAll').on('click', function() {
+            $('.question-checkbox').prop('checked', this.checked);
+        });
+
+        $('.question-checkbox').on('change', function() {
+            if (!this.checked) {
+                $('#selectAll').prop('checked', false);
+            }
+            if ($('.question-checkbox:checked').length === $('.question-checkbox').length) {
+                $('#selectAll').prop('checked', true);
+            }
+        });
+    });
+</script>
+
+    {% include 'department_template/footer.html' %}
+</div>
 {% endblock %}

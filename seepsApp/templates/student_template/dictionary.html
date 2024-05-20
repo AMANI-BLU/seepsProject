@@ -19,7 +19,7 @@
         </div>
         {% if meaning %}
             <div class="mt-4">
-                <h5 class="mb-3"><i class="fas fa-info-circle" style="color: #28a745;"></i> Result for word <b>"{{ word }}"</b></h5>
+                <h5 class="mb-3"><i class="fas fa-info-circle" style="color: #28a745;"></i> Result</h5>
                 {% for part_of_speech, definitions in meaning.items %}
                     <div class="mb-4">
                         <h6 class="text-muted">{{ part_of_speech }}</h6>
