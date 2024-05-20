@@ -748,9 +748,9 @@ class CommunityQuestionForm(forms.ModelForm):
         fields = ['title', 'body']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter the title of your question'}),
-            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Enter your question here'}),
-            # 'tags': forms.TextInput(attrs={'class': 'form-control', 'data-role': 'tagsinput'}),
+            'body': forms.Textarea(attrs={'class': 'form-control summernote', 'rows': 5, 'placeholder': 'Enter your question here'}),
         }
+
 class CommunityAnswerForm(forms.ModelForm):
     class Meta:
         model = CommunityAnswer
