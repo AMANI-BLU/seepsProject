@@ -25,7 +25,7 @@
                 </div>
 
                 {% if questions_with_choices %}
-                <form method="post">
+                <form method="post" onsubmit="return validateForm()">
                     {% csrf_token %}
                     {% for question_with_choices in questions_with_choices %}
                     <div class="card card-info">
@@ -71,4 +71,20 @@
 
     {% include 'department_template/footer.html' %}
 </div>
+
+<script>
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        for (let i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                // At least one checkbox is checked, form submission allowed
+                return true;
+            }
+        }
+        // If no checkbox is checked, display an alert and prevent form submission
+        toastr.error("Please select at least one answer for each question.");
+        return false;
+    }
+</script>
+
 {% endblock %}

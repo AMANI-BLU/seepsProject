@@ -760,3 +760,99 @@ class CommunityCommentForm(forms.ModelForm):
     class Meta:
         model = CommunityComment
         fields = ['body']
+
+
+
+
+
+
+
+
+class StudentSelfRegistrationForm(forms.ModelForm):
+    first_name = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your full name"
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your email"
+        })
+    )
+    sex_choices = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+    sex = forms.ChoiceField(
+        choices=sex_choices,
+        widget=forms.Select(attrs={
+            "class": "form-control"
+        })
+    )
+    phone = forms.CharField(
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Enter your phone number",
+        })
+    )
+    department = forms.ChoiceField(
+        choices=[],  # Will be populated dynamically
+        widget=forms.Select(attrs={
+            "class": "form-control"
+        })
+    )
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'email', 'sex', 'phone', 'department')
+
+    def __init__(self, *args, **kwargs):
+        departments = kwargs.pop('departments', [])
+        super(StudentSelfRegistrationForm, self).__init__(*args, **kwargs)
+        self.fields['department'].choices = [(dept.id, dept.department_name) for dept in departments]
+        print("Form initialized with departments")
+
+    def generate_username(self):
+        first_name = self.cleaned_data.get('first_name')
+        email = self.cleaned_data.get('email')
+        username = f"{first_name}_{email}".replace('@', '_').replace('.', '_')
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            print(f"Email already exists: {email}")
+            raise forms.ValidationError("Email already exists")
+        return email
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        pattern = r'^(\+2519\d{8}|09\d{8}|07\d{8}|\+2517\d{8})$'
+        if not re.match(pattern, phone):
+            print(f"Invalid phone number: {phone}")
+            raise forms.ValidationError('Phone number must be in the format +2519xxxxxxxx, 09xxxxxxxx, 07xxxxxxxx, or +2517xxxxxxxx.')
+        return phone
+
+    def generate_password(self):
+        length = 12
+        characters = string.ascii_letters + string.digits + string.punctuation
+        return ''.join(random.choice(characters) for _ in range(length))
+
+    def save(self, commit=True):
+        print("Saving user")
+        user = super().save(commit=False)
+        user.is_student = True
+        user.username = self.generate_username()
+        department_id = self.cleaned_data.get('department')
+        if department_id:
+            # Fetch the department's username and store it
+            department = User.objects.get(id=department_id)
+            user.department_name = department.username  # Store the department's username
+        password = self.generate_password()  # Generate a random password
+        print(f"Generated password: {password}")
+        user.set_password(password)
+        if commit:
+            user.save()
+        return user

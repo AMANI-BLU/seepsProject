@@ -9,7 +9,9 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-    path('', login_view,name ="login_view" ),
+    path('',landing,name="landing"),
+    path('register/', self_register,name ="self_register" ),
+    path('login/', login_view,name ="login_view" ),
     path('home/', home,name ="home" ),
     path('feedback/', feedback,name ="feedback" ),
     path('add_department/', add_department,name ="add_department" ),

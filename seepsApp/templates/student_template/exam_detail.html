@@ -98,7 +98,7 @@
           <div id="timerProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div> 
         <!-- Your exam content here -->
-      <form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}">
+<form id="examForm" method="post" action="{% url 'submit_exam' exam.id %}" onsubmit="handleSubmit(event)">
                         {% csrf_token %}
                         {% for question in questions %}
                             <div class="card card-info mb-4">
@@ -143,12 +143,47 @@
 
   <script>
     // Function to handle form submission
-    function handleSubmit() {
-      // Clear progress data from localStorage for the current user
-      const username = "{{ user.username }}";
-      localStorage.removeItem('examProgress_' + username);
-      localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
+ // Function to handle form submission
+function handleSubmit(event) {
+    // Retrieve all questions
+    const questions = document.querySelectorAll('.card.card-info');
+
+    // Iterate over each question
+    for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        const choices = question.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+        let choiceSelected = false;
+
+        // Check if at least one choice is selected for the current question
+        for (let j = 0; j < choices.length; j++) {
+            if (choices[j].checked) {
+                choiceSelected = true;
+                break;
+            }
+        }
+
+        // If no choice is selected for the current question, prevent form submission
+        if (!choiceSelected) {
+            // Scroll to the unanswered question for better user experience
+            question.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Highlight the unanswered question for better visibility
+            question.style.border = '2px solid red'; // Change border color to red
+
+            // Display a message to the user indicating that all questions must be answered
+            toastr.error("Please select an answer for all questions before submitting the exam.");
+            event.preventDefault(); // Prevent form submission
+            return; // Exit the function immediately
+        }
     }
+
+    // If all questions have at least one choice selected, proceed with form submission
+    // Clear progress data from localStorage for the current user
+    const username = "{{ user.username }}";
+    localStorage.removeItem('examProgress_' + username);
+    localStorage.removeItem('timerValue_' + username); // Remove timer value from localStorage
+}
+
     
     var attemptsRemaining = document.getElementById('attemptsRemaining').innerText;
 

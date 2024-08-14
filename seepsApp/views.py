@@ -32,6 +32,15 @@ def is_admin(user):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+
+def landing(request):
+    return render(request, 'LandingPage.html')
+
+
+def register(request):
+    return render(request,'register.html');    
 # Login View
 def login_view(request):
     form = LoginForm(request.POST or None)
@@ -1019,17 +1028,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Exam, Question, Choice, Result
 from django.shortcuts import redirect
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Result, Exam, Question, Choice
-from .models import ExamSubmission
 def submit_exam(request, exam_id):
     exam = Exam.objects.get(pk=exam_id)
     questions = Question.objects.filter(exam=exam)
 
     if request.method == 'POST':
-        # Initialize variables to store score and total weight
-        score = 0
-        total_weight = 0
+        # Calculate the number of correct answers
+        correct_answers = 0
 
         # Initialize dictionary to store user answers
         user_answers = {}
@@ -1039,9 +1044,7 @@ def submit_exam(request, exam_id):
             if selected_choice_id:
                 selected_choice = Choice.objects.get(pk=selected_choice_id)
                 if selected_choice.is_correct:
-                    # Increment score by question weight if the choice is correct
-                    score += question.weight
-                total_weight += question.weight
+                    correct_answers += 1
 
                 # Store user answer in session
                 user_answers[str(question.id)] = selected_choice_id
@@ -1050,21 +1053,20 @@ def submit_exam(request, exam_id):
         request.session['user_answers'] = user_answers
 
         # Store the result in the database
-        result = Result.objects.create(student=request.user, exam=exam, score=score)
+        result = Result.objects.create(student=request.user, exam=exam, score=correct_answers)
 
         # Record the submission
         ExamSubmission.objects.create(exam=exam, user=request.user)
 
         return render(request, 'student_template/exam_submitted.html', {
-            'score': score,
-            'total_weight': total_weight,
+            'correct_answers': correct_answers,
+            'total_questions': len(questions),
             'result': result,
         })
 
     return redirect('view_exams')  # Redirect to the view_exams page if it's not a POST request
+  # Redirect to the view_exams page if it's not a POST request
 
-from django.shortcuts import render, get_object_or_404
-from .models import Result, Question, Choice
 
 def result(request, result_id):
     result = get_object_or_404(Result, pk=result_id)
@@ -1087,25 +1089,11 @@ def result(request, result_id):
     # Serialize the selected choices into a dictionary
     selected_choices = {str(question.id): str(user_answers.get(str(question.id))) for question in questions}
 
-    # Calculate the weighted score
-    total_weight = sum(question.weight for question in questions)
-    weighted_score = 0
-
-    for question in questions:
-        selected_choice_id = user_answers.get(str(question.id))
-        if selected_choice_id:
-            selected_choice = Choice.objects.get(id=selected_choice_id)
-            if selected_choice.is_correct:
-                weighted_score += question.weight
-
     return render(request, 'student_template/result.html', {
         'result': result,
         'questions_with_choices': questions_with_choices,
         'selected_choices': selected_choices,
-        'weighted_score': weighted_score,
-        'total_weight': total_weight,
     })
-
 
 # views.py
 from django.shortcuts import render, redirect
@@ -1337,6 +1325,9 @@ def preview_questions_view(request):
         return redirect('manage_questions')  # Replace 'manage_questions' with the name of your success page URL pattern
     
     return render(request, 'department_template/preview_questions.html', {'questions_with_choices': questions_with_choices})
+
+
+
 from .forms import EditQuestionForm, EditChoiceFormSet  # Import the EditQuestionForm and EditChoiceFormSet
 
 def edit_question(request, question_id):
@@ -2487,3 +2478,42 @@ def delete_myquestion(request, question_id):
     if request.user == question.author:
         question.delete()
     return redirect('community')
+
+
+
+def self_register(request):
+    success_msg = None
+    error_msg = None
+
+    if request.method == 'POST':
+        departments = User.objects.filter(is_department=True)  # Fetch all departments
+        form = StudentSelfRegistrationForm(request.POST, departments=departments)
+        print("POST request received")
+        print("Form data:", request.POST)
+        
+        if form.is_valid():
+            try:
+                user = form.save(commit=False)
+                user.is_student = True
+                user.set_password(form.generate_password())  # Generate and set the password
+                user.save()
+                success_msg = 'Registration successful! You will receive your password via email.'
+                # Optionally, you can send the password to the user via email here
+              
+            except Exception as e:
+                error_msg = f'An error occurred: {str(e)}'
+                print("Error:", error_msg)
+        else:
+            error_msg = 'Form is not valid.'
+            print("Form is not valid:", form.errors)
+    else:
+        departments = User.objects.filter(is_department=True)  # Fetch all departments
+        form = StudentSelfRegistrationForm(departments=departments)
+        print("GET request received")
+        print("Fetched", departments.count(), "departments")
+
+    return render(request, 'register.html', {
+        'form': form,
+        'success_msg': success_msg,
+        'error_msg': error_msg
+    })

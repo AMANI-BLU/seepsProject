@@ -1,0 +1,185 @@
+{% extends "loginBase.html" %}
+{% block content %}
+{% load static %}
+
+<style>
+    .register-box {
+        max-width: 90%; /* Set a percentage to make it responsive */
+        width: 800px; /* Set a max width for larger screens */
+        margin: auto; /* Center the container */
+        padding: 20px; /* Add padding for better spacing */
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .input-group {
+        width: 100%;
+    }
+
+    .input-group-text {
+        min-width: 2.5rem; /* Adjust width of icons */
+    }
+
+    @media (max-width: 767.98px) {
+        .register-box {
+            width: 95%; /* Adjust width for smaller screens */
+        }
+    }
+</style>
+
+<div class="register-box">
+    <div class="register-logo">
+        <a href="#"><b>Register</b></a>
+    </div>
+    <div class="card card-outline mb-5 card-info">
+        <div class="card-body">
+            <!-- Display general success and error messages -->
+            {% if success_msg %}
+                <div class="alert alert-success">
+                    {{ success_msg }}
+                </div>
+            {% endif %}
+            {% if error_msg %}
+                <div class="alert alert-danger">
+                    {{ error_msg }}
+                </div>
+            {% endif %}
+
+            <form method="post" id="registrationForm">
+                {% csrf_token %}
+
+                <div class="row">
+                    <!-- Column 1 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.first_name.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.first_name }}
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-user"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Display errors for this field -->
+                            {% if form.first_name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.first_name.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.email.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.email }}
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-envelope"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Display errors for this field -->
+                            {% if form.email.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.email.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.phone.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.phone }}
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-phone"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Display errors for this field -->
+                            {% if form.phone.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.phone.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Column 2 -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.sex.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.sex }}
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-genderless"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Display errors for this field -->
+                            {% if form.sex.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.sex.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.department.label_tag }}
+                            <div class="input-group mb-3">
+                                {{ form.department }}
+                                <div class="input-group-append">
+                                    <div class="input-group-text">
+                                        <span class="fas fa-building"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Display errors for this field -->
+                            {% if form.department.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.department.errors %}
+                                        <small>{{ error }}</small><br>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="icheck-info mb-3">
+                    <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                    <label for="agreeTerms" class="text-muted">
+                        I agree to the <a href="#">terms</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-info btn-block" id="registerBtn">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    Register
+                </button>
+            </form>
+
+            <a href="{% url 'login_view' %}" class="text-center d-block mt-3">Already have an account? Login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+  document.getElementById("registrationForm").addEventListener("submit", function() {
+    document.getElementById("registerBtn").innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+  });
+</script>
+
+{% endblock content %}
